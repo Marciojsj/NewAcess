@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// App.tsx
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
+import LoginScreen from './src/screens/Login/LoginScreen';
+import HomeScreen from './src/screens/Home/HomeScreen';
 
-export default function App() {
+const Stack = createStackNavigator();
+
+// Componente para controlar a navegação baseada na autenticação
+function AppNavigator() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <></> // Ou um componente de loading
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {user ? (
+        <Stack.Screen name="Home" component={HomeScreen} />
+      ) : (
+        <Stack.Screen name="Login" component={LoginScreen} />
+      )}
+    </Stack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <AppNavigator />
+      </NavigationContainer>
+    </AuthProvider>
+  );
+}
