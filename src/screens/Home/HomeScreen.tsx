@@ -2,15 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
   Dimensions,
   Animated,
+  Easing,
   Alert,
+  ViewStyle,
+  TextStyle,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -38,18 +41,21 @@ interface ServiceCard {
   title: string;
   subtitle: string;
   icon: string;
-  backgroundColor: string;
+  colors: string[];
   progress?: number;
 }
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [greeting, setGreeting] = useState('');
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+
+  // Animações de fundo
+  const circle1Anim = useRef(new Animated.Value(0)).current;
+  const circle2Anim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -57,11 +63,30 @@ export default function HomeScreen() {
     else if (hour < 18) setGreeting('Boa tarde');
     else setGreeting('Boa noite');
 
-    // animação de entrada da tela
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
-    ]).start();
+    Animated.loop(
+      Animated.timing(circle1Anim, {
+        toValue: 1,
+        duration: 30000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    Animated.loop(
+      Animated.timing(circle2Anim, {
+        toValue: 1,
+        duration: 40000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.05, duration: 2000, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true }),
+      ])
+    ).start();
   }, []);
 
   const handleLogout = () => {
@@ -80,18 +105,26 @@ export default function HomeScreen() {
   ];
 
   const serviceCards: ServiceCard[] = [
-    { id: '1', title: 'Últimas Entradas', subtitle: 'Hoje', icon: '🚪', backgroundColor: '#8a2be2', progress: 80 },
-    { id: '2', title: 'Últimas Saídas', subtitle: 'Hoje', icon: '🏃‍♂️', backgroundColor: '#00b894', progress: 65 },
-    { id: '3', title: 'Visitantes Pendentes', subtitle: 'Hoje', icon: '🧑‍🤝‍🧑', backgroundColor: '#6c5ce7', progress: 45 },
-    { id: '4', title: 'Alertas Críticos', subtitle: 'Últimas 24h', icon: '⚠️', backgroundColor: '#e17055', progress: 30 },
+    { id: '1', title: 'Últimas Entradas', subtitle: 'Hoje', icon: '🚪', colors: ['#8a2be2', '#da70d6'], progress: 80 },
+    { id: '2', title: 'Últimas Saídas', subtitle: 'Hoje', icon: '🏃‍♂️', colors: ['#00b894', '#00ffe0'], progress: 65 },
+    { id: '3', title: 'Visitantes Pendentes', subtitle: 'Hoje', icon: '🧑‍🤝‍🧑', colors: ['#6c5ce7', '#a29bfe'], progress: 45 },
+    { id: '4', title: 'Alertas Críticos', subtitle: 'Últimas 24h', icon: '⚠️', colors: ['#e17055', '#ff6b6b'], progress: 30 },
   ];
+
+  const rotateCircle1 = circle1Anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  const rotateCircle2 = circle2Anim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+
+      {/* Background Animado */}
+      <Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
+      <Animated.View style={[styles.backgroundCircle, styles.circle2, { transform: [{ rotate: rotateCircle2 }, { scale: pulseAnim }] }]} />
+
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
-        <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+        <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.greetingContainer}>
               <Text style={styles.greeting}>{greeting}, {user?.name || 'Usuário'}</Text>
@@ -101,7 +134,7 @@ export default function HomeScreen() {
               <Text style={styles.profileIcon}>👤</Text>
             </TouchableOpacity>
           </View>
-        </Animated.View>
+        </View>
 
         {/* Quick Actions */}
         <View style={styles.quickActionsContainer}>
@@ -117,7 +150,7 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Estatísticas de Acesso</Text>
           <View style={styles.serviceCardsGrid}>
             {serviceCards.map((card) => (
-              <AnimatedServiceCard key={card.id} card={card} />
+              <AnimatedGradientCard key={card.id} card={card} />
             ))}
           </View>
         </View>
@@ -126,15 +159,17 @@ export default function HomeScreen() {
   );
 }
 
-// Componentes Animados
+// Animated Quick Button
 const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
   const handlePress = () => {
     Animated.sequence([
-      Animated.timing(scaleAnim, { toValue: 0.9, duration: 100, useNativeDriver: true }),
+      Animated.timing(scaleAnim, { toValue: 0.85, duration: 100, useNativeDriver: true }),
       Animated.timing(scaleAnim, { toValue: 1, duration: 100, useNativeDriver: true }),
     ]).start(action.onPress);
   };
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }], marginRight: 12 }}>
       <TouchableOpacity style={[styles.quickActionButton, { backgroundColor: action.color }]} onPress={handlePress} activeOpacity={0.8}>
@@ -145,55 +180,76 @@ const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
   );
 };
 
-const AnimatedServiceCard = ({ card }: { card: ServiceCard }) => {
+// Animated Gradient Card
+const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const gradientAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+    Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(gradientAnim, { toValue: 1, duration: 4000, useNativeDriver: false }),
+        Animated.timing(gradientAnim, { toValue: 0, duration: 4000, useNativeDriver: false }),
+      ])
+    ).start();
   }, []);
+
   return (
-    <Animated.View style={[styles.serviceCard, { backgroundColor: card.backgroundColor, opacity: fadeAnim }]}>
-      <View style={styles.serviceCardHeader}>
-        <Text style={styles.serviceCardIcon}>{card.icon}</Text>
-        <Text style={styles.serviceCardSubtitle}>{card.subtitle}</Text>
-      </View>
-      <Text style={styles.serviceCardTitle}>{card.title}</Text>
-      {card.progress !== undefined && (
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View style={[styles.progressFill, { width: `${card.progress}%` }]} />
-          </View>
-          <Text style={styles.progressText}>{card.progress}% concluído</Text>
+    <Animated.View style={{ opacity: fadeAnim, width: '48%', marginBottom: 16, alignSelf: 'stretch' }}>
+      <LinearGradient colors={[card.colors[0], card.colors[1]]} style={styles.serviceCard}>
+        <View style={styles.serviceCardHeader}>
+          <Text style={styles.serviceCardIcon}>{card.icon}</Text>
+          <Text style={styles.serviceCardSubtitle}>{card.subtitle}</Text>
         </View>
-      )}
+        <Text style={styles.serviceCardTitle}>{card.title}</Text>
+        {card.progress !== undefined && (
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${card.progress}%` }]} />
+            </View>
+            <Text style={styles.progressText}>{card.progress}% concluído</Text>
+          </View>
+        )}
+      </LinearGradient>
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create({
+// Styles
+const styles: { [key: string]: ViewStyle | TextStyle } = {
   container: { flex: 1, backgroundColor: '#0a0a0a' },
   scrollContent: { paddingBottom: 20 },
+
+  backgroundCircle: { position: 'absolute' as const, borderRadius: 999, borderWidth: 2, borderColor: 'rgba(138,43,226,0.2)' },
+  circle1: { width: screenWidth * 1.2, height: screenWidth * 1.2, top: -screenWidth * 0.4, left: -screenWidth * 0.2 },
+  circle2: { width: screenWidth * 0.9, height: screenWidth * 0.9, top: screenHeight * 0.5, right: -screenWidth * 0.3 },
+
   header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' as const },
   greetingContainer: { flex: 1 },
-  greeting: { fontSize: 20, fontWeight: '700', color: '#ffffff' },
+  greeting: { fontSize: 20, fontWeight: '700' as const, color: '#fff' },
   accountType: { fontSize: 14, color: '#aaa' },
-  profileButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center' },
+  profileButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center' as const, alignItems: 'center' as const },
   profileIcon: { fontSize: 18 },
+
   quickActionsContainer: { marginVertical: 20 },
   quickActionsScroll: { paddingHorizontal: 20 },
-  quickActionButton: { width: 80, height: 80, borderRadius: 24, justifyContent: 'center', alignItems: 'center', elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 6 },
+  quickActionButton: { width: 80, height: 80, borderRadius: 24, justifyContent: 'center' as const, alignItems: 'center' as const, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.3, shadowRadius: 8 },
   quickActionIcon: { fontSize: 28, marginBottom: 6 },
-  quickActionTitle: { fontSize: 12, fontWeight: '600', color: '#fff', textAlign: 'center' },
+  quickActionTitle: { fontSize: 12, fontWeight: '600' as const, color: '#fff', textAlign: 'center' as const },
+
   serviceCardsContainer: { marginBottom: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#fff', paddingHorizontal: 20, marginBottom: 12 },
-  serviceCardsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 20 },
-  serviceCard: { width: '48%', borderRadius: 16, padding: 20, marginBottom: 16, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.25, shadowRadius: 6 },
-  serviceCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '700' as const, color: '#fff', paddingHorizontal: 20, marginBottom: 12 },
+  serviceCardsGrid: { flexDirection: 'row', flexWrap: 'wrap' as const, justifyContent: 'space-between', paddingHorizontal: 20, alignItems: 'stretch' as const },
+
+  serviceCard: { borderRadius: 16, padding: 20, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, flex: 1, justifyContent: 'space-between' as const },
+  serviceCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' as const, marginBottom: 12 },
   serviceCardIcon: { fontSize: 24 },
-  serviceCardSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.85)', fontWeight: '500' },
-  serviceCardTitle: { fontSize: 16, fontWeight: '700', color: '#fff', lineHeight: 22, marginBottom: 12 },
+  serviceCardSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.85)', fontWeight: '500' as const },
+  serviceCardTitle: { fontSize: 16, fontWeight: '700' as const, color: '#fff', lineHeight: 22, marginBottom: 12 },
   progressContainer: { marginTop: 8 },
   progressBar: { height: 5, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 3, marginBottom: 4 },
   progressFill: { height: '100%', backgroundColor: '#fff', borderRadius: 3 },
-  progressText: { fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: '500' },
-});
+  progressText: { fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: '500' as const },
+};
