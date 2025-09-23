@@ -184,7 +184,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Service Cards */}
-        <View style={styles.serviceCardsContainer}>
+        <View style={[styles.serviceCardsContainer]}>
           <Text style={styles.sectionTitle}>Estatísticas de Acesso</Text>
           <View style={styles.serviceCardsGrid}>
             {serviceCards.map((card) => (
@@ -194,7 +194,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Carrossel de Recomendações */}
-        <View style={{ marginTop: 20 }}>
+        <View style={{ marginTop: 0 }}>
           <Text style={[styles.sectionTitle, { paddingHorizontal: 20 }]}>Recomendações</Text>
           <ScrollView
             horizontal
@@ -207,7 +207,7 @@ export default function HomeScreen() {
             {loopCards.map((card, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={{ width: screenWidth, borderRadius: 16, padding: 20 }}
+                style={{ width: screenWidth, borderRadius: 16, padding: 5 }}
                 activeOpacity={0.8}
                 onPress={() => Alert.alert('Recomendação', `Você clicou em ${card.title}`)}
               >
@@ -317,16 +317,16 @@ const styles: { [key: string]: ViewStyle | TextStyle } = {
   quickActionIcon: { fontSize: 28, marginBottom: 6 },
   quickActionTitle: { fontSize: 12, fontWeight: '600' as const, color: '#fff', textAlign: 'center' as const },
 
-  serviceCardsContainer: { marginBottom: 20 },
-  sectionTitle: { fontSize: 16, fontWeight: '700' as const, color: '#fff', paddingHorizontal: 20, marginBottom: 12 },
-  serviceCardsGrid: { flexDirection: 'row', flexWrap: 'wrap' as const, justifyContent: 'space-between', paddingHorizontal: 20, alignItems: 'stretch' as const },
+  serviceCardsContainer: { marginBottom: 1 },
+  sectionTitle: { fontSize: 16, fontWeight: '600' as const, color: '#fff', paddingHorizontal: 20, marginBottom: 12 },
+  serviceCardsGrid: { flexDirection: 'row', flexWrap: 'wrap' as const, justifyContent: 'space-between', paddingHorizontal: 5, alignItems: 'stretch' as const },
 
   serviceCard: { borderRadius: 16, padding: 20, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, flex: 1, justifyContent: 'space-between' as const },
   serviceCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' as const, marginBottom: 12 },
   serviceCardIcon: { fontSize: 24 },
   serviceCardSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.85)', fontWeight: '500' as const },
   serviceCardTitle: { fontSize: 16, fontWeight: '700' as const, color: '#fff', lineHeight: 22, marginBottom: 12 },
-  progressContainer: { marginTop: 8 },
+  progressContainer: { marginTop: 1 },
   progressBar: { height: 5, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 3, marginBottom: 4 },
   progressFill: { height: '100%', backgroundColor: '#fff', borderRadius: 3 },
   progressText: { fontSize: 12, color: 'rgba(255,255,255,0.9)', fontWeight: '500' as const },
