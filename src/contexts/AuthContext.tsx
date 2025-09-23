@@ -47,27 +47,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      // Simular API call - substitua pela sua lógica real
-      const mockUser: User = {
-        id: '1',
-        email: email,
-        name: 'Usuário Teste',
-        role: 'user'
-      };
+const login = async (email: string, password: string) => {
+  try {
+    setIsLoading(true);
 
-      // Salvar no AsyncStorage
-      await AsyncStorage.setItem('@user', JSON.stringify(mockUser));
-      setUser(mockUser);
-    } catch (error) {
-      console.error('Erro no login:', error);
-      throw error;
-    } finally {
-      setIsLoading(false);
+    // =========================
+    // Validação comentada para teste
+    // =========================
+    /*
+    const validEmail = 'teste@teste.com';
+    const validPassword = '123456';
+
+    if (email !== validEmail || password !== validPassword) {
+      throw new Error('Email ou senha inválidos');
     }
-  };
+    */
+
+    // Simular API call - mantém o login com qualquer usuário
+    const mockUser: User = {
+      id: '1',
+      email: email,
+      name: 'Usuário Teste',
+      role: 'user',
+    };
+
+    await AsyncStorage.setItem('@user', JSON.stringify(mockUser));
+    setUser(mockUser);
+
+  } catch (error: any) {
+    console.error('Erro no login:', error.message);
+    throw error;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const logout = async () => {
     try {

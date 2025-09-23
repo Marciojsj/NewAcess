@@ -115,6 +115,16 @@ export default function LoginScreen() {
       return;
     }
 
+    // =========================
+    // Validação comentada para teste
+    // =========================
+    /*
+    if (email !== 'teste@teste.com' || password !== '123456') {
+      Alert.alert('Erro', 'Email ou senha inválidos');
+      return;
+    }
+    */
+
     // Animação do botão
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -136,6 +146,7 @@ export default function LoginScreen() {
     }
   };
 
+
   const circleRotationInterpolate = circleRotation.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -147,46 +158,46 @@ export default function LoginScreen() {
   });
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
-      
+
       {/* Background com círculos animados */}
       <View style={styles.backgroundContainer}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.circle1,
             {
               transform: [{ rotate: circleRotationInterpolate }]
             }
-          ]} 
+          ]}
         />
-        <Animated.View 
+        <Animated.View
           style={[
             styles.circle2,
             {
               transform: [{ rotate: circleRotationInterpolate }]
             }
-          ]} 
+          ]}
         />
-        <Animated.View 
+        <Animated.View
           style={[
             styles.circle3,
             {
-              transform: [{ 
+              transform: [{
                 rotate: circleRotation.interpolate({
                   inputRange: [0, 1],
                   outputRange: ['360deg', '0deg'],
                 })
               }]
             }
-          ]} 
+          ]}
         />
       </View>
 
-      <Animated.View 
+      <Animated.View
         style={[
           styles.formContainer,
           {
@@ -209,7 +220,7 @@ export default function LoginScreen() {
           {/* Campo Email */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Email</Text>
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.inputWrapper,
                 emailFocused && styles.inputWrapperFocused,
@@ -244,7 +255,7 @@ export default function LoginScreen() {
           {/* Campo Senha */}
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Senha</Text>
-            <Animated.View 
+            <Animated.View
               style={[
                 styles.inputWrapper,
                 passwordFocused && styles.inputWrapperFocused,
@@ -276,17 +287,17 @@ export default function LoginScreen() {
 
           {/* Botão de Login */}
           <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.loginButton,
                 isLoading && styles.loginButtonLoading
-              ]} 
+              ]}
               onPress={handleLogin}
               disabled={isLoading}
               activeOpacity={0.8}
             >
               {isLoading ? (
-                <Animated.View 
+                <Animated.View
                   style={[
                     styles.loadingIcon,
                     { transform: [{ rotate: loadingRotationInterpolate }] }
@@ -300,14 +311,14 @@ export default function LoginScreen() {
 
           {/* Links secundários */}
           <View style={styles.linksContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.linkButton}
               onPress={() => Alert.alert('Info', 'Funcionalidade em desenvolvimento')}
             >
               <Text style={styles.linkText}>Esqueci minha senha</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={styles.linkButton}
               onPress={() => Alert.alert('Info', 'Funcionalidade em desenvolvimento')}
             >
