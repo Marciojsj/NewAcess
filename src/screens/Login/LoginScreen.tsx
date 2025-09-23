@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     borderColor: '#333',
     borderRadius: 12,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    transition: 'all 0.3s ease',
+    // transition: 'all 0.3s ease',
   },
   inputWrapperFocused: {
     borderColor: '#8a2be2',
@@ -432,7 +432,7 @@ const styles = StyleSheet.create({
   loginButton: {
     height: 56,
     backgroundColor: 'linear-gradient(135deg, #8a2be2, #da70d6)',
-    backgroundColor: '#8a2be2',
+    // backgroundColor: '#8a2be2',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
