@@ -12,6 +12,8 @@ import {
   Alert,
   ViewStyle,
   TextStyle,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
@@ -111,6 +113,42 @@ export default function HomeScreen() {
     { id: '4', title: 'Alertas Críticos', subtitle: 'Últimas 24h', icon: '⚠️', colors: ['#e17055', '#ff6b6b'], progress: 30 },
   ];
 
+  // Carrossel de recomendações
+  const recommendedCards: ServiceCard[] = [
+    { id: 'r1', title: 'Registrar Entrada', subtitle: 'Mais usado hoje', icon: '🚪', colors: ['#8a2be2', '#da70d6'] },
+    { id: 'r2', title: 'Registrar Saída', subtitle: 'Últimos acessos', icon: '🏃‍♂️', colors: ['#00b894', '#00ffe0'] },
+    { id: 'r3', title: 'Visitantes', subtitle: 'Pendentes', icon: '🧑‍🤝‍🧑', colors: ['#6c5ce7', '#a29bfe'] },
+  ];
+
+  // Duplicamos o array para simular loop infinito
+  const loopCards = [...recommendedCards, ...recommendedCards];
+
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Auto-scroll do carrossel a cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      let nextIndex = activeIndex + 1;
+
+      // Reset quando chega na metade duplicada
+      if (nextIndex >= loopCards.length / 2) {
+        scrollRef.current?.scrollTo({ x: 0, animated: false });
+        nextIndex = 1;
+      }
+
+      scrollRef.current?.scrollTo({ x: nextIndex * screenWidth, animated: true });
+      setActiveIndex(nextIndex);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeIndex]);
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+    setActiveIndex(index);
+  };
+
   const rotateCircle1 = circle1Anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   const rotateCircle2 = circle2Anim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
 
@@ -154,6 +192,53 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
+
+        {/* Carrossel de Recomendações */}
+        <View style={{ marginTop: 20 }}>
+          <Text style={[styles.sectionTitle, { paddingHorizontal: 20 }]}>Recomendações</Text>
+          <ScrollView
+            horizontal
+            pagingEnabled
+            ref={scrollRef}
+            showsHorizontalScrollIndicator={false}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+          >
+            {loopCards.map((card, idx) => (
+              <TouchableOpacity
+                key={idx}
+                style={{ width: screenWidth, borderRadius: 16, padding: 20 }}
+                activeOpacity={0.8}
+                onPress={() => Alert.alert('Recomendação', `Você clicou em ${card.title}`)}
+              >
+                <LinearGradient
+                  colors={[card.colors[0], card.colors[1]] as const}
+                  style={{ flex: 1, borderRadius: 16, justifyContent: 'center', alignItems: 'center', height: 140 }}
+                >
+                  <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{card.icon} {card.title}</Text>
+                  <Text style={{ color: '#fff', fontSize: 14 }}>{card.subtitle}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Bolinhas indicadoras */}
+          <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+            {recommendedCards.map((_, idx) => (
+              <View
+                key={idx}
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: activeIndex % recommendedCards.length === idx ? '#fff' : 'rgba(255,255,255,0.3)',
+                  marginHorizontal: 4,
+                }}
+              />
+            ))}
+          </View>
+        </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -183,16 +268,9 @@ const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
 // Animated Gradient Card
 const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const gradientAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }).start();
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(gradientAnim, { toValue: 1, duration: 4000, useNativeDriver: false }),
-        Animated.timing(gradientAnim, { toValue: 0, duration: 4000, useNativeDriver: false }),
-      ])
-    ).start();
   }, []);
 
   return (
