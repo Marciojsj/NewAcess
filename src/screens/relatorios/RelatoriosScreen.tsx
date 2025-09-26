@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2D3436', 
     justifyContent: 'center', 
     alignItems: 'center',
-    ...(Platform.OS === 'web' && { minHeight: '100vh' })
+    ...(Platform.OS === 'web' && { minHeight: typeof window !== 'undefined' ? window.innerHeight : 0 })
   },
   content: { 
     padding: responsive.padding.lg, 

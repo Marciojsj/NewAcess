@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0a0a0a',
     ...(Platform.OS === 'web' && {
-      minHeight: '100vh',
+      minHeight: Dimensions.get('window').height,
       justifyContent: 'center',
     }),
   },
@@ -402,7 +402,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
     padding: responsive.padding.xl * 1.5,
-    backdropFilter: 'blur(10px)',
     ...(Platform.OS === 'web' && {
       boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
     }),

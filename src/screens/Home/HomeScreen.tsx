@@ -341,7 +341,7 @@ const styles: { [key: string]: ViewStyle | TextStyle } = {
   container: { flex: 1, backgroundColor: '#0a0a0a' },
   scrollContent: { 
     paddingBottom: responsive.padding.lg,
-    ...(Platform.OS === 'web' && { minHeight: '100vh' })
+    ...(Platform.OS === 'web' && { minHeight: screenHeight })
   },
   scrollContentDesktop: {
     paddingHorizontal: 0,
