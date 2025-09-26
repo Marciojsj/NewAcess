@@ -13,6 +13,8 @@ import {
   StatusBar,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { ResponsiveContainer } from '../../components/ResponsiveContainer';
+import { responsive, deviceType, useResponsive } from '../../utils/responsive';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,6 +26,7 @@ export default function LoginScreen() {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const { login, isLoading } = useAuth();
+  const dimensions = useResponsive();
 
   // Animações
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -162,10 +165,15 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor="#0a0a0a"
+        {...(Platform.OS === 'web' && { hidden: true })}
+      />
 
       {/* Background com círculos animados */}
-      <View style={styles.backgroundContainer}>
+      {!deviceType.isDesktop && (
+        <View style={styles.backgroundContainer}>
         <Animated.View
           style={[
             styles.circle1,
@@ -196,8 +204,10 @@ export default function LoginScreen() {
           ]}
         />
       </View>
+      )}
 
-      <Animated.View
+      <ResponsiveContainer maxWidth={deviceType.isDesktop ? 500 : undefined}>
+        <Animated.View
         style={[
           styles.formContainer,
           {
@@ -207,12 +217,18 @@ export default function LoginScreen() {
               { scale: scaleAnim }
             ]
           }
+          },
+          deviceType.isDesktop && styles.formContainerDesktop
         ]}
       >
         {/* Logo/Título */}
         <View style={styles.headerContainer}>
-          <Text style={styles.title}>Controle de Acesso</Text>
-          <Text style={styles.subtitle}>Faça login para continuar</Text>
+          <Text style={[styles.title, deviceType.isDesktop && styles.titleDesktop]}>
+            Controle de Acesso
+          </Text>
+          <Text style={[styles.subtitle, deviceType.isDesktop && styles.subtitleDesktop]}>
+            Faça login para continuar
+          </Text>
         </View>
 
         {/* Formulário */}
@@ -327,6 +343,7 @@ export default function LoginScreen() {
           </View>
         </View>
       </Animated.View>
+      </ResponsiveContainer>
     </KeyboardAvoidingView>
   );
 }
@@ -335,6 +352,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0a0a0a',
+    ...(Platform.OS === 'web' && {
+      minHeight: '100vh',
+      justifyContent: 'center',
+    }),
   },
   backgroundContainer: {
     position: 'absolute',
@@ -374,35 +395,51 @@ const styles = StyleSheet.create({
   formContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 40,
+    paddingHorizontal: responsive.padding.xl,
+    paddingVertical: responsive.padding.xl,
+  },
+  formContainerDesktop: {
+    flex: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 20,
+    padding: responsive.padding.xl * 1.5,
+    backdropFilter: 'blur(10px)',
+    ...(Platform.OS === 'web' && {
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+    }),
   },
   headerContainer: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: responsive.spacing.xl * 2,
   },
   title: {
-    fontSize: 32,
+    fontSize: responsive.fontSize.xxl,
     fontWeight: 'bold',
     color: '#ffffff',
-    marginBottom: 8,
+    marginBottom: responsive.spacing.sm,
     textAlign: 'center',
   },
+  titleDesktop: {
+    fontSize: 36,
+  },
   subtitle: {
-    fontSize: 16,
+    fontSize: responsive.fontSize.md,
     color: '#888',
     textAlign: 'center',
+  },
+  subtitleDesktop: {
+    fontSize: responsive.fontSize.lg,
   },
   form: {
     width: '100%',
   },
   inputContainer: {
-    marginBottom: 24,
+    marginBottom: responsive.spacing.xl,
   },
   inputLabel: {
-    fontSize: 14,
+    fontSize: responsive.fontSize.sm,
     color: '#ccc',
-    marginBottom: 8,
+    marginBottom: responsive.spacing.sm,
     fontWeight: '500',
   },
   inputWrapper: {
@@ -426,9 +463,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 71, 87, 0.1)',
   },
   input: {
-    height: 56,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    height: deviceType.isDesktop ? 60 : 56,
+    paddingHorizontal: responsive.padding.md,
+    fontSize: responsive.fontSize.md,
     color: '#ffffff',
   },
   inputFocused: {
@@ -436,18 +473,18 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#ff4757',
-    fontSize: 12,
-    marginTop: 4,
-    marginLeft: 4,
+    fontSize: responsive.fontSize.xs,
+    marginTop: responsive.spacing.xs,
+    marginLeft: responsive.spacing.xs,
   },
   loginButton: {
-    height: 56,
+    height: deviceType.isDesktop ? 60 : 56,
     backgroundColor: 'linear-gradient(135deg, #8a2be2, #da70d6)',
     // backgroundColor: '#8a2be2',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: responsive.spacing.sm,
     shadowColor: '#8a2be2',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -459,7 +496,7 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: responsive.fontSize.lg,
     fontWeight: '600',
   },
   loadingIcon: {
@@ -473,15 +510,15 @@ const styles = StyleSheet.create({
   linksContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 32,
+    marginTop: responsive.spacing.xl * 1.5,
   },
   linkButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: responsive.padding.xs,
+    paddingHorizontal: responsive.padding.xs,
   },
   linkText: {
     color: '#888',
-    fontSize: 14,
+    fontSize: responsive.fontSize.sm,
     textDecorationLine: 'underline',
   },
 });

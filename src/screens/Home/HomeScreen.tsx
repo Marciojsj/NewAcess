@@ -14,11 +14,14 @@ import {
   TextStyle,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ResponsiveContainer } from '../../components/ResponsiveContainer';
+import { responsive, deviceType, useResponsive } from '../../utils/responsive';
 
 type RootStackParamList = {
   Home: undefined;
@@ -53,6 +56,7 @@ export default function HomeScreen() {
   const { user, logout } = useAuth();
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [greeting, setGreeting] = useState('');
+  const dimensions = useResponsive();
 
   // Animações de fundo
   const circle1Anim = useRef(new Animated.Value(0)).current;
@@ -145,7 +149,8 @@ export default function HomeScreen() {
   }, [activeIndex]);
 
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / screenWidth);
+    const cardWidth = dimensions.isMobile ? dimensions.width : Math.min(400, dimensions.width * 0.8);
+    const index = Math.round(event.nativeEvent.contentOffset.x / cardWidth);
     setActiveIndex(index);
   };
 
@@ -154,19 +159,38 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+      <StatusBar 
+        barStyle="light-content" 
+        backgroundColor="#0a0a0a"
+        {...(Platform.OS === 'web' && { hidden: true })}
+      />
 
       {/* Background Animado */}
-      <Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
-      <Animated.View style={[styles.backgroundCircle, styles.circle2, { transform: [{ rotate: rotateCircle2 }, { scale: pulseAnim }] }]} />
+      {!deviceType.isDesktop && (
+        <>
+          <Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
+          <Animated.View style={[styles.backgroundCircle, styles.circle2, { transform: [{ rotate: rotateCircle2 }, { scale: pulseAnim }] }]} />
+        </>
+      )}
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false} 
+        contentContainerStyle={[
+          styles.scrollContent,
+          deviceType.isDesktop && styles.scrollContentDesktop
+        ]}
+      >
+        <ResponsiveContainer>
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, deviceType.isDesktop && styles.headerDesktop]}>
           <View style={styles.headerTop}>
             <View style={styles.greetingContainer}>
-              <Text style={styles.greeting}>{greeting}, {user?.name || 'Usuário'}</Text>
-              <Text style={styles.accountType}>Controle de Acesso</Text>
+              <Text style={[styles.greeting, deviceType.isDesktop && styles.greetingDesktop]}>
+                {greeting}, {user?.name || 'Usuário'}
+              </Text>
+              <Text style={[styles.accountType, deviceType.isDesktop && styles.accountTypeDesktop]}>
+                Controle de Acesso
+              </Text>
             </View>
             <TouchableOpacity style={styles.profileButton} onPress={handleLogout}>
               <Text style={styles.profileIcon}>👤</Text>
@@ -175,7 +199,10 @@ export default function HomeScreen() {
         </View>
 
         {/* Quick Actions */}
-        <View style={styles.quickActionsContainer}>
+        <View style={[
+          styles.quickActionsContainer,
+          deviceType.isDesktop && styles.quickActionsContainerDesktop
+        ]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsScroll}>
             {quickActions.map((action) => (
               <AnimatedQuickButton key={action.id} action={action} />
@@ -184,8 +211,11 @@ export default function HomeScreen() {
         </View>
 
         {/* Service Cards */}
-        <View style={[styles.serviceCardsContainer]}>
-          <Text style={styles.sectionTitle}>Estatísticas de Acesso</Text>
+        <View style={styles.serviceCardsContainer}>
+          <Text style={[
+            styles.sectionTitle,
+            deviceType.isDesktop && styles.sectionTitleDesktop
+          ]}>Estatísticas de Acesso</Text>
           <View style={styles.serviceCardsGrid}>
             {serviceCards.map((card) => (
               <AnimatedGradientCard key={card.id} card={card} />
@@ -195,7 +225,11 @@ export default function HomeScreen() {
 
         {/* Carrossel de Recomendações */}
         <View style={{ marginTop: 0 }}>
-          <Text style={[styles.sectionTitle, { paddingHorizontal: 20 }]}>Recomendações</Text>
+          <Text style={[
+            styles.sectionTitle, 
+            { paddingHorizontal: responsive.padding.md },
+            deviceType.isDesktop && styles.sectionTitleDesktop
+          ]}>Recomendações</Text>
           <ScrollView
             horizontal
             pagingEnabled
@@ -207,7 +241,11 @@ export default function HomeScreen() {
             {loopCards.map((card, idx) => (
               <TouchableOpacity
                 key={idx}
-                style={{ width: screenWidth, borderRadius: 16, padding: 5 }}
+                style={{ 
+                  width: dimensions.isMobile ? dimensions.width : Math.min(400, dimensions.width * 0.8), 
+                  borderRadius: 16, 
+                  padding: 5 
+                }}
                 activeOpacity={0.8}
                 onPress={() => Alert.alert('Recomendação', `Você clicou em ${card.title}`)}
               >
@@ -239,6 +277,7 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        </ResponsiveContainer>
       </ScrollView>
     </SafeAreaView>
   );
@@ -269,12 +308,15 @@ const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
 const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const dimensions = useResponsive();
+  const cardWidth = dimensions.isDesktop ? '23%' : '48%';
+
   useEffect(() => {
     Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }).start();
   }, []);
 
   return (
-    <Animated.View style={{ opacity: fadeAnim, width: '48%', marginBottom: 16, alignSelf: 'stretch' }}>
+    <Animated.View style={{ opacity: fadeAnim, width: cardWidth, marginBottom: 16, alignSelf: 'stretch' }}>
       <LinearGradient colors={[card.colors[0], card.colors[1]]} style={styles.serviceCard}>
         <View style={styles.serviceCardHeader}>
           <Text style={styles.serviceCardIcon}>{card.icon}</Text>
@@ -297,29 +339,83 @@ const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
 // Styles
 const styles: { [key: string]: ViewStyle | TextStyle } = {
   container: { flex: 1, backgroundColor: '#0a0a0a' },
-  scrollContent: { paddingBottom: 20 },
+  scrollContent: { 
+    paddingBottom: responsive.padding.lg,
+    ...(Platform.OS === 'web' && { minHeight: '100vh' })
+  },
+  scrollContentDesktop: {
+    paddingHorizontal: 0,
+  },
 
   backgroundCircle: { position: 'absolute' as const, borderRadius: 999, borderWidth: 2, borderColor: 'rgba(138,43,226,0.2)' },
   circle1: { width: screenWidth * 1.2, height: screenWidth * 1.2, top: -screenWidth * 0.4, left: -screenWidth * 0.2 },
   circle2: { width: screenWidth * 0.9, height: screenWidth * 0.9, top: screenHeight * 0.5, right: -screenWidth * 0.3 },
 
-  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
+  header: { 
+    paddingHorizontal: responsive.padding.md, 
+    paddingTop: responsive.padding.sm, 
+    paddingBottom: responsive.padding.md 
+  },
+  headerDesktop: {
+    paddingTop: responsive.padding.lg,
+    paddingBottom: responsive.padding.xl,
+  },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' as const },
   greetingContainer: { flex: 1 },
-  greeting: { fontSize: 20, fontWeight: '700' as const, color: '#fff' },
-  accountType: { fontSize: 14, color: '#aaa' },
+  greeting: { 
+    fontSize: responsive.fontSize.lg, 
+    fontWeight: '700' as const, 
+    color: '#fff' 
+  },
+  greetingDesktop: {
+    fontSize: responsive.fontSize.xxl,
+  },
+  accountType: { 
+    fontSize: responsive.fontSize.sm, 
+    color: '#aaa' 
+  },
+  accountTypeDesktop: {
+    fontSize: responsive.fontSize.md,
+  },
   profileButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center' as const, alignItems: 'center' as const },
   profileIcon: { fontSize: 18 },
 
-  quickActionsContainer: { marginVertical: 20 },
-  quickActionsScroll: { paddingHorizontal: 20 },
+  quickActionsContainer: { 
+    marginVertical: responsive.spacing.lg 
+  },
+  quickActionsContainerDesktop: {
+    marginVertical: responsive.spacing.xl,
+  },
+  quickActionsScroll: { 
+    paddingHorizontal: responsive.padding.md,
+    ...(deviceType.isDesktop && {
+      justifyContent: 'center',
+      flexGrow: 1,
+    })
+  },
   quickActionButton: { width: 80, height: 80, borderRadius: 24, justifyContent: 'center' as const, alignItems: 'center' as const, elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.3, shadowRadius: 8 },
   quickActionIcon: { fontSize: 28, marginBottom: 6 },
   quickActionTitle: { fontSize: 12, fontWeight: '600' as const, color: '#fff', textAlign: 'center' as const },
 
   serviceCardsContainer: { marginBottom: 1 },
-  sectionTitle: { fontSize: 16, fontWeight: '600' as const, color: '#fff', paddingHorizontal: 20, marginBottom: 12 },
-  serviceCardsGrid: { flexDirection: 'row', flexWrap: 'wrap' as const, justifyContent: 'space-between', paddingHorizontal: 5, alignItems: 'stretch' as const },
+  sectionTitle: { 
+    fontSize: responsive.fontSize.md, 
+    fontWeight: '600' as const, 
+    color: '#fff', 
+    paddingHorizontal: responsive.padding.md, 
+    marginBottom: responsive.spacing.md 
+  },
+  sectionTitleDesktop: {
+    fontSize: responsive.fontSize.lg,
+    marginBottom: responsive.spacing.lg,
+  },
+  serviceCardsGrid: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap' as const, 
+    justifyContent: 'space-between', 
+    paddingHorizontal: responsive.padding.xs, 
+    alignItems: 'stretch' as const 
+  },
 
   serviceCard: { borderRadius: 16, padding: 20, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, flex: 1, justifyContent: 'space-between' as const },
   serviceCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' as const, marginBottom: 12 },
