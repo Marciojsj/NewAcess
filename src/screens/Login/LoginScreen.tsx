@@ -216,7 +216,6 @@ export default function LoginScreen() {
               { translateY: slideAnim },
               { scale: scaleAnim }
             ]
-          }
           },
           deviceType.isDesktop && styles.formContainerDesktop
         ]}
