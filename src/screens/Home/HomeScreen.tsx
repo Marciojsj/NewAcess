@@ -59,6 +59,7 @@ export default function HomeScreen() {
 	const navigation = useNavigation<HomeScreenNavigationProp>();
 	const [greeting, setGreeting] = useState('');
 	const dimensions = useResponsive();
+	// Sidebar and Footer only appear after successful login (user is authenticated)
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 
 	const circle1Anim = useRef(new Animated.Value(0)).current;
@@ -173,6 +174,7 @@ export default function HomeScreen() {
 	const rotateCircle1 = circle1Anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 	const rotateCircle2 = circle2Anim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
 
+	// Only render authenticated user content - sidebar and footer appear after login
 	return (
 		<SafeAreaView style={styles.container}>
 			<StatusBar
@@ -181,6 +183,7 @@ export default function HomeScreen() {
 				{...(Platform.OS === 'web' && { hidden: true })}
 			/>
 
+			{/* Background animations only for mobile - web has different styling */}
 			{!deviceType.isDesktop && (
 				<>
 					<Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
@@ -188,7 +191,7 @@ export default function HomeScreen() {
 				</>
 			)}
 
-			{/* Sidebar Web */}
+			{/* Web Sidebar - Only appears after successful authentication */}
 			{deviceType.isDesktop && (
 				<WebSidebar
 					isOpen={sidebarOpen}
@@ -220,7 +223,7 @@ export default function HomeScreen() {
 						</View>
 					</View>
 
-					{/* Botões Mobile */}
+					{/* Mobile Quick Actions */}
 					{dimensions.isMobile && (
 						<View style={styles.quickActionsContainer}>
 							<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsScroll}>
@@ -231,7 +234,7 @@ export default function HomeScreen() {
 						</View>
 					)}
 
-					{/* Botões Web/Desktop */}
+					{/* Desktop Quick Actions */}
 					{dimensions.isDesktop && (
 						<View style={[styles.quickActionsContainerDesktop, { flexDirection: 'row', justifyContent: 'center' }]}>
 							{quickActionsWeb.map((action) => (
@@ -240,7 +243,7 @@ export default function HomeScreen() {
 						</View>
 					)}
 
-					{/* Cards de serviço */}
+					{/* Service Cards */}
 					<View style={styles.serviceCardsContainer}>
 						<Text style={[styles.sectionTitle, deviceType.isDesktop && styles.sectionTitleDesktop]}>Estatísticas de Acesso</Text>
 						<View style={styles.serviceCardsGrid}>
@@ -250,7 +253,7 @@ export default function HomeScreen() {
 						</View>
 					</View>
 
-					{/* Carrossel */}
+					{/* Recommendations Carousel */}
 					<View style={{ marginTop: 0 }}>
 						<Text style={[styles.sectionTitle, { paddingHorizontal: responsive.padding.md }, deviceType.isDesktop && styles.sectionTitleDesktop]}>Recomendações</Text>
 						<ScrollView
@@ -302,7 +305,7 @@ export default function HomeScreen() {
 				</ResponsiveContainer>
 			</ScrollView>
 
-			{/* Footer Mobile */}
+			{/* Mobile Footer - Only appears after successful authentication */}
 			<MobileFooter visible={!deviceType.isDesktop} />
 		</SafeAreaView>
 	);

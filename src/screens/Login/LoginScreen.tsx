@@ -13,8 +13,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { ResponsiveContainer } from "../../components/ResponsiveContainer";
 import { AnimatedBackground } from "../../components/AnimatedBackground";
 import { AnimatedInput } from "../../components/AnimatedInput";
-import { MobileFooter } from "../../components/MobileFooter";
-import { WebSidebar } from "../../components/WebSidebar";
 import { LoadingSpinner } from "../../components/LoadingSpinner";
 import { responsive, deviceType, useResponsive } from "../../utils/responsive";
 
@@ -33,7 +31,6 @@ export default function LoginScreen() {
   const [passwordError, setPasswordError] = useState("");
   const { login, isLoading } = useAuth();
   const dimensions = useResponsive();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Animações
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -42,7 +39,7 @@ export default function LoginScreen() {
   const buttonScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // animação de entrada
+    // Animação de entrada da tela
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -60,7 +57,6 @@ export default function LoginScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-
   }, []);
 
   const validateEmail = (email: string) => {
@@ -111,6 +107,8 @@ export default function LoginScreen() {
 
     try {
       await login(email, password);
+      // After successful login, user will be redirected to Home
+      // Footer and Sidebar will only appear after authentication
     } catch (error) {
       Alert.alert("Erro", "Falha no login. Tente novamente.");
     }
@@ -127,16 +125,8 @@ export default function LoginScreen() {
         {...(Platform.OS === "web" && { hidden: true })}
       />
 
-      {/* Fundo animado */}
-      <AnimatedBackground />
-
-      {/* Sidebar Web */}
-      {deviceType.isDesktop && (
-        <WebSidebar
-          isOpen={sidebarOpen}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
-        />
-      )}
+      {/* Background Animation - Different for Web and Mobile */}
+      <AnimatedBackground forWeb={deviceType.isDesktop || Platform.OS === 'web'} />
 
       <ResponsiveContainer maxWidth={deviceType.isDesktop ? 500 : undefined}>
         <Animated.View
@@ -148,13 +138,13 @@ export default function LoginScreen() {
             },
           ]}
         >
-          {/* título */}
+          {/* Header */}
           <View style={styles.headerContainer}>
             <Text style={styles.title}>Controle de Acesso</Text>
             <Text style={styles.subtitle}>Faça login para continuar</Text>
           </View>
 
-          {/* formulário */}
+          {/* Login Form */}
           <View style={styles.form}>
             <AnimatedInput
               label="Email"
@@ -192,7 +182,7 @@ export default function LoginScreen() {
               secureTextEntry
             />
 
-            {/* Botão */}
+            {/* Login Button */}
             <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
               <TouchableOpacity
                 style={[styles.loginButton, isLoading && styles.loginButtonLoading]}
@@ -208,7 +198,7 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </Animated.View>
 
-            {/* Links */}
+            {/* Additional Links */}
             <View style={styles.linksContainer}>
               <TouchableOpacity
                 style={styles.linkButton}
@@ -231,9 +221,5 @@ export default function LoginScreen() {
           </View>
         </Animated.View>
       </ResponsiveContainer>
-
-      {/* Footer Mobile */}
-      <MobileFooter visible={!deviceType.isDesktop} />
     </KeyboardAvoidingView>
   );
-}
