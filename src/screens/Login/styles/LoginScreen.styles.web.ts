@@ -90,43 +90,6 @@ export default StyleSheet.create({
   form: {
     width: "100%",
   },
-  inputContainer: {
-    marginBottom: responsive.spacing.lg,
-  },
-  inputLabel: {
-    fontSize: responsive.fontSize.sm,
-    color: "#ffffff",
-    marginBottom: responsive.spacing.sm,
-    fontWeight: "600",
-  },
-  inputWrapper: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "transparent",
-    ...webSpecificStyles.inputWrapper,
-  },
-  inputWrapperFocused: {
-    borderColor: "#8a2be2",
-    backgroundColor: "rgba(138, 43, 226, 0.1)",
-    transform: [{ scale: 1.02 }],
-  },
-  inputWrapperError: {
-    borderColor: "#ff4757",
-  },
-  input: {
-    height: 60,
-    paddingHorizontal: responsive.padding.md,
-    fontSize: responsive.fontSize.md,
-    color: "#ffffff",
-    ...webSpecificStyles.input,
-  },
-  inputFocused: {},
-  errorText: {
-    color: "#ff4757",
-    fontSize: responsive.fontSize.sm,
-    marginTop: responsive.spacing.sm,
-  },
   loginButton: {
     height: 60,
     backgroundColor: "#8a2be2",
@@ -144,14 +107,6 @@ export default StyleSheet.create({
     color: "#ffffff",
     fontSize: responsive.fontSize.lg,
     fontWeight: "600",
-  },
-  loadingIcon: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#ffffff",
-    borderTopColor: "transparent",
   },
   linksContainer: {
     flexDirection: "row",

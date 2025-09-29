@@ -21,6 +21,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ResponsiveContainer } from '../../components/ResponsiveContainer';
+import { WebSidebar } from '../../components/WebSidebar';
+import { MobileFooter } from '../../components/MobileFooter';
 import { responsive, deviceType, useResponsive } from '../../utils/responsive';
 
 type RootStackParamList = {
@@ -57,6 +59,7 @@ export default function HomeScreen() {
 	const navigation = useNavigation<HomeScreenNavigationProp>();
 	const [greeting, setGreeting] = useState('');
 	const dimensions = useResponsive();
+	const [sidebarOpen, setSidebarOpen] = useState(false);
 
 	const circle1Anim = useRef(new Animated.Value(0)).current;
 	const circle2Anim = useRef(new Animated.Value(0)).current;
@@ -97,7 +100,7 @@ export default function HomeScreen() {
 	const handleLogout = () => {
 		console.log('handleLogout chamado');
 
-		if (Platform.OS === 'web') {
+		if (Platform.OS === 'web' || deviceType.isDesktop) {
 			console.log('Estamos no Web');
 			const confirmLogout = window.confirm('Deseja realmente sair?'); // <-- funciona no navegador
 			if (confirmLogout) {
@@ -183,6 +186,14 @@ export default function HomeScreen() {
 					<Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
 					<Animated.View style={[styles.backgroundCircle, styles.circle2, { transform: [{ rotate: rotateCircle2 }, { scale: pulseAnim }] }]} />
 				</>
+			)}
+
+			{/* Sidebar Web */}
+			{deviceType.isDesktop && (
+				<WebSidebar
+					isOpen={sidebarOpen}
+					onToggle={() => setSidebarOpen(!sidebarOpen)}
+				/>
 			)}
 
 			<ScrollView
@@ -290,6 +301,9 @@ export default function HomeScreen() {
 
 				</ResponsiveContainer>
 			</ScrollView>
+
+			{/* Footer Mobile */}
+			<MobileFooter visible={!deviceType.isDesktop} />
 		</SafeAreaView>
 	);
 }
@@ -298,7 +312,6 @@ const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
 	const scaleAnim = useRef(new Animated.Value(1)).current;
 
 	const handlePress = () => {
-		alert('entre2i')
 
 		Animated.sequence([
 			Animated.timing(scaleAnim, { toValue: 0.85, duration: 100, useNativeDriver: true }),
@@ -351,7 +364,10 @@ const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
 
 const styles: { [key: string]: ViewStyle | TextStyle } = {
 	container: { flex: 1, backgroundColor: '#0a0a0a' },
-	scrollContent: { paddingBottom: responsive.padding.lg, ...(Platform.OS === 'web' && { minHeight: screenHeight }) },
+	scrollContent: { 
+		paddingBottom: deviceType.isDesktop ? responsive.padding.lg : 120, // Espaço para footer mobile
+		...(Platform.OS === 'web' && { minHeight: screenHeight }) 
+	},
 	scrollContentDesktop: { paddingHorizontal: 0 },
 	backgroundCircle: { position: 'absolute' as const, borderRadius: 999, borderWidth: 2, borderColor: 'rgba(138,43,226,0.2)' },
 	circle1: { width: screenWidth * 1.2, height: screenWidth * 1.2, top: -screenWidth * 0.4, left: -screenWidth * 0.2 },
