@@ -1,3 +1,4 @@
+// src/screens/Login/styles/LoginScreen.styles.ts
 import { Platform } from "react-native";
 
 const styles = Platform.select({

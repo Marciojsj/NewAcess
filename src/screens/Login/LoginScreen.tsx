@@ -1,3 +1,4 @@
+// src/screens/Login/LoginScreen.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   View,
@@ -14,11 +15,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { ResponsiveContainer } from "../../components/ResponsiveContainer";
 import { responsive, deviceType, useResponsive } from "../../utils/responsive";
 
-// Import condicional dos estilos
-const styles = Platform.select({
-  web: require("./styles/LoginScreen.styles.web").default,
-  default: require("./styles/LoginScreen.styles.native").default,
-});
+// Importe os estilos do arquivo correto
+import styles from "./styles/LoginScreen.styles";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
@@ -30,16 +28,20 @@ export default function LoginScreen() {
   const { login, isLoading } = useAuth();
   const dimensions = useResponsive();
 
-  // Animações
+  // Animações de entrada
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
-  const circleRotation = useRef(new Animated.Value(0)).current;
   const buttonScale = useRef(new Animated.Value(1)).current;
   const loadingRotation = useRef(new Animated.Value(0)).current;
 
+  // Animações para MOVIMENTO dos círculos
+  const circle1Anim = useRef(new Animated.Value(0)).current;
+  const circle2Anim = useRef(new Animated.Value(0)).current;
+  const circle3Anim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    // animação de entrada
+    // Animação de entrada do formulário
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -58,18 +60,59 @@ export default function LoginScreen() {
       }),
     ]).start();
 
-    // círculos girando
-    const circleAnimation = Animated.loop(
-      Animated.timing(circleRotation, {
-        toValue: 1,
-        duration: 20000,
-        useNativeDriver: true,
-      })
-    );
-    circleAnimation.start();
+    // Animações de MOVIMENTO para os círculos
+    const startCircleAnimations = () => {
+      // Círculo 1 - movimento vertical
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(circle1Anim, {
+            toValue: 1,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circle1Anim, {
+            toValue: 0,
+            duration: 4000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
 
-    return () => circleAnimation.stop();
-  }, []);
+      // Círculo 2 - movimento horizontal
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(circle2Anim, {
+            toValue: 1,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circle2Anim, {
+            toValue: 0,
+            duration: 5000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+
+      // Círculo 3 - movimento diagonal
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(circle3Anim, {
+            toValue: 1,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(circle3Anim, {
+            toValue: 0,
+            duration: 4500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    };
+
+    startCircleAnimations();
+  }, [fadeAnim, slideAnim, scaleAnim, circle1Anim, circle2Anim, circle3Anim]);
 
   useEffect(() => {
     if (isLoading) {
@@ -84,6 +127,32 @@ export default function LoginScreen() {
       return () => loadingAnimation.stop();
     }
   }, [isLoading]);
+
+  // Interpolações para MOVIMENTO dos círculos
+  const circle1TranslateY = circle1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -30], // Move para cima e volta
+  });
+
+  const circle2TranslateX = circle2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 40], // Move para direita e volta
+  });
+
+  const circle3TranslateY = circle3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -20], // Move para cima e volta
+  });
+
+  const circle3TranslateX = circle3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -15], // Move para esquerda e volta
+  });
+
+  const loadingRotationInterpolate = loadingRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0deg", "360deg"],
+  });
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -138,16 +207,6 @@ export default function LoginScreen() {
     }
   };
 
-  const circleRotationInterpolate = circleRotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  const loadingRotationInterpolate = loadingRotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -159,33 +218,42 @@ export default function LoginScreen() {
         {...(Platform.OS === "web" && { hidden: true })}
       />
 
-      {/* fundo animado */}
+      {/* Fundo animado com círculos em MOVIMENTO */}
       {!deviceType.isDesktop && (
         <View style={styles.backgroundContainer}>
+          {/* Círculo 1 com movimento vertical */}
           <Animated.View
             style={[
               styles.circle1,
-              { transform: [{ rotate: circleRotationInterpolate }] },
+              { 
+                transform: [
+                  { translateY: circle1TranslateY }
+                ] 
+              },
             ]}
           />
+          
+          {/* Círculo 2 com movimento horizontal */}
           <Animated.View
             style={[
               styles.circle2,
-              { transform: [{ rotate: circleRotationInterpolate }] },
+              { 
+                transform: [
+                  { translateX: circle2TranslateX }
+                ] 
+              },
             ]}
           />
+          
+          {/* Círculo 3 com movimento diagonal */}
           <Animated.View
             style={[
               styles.circle3,
-              {
+              { 
                 transform: [
-                  {
-                    rotate: circleRotation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ["360deg", "0deg"],
-                    }),
-                  },
-                ],
+                  { translateY: circle3TranslateY },
+                  { translateX: circle3TranslateX }
+                ] 
               },
             ]}
           />
@@ -202,13 +270,13 @@ export default function LoginScreen() {
             },
           ]}
         >
-          {/* título */}
+          {/* Título */}
           <View style={styles.headerContainer}>
             <Text style={styles.title}>Controle de Acesso</Text>
             <Text style={styles.subtitle}>Faça login para continuar</Text>
           </View>
 
-          {/* formulário */}
+          {/* Formulário */}
           <View style={styles.form}>
             {/* Email */}
             <View style={styles.inputContainer}>
