@@ -12,6 +12,7 @@ export default StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
+
   },
   circle1: {
     position: "absolute",
@@ -43,22 +44,27 @@ export default StyleSheet.create({
     top: height * 0.4,
     right: -width * 0.1,
   },
-  formContainer: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: responsive.padding.lg,
-    paddingVertical: responsive.padding.xl,
-  },
+formContainer: {
+  top: height * 0.25,
+  justifyContent: "center",
+  paddingHorizontal: responsive.padding.lg,
+  paddingVertical: responsive.padding.xl,
+  // backgroundColor: "red",
+  // borderWidth: 1,      
+  // borderColor: "white",
+},
   headerContainer: {
     alignItems: "center",
     marginBottom: responsive.spacing.xl * 2,
   },
   title: {
-    fontSize: responsive.fontSize.xl * 2,
+    fontSize: responsive.fontSize.xl * 1.7,
     fontWeight: "bold",
     color: "#ffffff",
     marginBottom: responsive.spacing.sm,
     textAlign: "center",
+        // backgroundColor: "red",
+
   },
   subtitle: {
     fontSize: responsive.fontSize.md,
@@ -67,7 +73,49 @@ export default StyleSheet.create({
   },
   form: {
     width: "100%",
-    paddingBottom: 120, // Espaço para o footer mobile
+  },
+  inputContainer: {
+    marginBottom: responsive.spacing.lg,
+  },
+  inputLabel: {
+    fontSize: responsive.fontSize.sm,
+    color: "#ccc",
+    marginBottom: responsive.spacing.xs,
+    fontWeight: "500",
+  },
+  inputWrapper: {
+    borderWidth: 1,
+    borderColor: "#333",
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+  },
+  inputWrapperFocused: {
+    borderColor: "#8a2be2",
+    backgroundColor: "rgba(138, 43, 226, 0.1)",
+    shadowColor: "#8a2be2",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  inputWrapperError: {
+    borderColor: "#ff4757",
+    backgroundColor: "rgba(255, 71, 87, 0.1)",
+  },
+  input: {
+    height: 56,
+    paddingHorizontal: responsive.padding.md,
+    fontSize: responsive.fontSize.md,
+    color: "#ffffff",
+  },
+  inputFocused: {
+    color: "#ffffff",
+  },
+  errorText: {
+    color: "#ff4757",
+    fontSize: responsive.fontSize.sm,
+    marginTop: responsive.spacing.xs,
+    marginLeft: responsive.spacing.xs,
   },
   loginButton: {
     height: 56,
@@ -89,6 +137,14 @@ export default StyleSheet.create({
     color: "#ffffff",
     fontSize: responsive.fontSize.lg,
     fontWeight: "600",
+  },
+  loadingIcon: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderColor: "#ffffff",
+    borderTopColor: "transparent",
+    borderRadius: 12,
   },
   linksContainer: {
     flexDirection: "row",
