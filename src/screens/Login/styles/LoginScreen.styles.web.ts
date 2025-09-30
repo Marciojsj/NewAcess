@@ -1,3 +1,4 @@
+// src/screens/Login/styles/LoginScreen.styles.web.ts
 import { StyleSheet } from "react-native";
 import { responsive } from "../../../utils/responsive";
 
@@ -32,6 +33,7 @@ export default StyleSheet.create({
     bottom: 0,
     overflow: "hidden",
   },
+  //  CÍRCULO 1 - Canto superior direito
   circle1: {
     position: "absolute",
     width: 400,
@@ -39,28 +41,41 @@ export default StyleSheet.create({
     borderRadius: 200,
     borderWidth: 2,
     borderColor: "rgba(138, 43, 226, 0.1)",
-    top: -150,
-    left: -100,
+    top: -100, // Ajustado para melhor distribuição
+    right: 100, // Movido para direita
   },
+  //  CÍRCULO 2 - Canto inferior direito (maior)
   circle2: {
+    position: "absolute",
+    width: 750,
+    height: 750,
+    borderRadius: 400,
+    borderWidth: 2,
+    borderColor: "rgba(49, 40, 58, 0.64)",
+    bottom: -200, // Ajustado para melhor distribuição
+    right: -150, // Ajustado posição
+  },
+  //  CÍRCULO 3 - Centro esquerdo
+  circle3: {
     position: "absolute",
     width: 600,
     height: 600,
-    borderRadius: 300,
+    borderRadius: 400,
     borderWidth: 2,
-    borderColor: "rgba(138, 43, 226, 0.05)",
-    bottom: -200,
-    right: -150,
+    borderColor: "rgba(137, 43, 226, 0.19)",
+    top: "30%", 
+    left: "10%", 
   },
-  circle3: {
+  // CÍRCULO 4 - Centro inferior esquerdo
+  circle4: {
     position: "absolute",
-    width: 300,
-    height: 300,
-    borderRadius: 150,
+    width: 500,
+    height: 500,
+    borderRadius: 250,
     borderWidth: 2,
-    borderColor: "rgba(138, 43, 226, 0.08)",
-    top: "30%",
-    left: "15%",
+    borderColor: "rgba(255, 255, 255, 0.08)", // Cor ajustada
+    bottom: "38%", // Posição ajustada
+    left: "5%", // Posição ajustada
   },
   formContainer: {
     width: "100%",

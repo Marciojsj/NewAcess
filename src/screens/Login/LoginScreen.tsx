@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  Easing,
 } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
 import { ResponsiveContainer } from "../../components/ResponsiveContainer";
@@ -35,10 +36,12 @@ export default function LoginScreen() {
   const buttonScale = useRef(new Animated.Value(1)).current;
   const loadingRotation = useRef(new Animated.Value(0)).current;
 
-  // Animações para MOVIMENTO dos círculos
+  // Animações para MOVIMENTO dos círculos (funciona tanto no mobile quanto web)
   const circle1Anim = useRef(new Animated.Value(0)).current;
   const circle2Anim = useRef(new Animated.Value(0)).current;
   const circle3Anim = useRef(new Animated.Value(0)).current;
+  // 🆕 NOVA ANIMAÇÃO para o círculo 4 (só web)
+  const circle4Anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     // Animação de entrada do formulário
@@ -60,59 +63,85 @@ export default function LoginScreen() {
       }),
     ]).start();
 
-    // Animações de MOVIMENTO para os círculos
+    // Animações de MOVIMENTO para os círculos - FUNCIONA NO WEB TAMBÉM
     const startCircleAnimations = () => {
-      // Círculo 1 - movimento vertical
+      // Círculo 1 - movimento vertical suave
       Animated.loop(
         Animated.sequence([
           Animated.timing(circle1Anim, {
             toValue: 1,
-            duration: 4000,
+            duration: 8000, // ⚡ VELOCIDADE: Mais lento para web (8 segundos)
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
           Animated.timing(circle1Anim, {
             toValue: 0,
-            duration: 4000,
+            duration: 8000,
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
         ])
       ).start();
 
-      // Círculo 2 - movimento horizontal
+      // Círculo 2 - movimento horizontal suave
       Animated.loop(
         Animated.sequence([
           Animated.timing(circle2Anim, {
             toValue: 1,
-            duration: 5000,
+            duration: 10000, // ⚡ VELOCIDADE: Mais lento para web (10 segundos)
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
           Animated.timing(circle2Anim, {
             toValue: 0,
-            duration: 5000,
+            duration: 10000,
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
         ])
       ).start();
 
-      // Círculo 3 - movimento diagonal
+      // Círculo 3 - movimento diagonal suave
       Animated.loop(
         Animated.sequence([
           Animated.timing(circle3Anim, {
             toValue: 1,
-            duration: 4500,
+            duration: 9000, // ⚡ VELOCIDADE: Mais lento para web (9 segundos)
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
           Animated.timing(circle3Anim, {
             toValue: 0,
-            duration: 4500,
+            duration: 9000,
+            easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
         ])
       ).start();
+
+      // 🆕 Círculo 4 - movimento vertical (só no web)
+      if (Platform.OS === 'web') {
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(circle4Anim, {
+              toValue: 1,
+              duration: 7000, // ⚡ VELOCIDADE: 7 segundos
+              easing: Easing.inOut(Easing.sin),
+              useNativeDriver: true,
+            }),
+            Animated.timing(circle4Anim, {
+              toValue: 0,
+              duration: 7000,
+              easing: Easing.inOut(Easing.sin),
+              useNativeDriver: true,
+            }),
+          ])
+        ).start();
+      }
     };
 
     startCircleAnimations();
-  }, [fadeAnim, slideAnim, scaleAnim, circle1Anim, circle2Anim, circle3Anim]);
+  }, [fadeAnim, slideAnim, scaleAnim, circle1Anim, circle2Anim, circle3Anim, circle4Anim]);
 
   useEffect(() => {
     if (isLoading) {
@@ -128,25 +157,31 @@ export default function LoginScreen() {
     }
   }, [isLoading]);
 
-  // Interpolações para MOVIMENTO dos círculos
+  // Interpolações para MOVIMENTO dos círculos - VALORES MAIORES PARA WEB
   const circle1TranslateY = circle1Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -30], // Move para cima e volta
+    outputRange: [0, -60], // 📍 MOVIMENTO: Distância maior para web (-60px)
   });
 
   const circle2TranslateX = circle2Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 40], // Move para direita e volta
+    outputRange: [0, 80], // 📍 MOVIMENTO: Distância maior para web (80px)
   });
 
   const circle3TranslateY = circle3Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -20], // Move para cima e volta
+    outputRange: [0, -40], // 📍 MOVIMENTO: Distância maior para web (-40px)
   });
 
   const circle3TranslateX = circle3Anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, -15], // Move para esquerda e volta
+    outputRange: [0, -30], // 📍 MOVIMENTO: Distância maior para web (-30px)
+  });
+
+  // 🆕 INTERPOLAÇÃO para o círculo 4 (só web)
+  const circle4TranslateY = circle4Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -50], // 📍 MOVIMENTO: Vertical para cima (-50px)
   });
 
   const loadingRotationInterpolate = loadingRotation.interpolate({
@@ -218,47 +253,74 @@ export default function LoginScreen() {
         {...(Platform.OS === "web" && { hidden: true })}
       />
 
-      {/* Fundo animado com círculos em MOVIMENTO */}
-      {!deviceType.isDesktop && (
-        <View style={styles.backgroundContainer}>
-          {/* Círculo 1 com movimento vertical */}
+      {/* Fundo animado com círculos em MOVIMENTO - AGORA FUNCIONA NO WEB TAMBÉM */}
+      <View style={styles.backgroundContainer}>
+        {/* 
+          🎨 CÍRCULO 1 - Configurações web:
+          - TAMANHO: 400x400 (definido no CSS web)
+          - COR: rgba(138, 43, 226, 0.1) (definido no CSS web)
+          - MOVIMENTO: Vertical suave
+        */}
+        <Animated.View
+          style={[
+            styles.circle1,
+            { 
+              transform: [
+                { translateY: circle1TranslateY }
+              ] 
+            },
+          ]}
+        />
+        
+        {/* 
+          🎨 CÍRCULO 2 - Configurações web:
+          - TAMANHO: 600x600 (definido no CSS web)
+          - COR: rgba(138, 43, 226, 0.05) (definido no CSS web)
+          - MOVIMENTO: Horizontal suave
+        */}
+        <Animated.View
+          style={[
+            styles.circle2,
+            { 
+              transform: [
+                { translateX: circle2TranslateX }
+              ] 
+            },
+          ]}
+        />
+        
+        {/* 
+          🎨 CÍRCULO 3 - Configurações web:
+          - TAMANHO: 300x300 (definido no CSS web)
+          - COR: rgba(138, 43, 226, 0.08) (definido no CSS web)
+          - MOVIMENTO: Diagonal suave
+        */}
+        <Animated.View
+          style={[
+            styles.circle3,
+            { 
+              transform: [
+                { translateY: circle3TranslateY },
+                { translateX: circle3TranslateX }
+              ] 
+            },
+          ]}
+        />
+
+        {/* 🆕 CÍRCULO 4 - SÓ APARECE NO WEB */}
+        {Platform.OS === 'web' && (
           <Animated.View
             style={[
-              styles.circle1,
+              styles.circle4,
               { 
                 transform: [
-                  { translateY: circle1TranslateY }
+                  { translateY: circle4TranslateY }
                 ] 
               },
             ]}
           />
-          
-          {/* Círculo 2 com movimento horizontal */}
-          <Animated.View
-            style={[
-              styles.circle2,
-              { 
-                transform: [
-                  { translateX: circle2TranslateX }
-                ] 
-              },
-            ]}
-          />
-          
-          {/* Círculo 3 com movimento diagonal */}
-          <Animated.View
-            style={[
-              styles.circle3,
-              { 
-                transform: [
-                  { translateY: circle3TranslateY },
-                  { translateX: circle3TranslateX }
-                ] 
-              },
-            ]}
-          />
-        </View>
-      )}
+        )}
+      </View>
 
       <ResponsiveContainer maxWidth={deviceType.isDesktop ? 500 : undefined}>
         <Animated.View
