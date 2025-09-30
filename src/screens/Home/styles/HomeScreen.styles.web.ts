@@ -4,233 +4,242 @@ import { responsive, deviceType } from "../../../utils/responsive";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-// Estilos específicos para web
 const webSpecificStyles = {
-  container: { 
+  container: {
     minHeight: "100vh" as any,
-    background: "linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)" as any
+    background: "linear-gradient(180deg, #1a1d2e 0%, #252842 50%, #1a1d2e 100%)" as any
   },
   quickActionButton: {
-    transition: "all 0.3s ease" as any,
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" as any,
     cursor: "pointer" as any,
     "&:hover": {
-      transform: "translateY(-5px)" as any,
-      boxShadow: "0 10px 25px rgba(0,0,0,0.3)" as any
+      transform: "translateY(-4px) scale(1.05)" as any,
+      boxShadow: "0 12px 30px rgba(0,0,0,0.4)" as any
     }
   },
   serviceCard: {
-    transition: "all 0.3s ease" as any,
+    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" as any,
     cursor: "pointer" as any,
     "&:hover": {
-      transform: "translateY(-3px)" as any,
-      boxShadow: "0 8px 20px rgba(0,0,0,0.4)" as any
+      transform: "translateY(-5px) scale(1.02)" as any,
+      boxShadow: "0 10px 25px rgba(0,0,0,0.5)" as any
     }
   },
   profileButton: {
     cursor: "pointer" as any,
     transition: "all 0.2s ease" as any,
     "&:hover": {
-      backgroundColor: "rgba(255,255,255,0.2)" as any
+      backgroundColor: "rgba(255,255,255,0.25)" as any,
+      transform: "scale(1.1)" as any
     }
   }
 };
 
 export default StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#0a0a0a',
+  container: {
+    flex: 1,
+    backgroundColor: '#1a1d2e',
     ...webSpecificStyles.container
   },
-  scrollContent: { 
-    paddingBottom: responsive.padding.lg,
+  scrollContent: {
+    paddingBottom: responsive.padding.xl,
     minHeight: screenHeight
   },
-  scrollContentDesktop: { 
-    paddingHorizontal: 0 
+  scrollContentDesktop: {
+    paddingHorizontal: 0
   },
-  backgroundCircle: { 
-    position: 'absolute' as const, 
-    borderRadius: 999, 
-    borderWidth: 2, 
-    borderColor: 'rgba(138,43,226,0.15)' 
+  backgroundCircle: {
+    position: 'absolute' as const,
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: 'rgba(100,120,200,0.1)'
   },
-  circle1: { 
-    width: 600, 
-    height: 600, 
-    top: -200, 
-    left: -150 
+  circle1: {
+    width: 700,
+    height: 700,
+    top: -250,
+    left: -180
   },
-  circle2: { 
-    width: 800, 
-    height: 800, 
-    top: '40%', 
-    right: -300 
+  circle2: {
+    width: 900,
+    height: 900,
+    top: '35%',
+    right: -350
   },
-  header: { 
-    paddingHorizontal: responsive.padding.xl, 
-    paddingTop: responsive.padding.lg, 
-    paddingBottom: responsive.padding.xl 
+  header: {
+    paddingHorizontal: responsive.padding.xl,
+    paddingTop: responsive.padding.xl,
+    paddingBottom: responsive.padding.lg
   },
-  headerDesktop: { 
-    paddingTop: responsive.padding.xl, 
-    paddingBottom: responsive.padding.xl 
+  headerDesktop: {
+    paddingTop: responsive.padding.xl * 1.5,
+    paddingBottom: responsive.padding.xl
   },
-  headerTop: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' as const,
-    maxWidth: 1200,
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start' as const,
+    maxWidth: 1400,
     marginHorizontal: 'auto',
-    width: '100%'
+    width: '100%',
+    marginBottom: responsive.spacing.md
   },
-  greetingContainer: { 
-    flex: 1 
+  greetingContainer: {
+    flex: 1
   },
-  greeting: { 
-    fontSize: responsive.fontSize.xxl * 1.2, 
-    fontWeight: '700' as const, 
+  greeting: {
+    fontSize: 36,
+    fontWeight: '700' as const,
     color: '#fff',
-    marginBottom: responsive.spacing.xs
+    marginBottom: 6,
+    letterSpacing: -0.5
   },
-  greetingDesktop: { 
-    fontSize: responsive.fontSize.xxl * 1.5
+  greetingDesktop: {
+    fontSize: 42
   },
-  accountType: { 
-    fontSize: responsive.fontSize.lg, 
-    color: 'rgba(255,255,255,0.7)',
-    fontWeight: '500' as const
+  accountType: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.55)',
+    fontWeight: '400' as const,
+    letterSpacing: 0.3
   },
-  accountTypeDesktop: { 
-    fontSize: responsive.fontSize.xl 
+  accountTypeDesktop: {
+    fontSize: 17
   },
-  profileButton: { 
-    width: 50, 
-    height: 50, 
-    borderRadius: 25, 
-    backgroundColor: 'rgba(255,255,255,0.1)', 
-    justifyContent: 'center', 
+  profileButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    justifyContent: 'center',
     alignItems: 'center',
     ...webSpecificStyles.profileButton
   },
-  profileIcon: { 
-    fontSize: 20 
+  profileIcon: {
+    fontSize: 20
   },
-  quickActionsContainer: { 
-    marginVertical: responsive.spacing.xl 
+  quickActionsContainer: {
+    marginVertical: responsive.spacing.xl
   },
-  quickActionsContainerDesktop: { 
+  quickActionsContainerDesktop: {
     marginVertical: responsive.spacing.xl,
-    maxWidth: 1000,
+    maxWidth: 1200,
     marginHorizontal: 'auto',
     width: '100%',
     paddingHorizontal: responsive.padding.xl
   },
-  quickActionsScroll: { 
+  quickActionsScroll: {
     paddingHorizontal: responsive.padding.xl,
     justifyContent: 'center',
     flexGrow: 1
   },
-  quickActionButton: { 
-    width: 100, 
-    height: 100, 
-    borderRadius: 20, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    elevation: 8, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 5 }, 
-    shadowOpacity: 0.3, 
-    shadowRadius: 8,
+  quickActionButton: {
+    width: 110,
+    height: 110,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
     marginHorizontal: responsive.spacing.md,
     ...webSpecificStyles.quickActionButton
   },
-  quickActionIcon: { 
-    fontSize: 32, 
-    marginBottom: 8 
+  quickActionIcon: {
+    fontSize: 36,
+    marginBottom: 8
   },
-  quickActionTitle: { 
-    fontSize: 14, 
-    fontWeight: '600' as const, 
-    color: '#fff', 
-    textAlign: 'center' 
+  quickActionTitle: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#fff',
+    textAlign: 'center',
+    letterSpacing: 0.2
   },
-  serviceCardsContainer: { 
+  serviceCardsContainer: {
     marginBottom: responsive.spacing.xl,
-    maxWidth: 1200,
+    maxWidth: 1400,
     marginHorizontal: 'auto',
     width: '100%',
     paddingHorizontal: responsive.padding.xl
   },
-  sectionTitle: { 
-    fontSize: responsive.fontSize.xl, 
-    fontWeight: '600' as const, 
-    color: '#fff', 
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '600' as const,
+    color: '#fff',
     marginBottom: responsive.spacing.lg,
-    textAlign: 'center' as const
+    letterSpacing: 0.3
   },
-  sectionTitleDesktop: { 
-    fontSize: responsive.fontSize.xxl, 
-    marginBottom: responsive.spacing.xl 
+  sectionTitleDesktop: {
+    fontSize: 24,
+    marginBottom: responsive.spacing.xl
   },
-  serviceCardsGrid: { 
-    flexDirection: 'row', 
-    flexWrap: 'wrap' as const, 
-    justifyContent: 'center', 
-    gap: responsive.spacing.lg,
-    alignItems: 'stretch' as const 
+  serviceCardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap' as const,
+    justifyContent: 'flex-start',
+    gap: 16,
+    alignItems: 'stretch' as const
   },
-  serviceCard: { 
-    borderRadius: 20, 
-    padding: 24, 
-    elevation: 6, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 4 }, 
-    shadowOpacity: 0.3, 
-    shadowRadius: 8, 
-    flex: 1, 
-    justifyContent: 'space-between' as const,
-    minWidth: 280,
+  serviceCard: {
+    borderRadius: 20,
+    padding: 22,
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    minWidth: 260,
     maxWidth: 320,
+    minHeight: 140,
+    flex: 1,
+    justifyContent: 'space-between' as const,
     ...webSpecificStyles.serviceCard
   },
-  serviceCardHeader: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' as const, 
-    marginBottom: 16 
+  serviceCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start' as const,
+    marginBottom: 12
   },
-  serviceCardIcon: { 
-    fontSize: 28 
+  serviceCardIcon: {
+    fontSize: 26
   },
-  serviceCardSubtitle: { 
-    fontSize: 14, 
-    color: 'rgba(255,255,255,0.85)', 
-    fontWeight: '500' as const 
+  serviceCardSubtitle: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
+    fontWeight: '500' as const,
+    letterSpacing: 0.2
   },
-  serviceCardTitle: { 
-    fontSize: 18, 
-    fontWeight: '700' as const, 
-    color: '#fff', 
-    lineHeight: 24, 
-    marginBottom: 16 
+  serviceCardTitle: {
+    fontSize: 17,
+    fontWeight: '700' as const,
+    color: '#fff',
+    lineHeight: 23,
+    marginBottom: 12,
+    letterSpacing: 0.2
   },
-  progressContainer: { 
-    marginTop: 8 
+  progressContainer: {
+    marginTop: 8
   },
-  progressBar: { 
-    height: 6, 
-    backgroundColor: 'rgba(255,255,255,0.2)', 
-    borderRadius: 3, 
-    marginBottom: 6 
+  progressBar: {
+    height: 5,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 3,
+    marginBottom: 6,
+    overflow: 'hidden' as const
   },
-  progressFill: { 
-    height: '100%', 
-    backgroundColor: '#fff', 
-    borderRadius: 3 
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 3
   },
-  progressText: { 
-    fontSize: 13, 
-    color: 'rgba(255,255,255,0.9)', 
-    fontWeight: '500' as const 
+  progressText: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: '500' as const,
+    letterSpacing: 0.2
   },
 });
