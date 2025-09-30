@@ -7,7 +7,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const webSpecificStyles = {
   container: {
     minHeight: "100vh" as any,
-    background: "linear-gradient(180deg, #1a1d2e 0%, #252842 50%, #1a1d2e 100%)" as any
+    // background será definido via theme
   },
   quickActionButton: {
     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)" as any,
@@ -29,7 +29,7 @@ const webSpecificStyles = {
     cursor: "pointer" as any,
     transition: "all 0.2s ease" as any,
     "&:hover": {
-      backgroundColor: "rgba(255,255,255,0.25)" as any,
+      // backgroundColor será definido via theme
       transform: "scale(1.1)" as any
     }
   }
@@ -38,7 +38,7 @@ const webSpecificStyles = {
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1d2e',
+    // backgroundColor será definido via theme
     ...webSpecificStyles.container
   },
   scrollContent: {
@@ -52,7 +52,7 @@ export default StyleSheet.create({
     position: 'absolute' as const,
     borderRadius: 999,
     borderWidth: 2,
-    borderColor: 'rgba(100,120,200,0.1)'
+    // borderColor será definido via theme
   },
   circle1: {
     width: 700,
@@ -90,7 +90,7 @@ export default StyleSheet.create({
   greeting: {
     fontSize: 36,
     fontWeight: '700' as const,
-    color: '#fff',
+    // color será definido via theme
     marginBottom: 6,
     letterSpacing: -0.5
   },
@@ -99,7 +99,7 @@ export default StyleSheet.create({
   },
   accountType: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.55)',
+    // color será definido via theme
     fontWeight: '400' as const,
     letterSpacing: 0.3
   },
@@ -110,7 +110,7 @@ export default StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    // backgroundColor será definido via theme
     justifyContent: 'center',
     alignItems: 'center',
     ...webSpecificStyles.profileButton
@@ -140,7 +140,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -154,7 +154,7 @@ export default StyleSheet.create({
   quickActionTitle: {
     fontSize: 13,
     fontWeight: '600' as const,
-    color: '#fff',
+    color: '#fff', // Mantido para contrastar com gradientes
     textAlign: 'center',
     letterSpacing: 0.2
   },
@@ -168,7 +168,7 @@ export default StyleSheet.create({
   sectionTitle: {
     fontSize: 22,
     fontWeight: '600' as const,
-    color: '#fff',
+    // color será definido via theme
     marginBottom: responsive.spacing.lg,
     letterSpacing: 0.3
   },
@@ -187,7 +187,7 @@ export default StyleSheet.create({
     borderRadius: 20,
     padding: 22,
     elevation: 6,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -209,14 +209,14 @@ export default StyleSheet.create({
   },
   serviceCardSubtitle: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.7)',
+    // color será definido via theme
     fontWeight: '500' as const,
     letterSpacing: 0.2
   },
   serviceCardTitle: {
     fontSize: 17,
     fontWeight: '700' as const,
-    color: '#fff',
+    // color será definido via theme
     lineHeight: 23,
     marginBottom: 12,
     letterSpacing: 0.2
@@ -226,25 +226,25 @@ export default StyleSheet.create({
   },
   progressBar: {
     height: 5,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    // backgroundColor será definido via theme
     borderRadius: 3,
     marginBottom: 6,
     overflow: 'hidden' as const
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#fff',
+    // backgroundColor será definido via theme
     borderRadius: 3
   },
   progressText: {
     fontSize: 12,
-    color: 'rgba(255,255,255,0.85)',
+    // color será definido via theme
     fontWeight: '500' as const,
     letterSpacing: 0.2
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    // backgroundColor será definido via theme
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20
@@ -254,7 +254,7 @@ export default StyleSheet.create({
     maxWidth: 450,
     borderRadius: 24,
     padding: 32,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
@@ -298,6 +298,7 @@ export default StyleSheet.create({
   },
   modalDivider: {
     height: 1,
+    // backgroundColor será definido via theme
     marginVertical: 20
   },
   logoutButton: {
@@ -306,7 +307,7 @@ export default StyleSheet.create({
     alignItems: 'center'
   },
   logoutButtonText: {
-    color: '#fff',
+    color: '#fff', // Mantido para contraste
     fontSize: 17,
     fontWeight: '600' as const,
     letterSpacing: 0.3

@@ -7,7 +7,7 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1d2e'
+    // backgroundColor será definido via theme
   },
   scrollContent: {
     paddingBottom: deviceType.isDesktop ? responsive.padding.lg : 120,
@@ -20,7 +20,7 @@ export default StyleSheet.create({
     position: 'absolute' as const,
     borderRadius: 999,
     borderWidth: 2,
-    borderColor: 'rgba(138,43,226,0.2)'
+    // borderColor será definido via theme
   },
   circle1: {
     width: screenWidth * 1.2,
@@ -55,7 +55,7 @@ export default StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '700' as const,
-    color: '#fff',
+    // color será definido via theme
     marginBottom: 4
   },
   greetingDesktop: {
@@ -63,7 +63,7 @@ export default StyleSheet.create({
   },
   accountType: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.6)',
+    // color será definido via theme
     fontWeight: '400' as const
   },
   accountTypeDesktop: {
@@ -73,7 +73,7 @@ export default StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    // backgroundColor será definido via theme
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 2
@@ -99,7 +99,7 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6
@@ -111,7 +111,7 @@ export default StyleSheet.create({
   quickActionTitle: {
     fontSize: 11,
     fontWeight: '600' as const,
-    color: '#fff',
+    color: '#fff', // Mantido para contrastar com gradientes
     textAlign: 'center'
   },
   serviceCardsContainer: {
@@ -121,7 +121,7 @@ export default StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600' as const,
-    color: '#fff',
+    // color será definido via theme
     marginBottom: responsive.spacing.md
   },
   sectionTitleDesktop: {
@@ -138,7 +138,7 @@ export default StyleSheet.create({
     borderRadius: 18,
     padding: 18,
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -156,13 +156,13 @@ export default StyleSheet.create({
   },
   serviceCardSubtitle: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.7)',
+    // color será definido via theme
     fontWeight: '500' as const
   },
   serviceCardTitle: {
     fontSize: 15,
     fontWeight: '700' as const,
-    color: '#fff',
+    // color será definido via theme
     lineHeight: 20,
     marginBottom: 8
   },
@@ -171,23 +171,23 @@ export default StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    // backgroundColor será definido via theme
     borderRadius: 2,
     marginBottom: 4
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#fff',
+    // backgroundColor será definido via theme
     borderRadius: 2
   },
   progressText: {
     fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
+    // color será definido via theme
     fontWeight: '500' as const
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    // backgroundColor será definido via theme
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20
@@ -197,7 +197,7 @@ export default StyleSheet.create({
     maxWidth: 400,
     borderRadius: 20,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: '#000', // Mantido como está
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -239,6 +239,7 @@ export default StyleSheet.create({
   },
   modalDivider: {
     height: 1,
+    // backgroundColor será definido via theme
     marginVertical: 16
   },
   logoutButton: {
@@ -247,7 +248,7 @@ export default StyleSheet.create({
     alignItems: 'center'
   },
   logoutButtonText: {
-    color: '#fff',
+    color: '#fff', // Mantido para contraste
     fontSize: 16,
     fontWeight: '600' as const
   },
