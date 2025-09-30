@@ -29,6 +29,7 @@ interface SearchModalProps {
   onClose: () => void;
   theme: 'light' | 'dark';
   searchData: SearchableItem[];
+  autoFocus?: boolean;
 }
 
 const { height: screenHeight } = Dimensions.get('window');
@@ -37,7 +38,8 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   visible,
   onClose,
   theme,
-  searchData
+  searchData,
+  autoFocus = true
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState<SearchableItem[]>(searchData);
@@ -52,7 +54,10 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         stiffness: 90,
         useNativeDriver: true,
       }).start();
-      setTimeout(() => inputRef.current?.focus(), 300);
+      
+      if (autoFocus) {
+        setTimeout(() => inputRef.current?.focus(), 300);
+      }
     } else {
       Animated.spring(slideAnim, {
         toValue: screenHeight,
@@ -70,13 +75,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       const query = searchQuery.toLowerCase();
       const filtered = searchData.filter(item =>
         item.title.toLowerCase().includes(query) ||
-        item.keywords.some(keyword => keyword.toLowerCase().includes(query))
+        item.keywords.some((keyword: string) => keyword.toLowerCase().includes(query)) // TIPAGEM CORRIGIDA
       );
       setFilteredData(filtered);
     }
   }, [searchQuery, searchData]);
 
   const handleItemPress = (item: SearchableItem) => {
+    Keyboard.dismiss(); // Fecha teclado ao selecionar item
     onClose();
     setTimeout(() => item.onPress(), 300);
   };
@@ -120,114 +126,130 @@ export const SearchModal: React.FC<SearchModalProps> = ({
     </TouchableOpacity>
   );
 
+  const handleClose = () => {
+    Keyboard.dismiss(); // Fecha teclado ao fechar modal
+    onClose();
+  };
+
   return (
     <Modal
       visible={visible}
       animationType="none"
       transparent={true}
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
-      <View style={styles.modalContainer}>
-        <Animated.View
-          style={[
-            styles.modalContent,
-            {
-              backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
-              transform: [{ translateY: slideAnim }]
-            }
-          ]}
+      <TouchableOpacity 
+        style={styles.modalContainer}
+        activeOpacity={1}
+        onPress={handleClose} // Fecha modal e teclado ao clicar fora
+      >
+        <TouchableOpacity 
+          activeOpacity={1} 
+          onPress={(e) => e.stopPropagation()} // Impede fechamento ao clicar no conteúdo
         >
-          {/* Header */}
-          <View style={styles.modalHeader}>
-            <Text style={[
-              styles.modalTitle,
-              { color: theme === 'dark' ? '#ffffff' : '#1e293b' }
-            ]}>
-              Buscar
-            </Text>
-            <TouchableOpacity
-              style={[
-                styles.closeButton,
-                { backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }
-              ]}
-              onPress={onClose}
-            >
+          <Animated.View
+            style={[
+              styles.modalContent,
+              {
+                backgroundColor: theme === 'dark' ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
+          >
+            {/* Header */}
+            <View style={styles.modalHeader}>
               <Text style={[
-                styles.closeIcon,
+                styles.modalTitle,
                 { color: theme === 'dark' ? '#ffffff' : '#1e293b' }
               ]}>
-                ✕
+                Buscar
               </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Input */}
-          <View style={[
-            styles.searchContainer,
-            {
-              backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-            }
-          ]}>
-            <Text style={styles.searchIcon}>🔍</Text>
-            <TextInput
-              ref={inputRef}
-              style={[
-                styles.searchInput,
-                {
-                  color: theme === 'dark' ? '#ffffff' : '#1e293b',
-                }
-              ]}
-              placeholder="Buscar páginas..."
-              placeholderTextColor={theme === 'dark' ? '#94a3b8' : '#9ca3af'}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              returnKeyType="search"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <TouchableOpacity
+                style={[
+                  styles.closeButton,
+                  { backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)' }
+                ]}
+                onPress={handleClose}
+              >
                 <Text style={[
-                  styles.clearIcon,
-                  { color: theme === 'dark' ? '#94a3b8' : '#9ca3af' }
+                  styles.closeIcon,
+                  { color: theme === 'dark' ? '#ffffff' : '#1e293b' }
                 ]}>
                   ✕
                 </Text>
               </TouchableOpacity>
-            )}
-          </View>
+            </View>
 
-          {/* Results */}
-          <FlatList
-            data={filteredData}
-            renderItem={renderItem}
-            keyExtractor={(item) => item.id}
-            style={styles.resultsList}
-            showsVerticalScrollIndicator={false}
-            ListEmptyComponent={
-              <View style={styles.emptyState}>
-                <Text style={[
-                  styles.emptyText,
-                  { color: theme === 'dark' ? '#64748b' : '#94a3b8' }
-                ]}>
-                  {searchQuery ? 'Nenhum resultado encontrado' : 'Digite para buscar'}
-                </Text>
-              </View>
-            }
-          />
-
-          {/* Footer */}
-          <View style={[
-            styles.modalFooter,
-            { borderTopColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }
-          ]}>
-            <Text style={[
-              styles.footerText,
-              { color: theme === 'dark' ? '#64748b' : '#94a3b8' }
+            {/* Search Input */}
+            <View style={[
+              styles.searchContainer,
+              {
+                backgroundColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+              }
             ]}>
-              {filteredData.length} itens encontrados
-            </Text>
-          </View>
-        </Animated.View>
-      </View>
+              <Text style={styles.searchIcon}>🔍</Text>
+              <TextInput
+                ref={inputRef}
+                style={[
+                  styles.searchInput,
+                  {
+                    color: theme === 'dark' ? '#ffffff' : '#1e293b',
+                  }
+                ]}
+                placeholder="Buscar páginas..."
+                placeholderTextColor={theme === 'dark' ? '#94a3b8' : '#9ca3af'}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                returnKeyType="search"
+                autoFocus={autoFocus}
+                onSubmitEditing={Keyboard.dismiss} // Fecha teclado ao pressionar Enter
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')}>
+                  <Text style={[
+                    styles.clearIcon,
+                    { color: theme === 'dark' ? '#94a3b8' : '#9ca3af' }
+                  ]}>
+                    ✕
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Results */}
+            <FlatList
+              data={filteredData}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id}
+              style={styles.resultsList}
+              showsVerticalScrollIndicator={false}
+              ListEmptyComponent={
+                <View style={styles.emptyState}>
+                  <Text style={[
+                    styles.emptyText,
+                    { color: theme === 'dark' ? '#64748b' : '#94a3b8' }
+                  ]}>
+                    {searchQuery ? 'Nenhum resultado encontrado' : 'Digite para buscar'}
+                  </Text>
+                </View>
+              }
+            />
+
+            {/* Footer */}
+            <View style={[
+              styles.modalFooter,
+              { borderTopColor: theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' }
+            ]}>
+              <Text style={[
+                styles.footerText,
+                { color: theme === 'dark' ? '#64748b' : '#94a3b8' }
+              ]}>
+                {filteredData.length} itens encontrados
+              </Text>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -236,14 +258,13 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    padding: 20,
   },
   modalContent: {
-    flex: 1,
-    marginTop: Platform.OS === 'ios' ? 50 : 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
     borderRadius: 20,
     overflow: 'hidden',
+    maxHeight: screenHeight * 0.8,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -293,6 +314,7 @@ const styles = StyleSheet.create({
   },
   resultsList: {
     flex: 1,
+    maxHeight: 400,
   },
   resultItem: {
     flexDirection: 'row',

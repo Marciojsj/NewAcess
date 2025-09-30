@@ -1,3 +1,4 @@
+// src/components/WebSidebar.tsx
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   View,
@@ -41,6 +42,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
   const { theme: appTheme } = useTheme();
   const slideAnim = useRef(new Animated.Value(-320)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
+  const iconAnim = useRef(new Animated.Value(0)).current;
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(theme);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredActions, setFilteredActions] = useState<SidebarAction[]>([]);
@@ -102,6 +104,11 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
         duration: 300,
         useNativeDriver: true,
       }),
+      Animated.timing(iconAnim, {
+        toValue: isOpen ? 320 : 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
     ]).start();
 
     if (isOpen && Platform.OS === 'web') {
@@ -117,7 +124,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
       const query = searchQuery.toLowerCase();
       const filtered = sidebarActions.filter(item =>
         item.title.toLowerCase().includes(query) ||
-        item.keywords.some(keyword => keyword.toLowerCase().includes(query))
+        item.keywords.some((keyword: string) => keyword.toLowerCase().includes(query))
       );
       setFilteredActions(filtered);
       setSelectedIndex(filtered.length > 0 ? 0 : -1);
@@ -242,20 +249,6 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
               </Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={[
-              styles.closeButton,
-              { backgroundColor: appTheme.borderLight }
-            ]}
-            onPress={onToggle}
-          >
-            <Text style={[
-              styles.closeIcon,
-              { color: appTheme.text }
-            ]}>
-              ✕
-            </Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.searchWrapper}>
@@ -266,7 +259,6 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
               {
                 color: appTheme.text,
                 backgroundColor: appTheme.background + '80',
-                // textAlign: 'center',
               }
             ]}
             placeholder="Buscar funcionalidades..."
@@ -391,7 +383,14 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
         </View>
       </Animated.View>
 
-      {!isOpen && (
+      <Animated.View
+        style={[
+          styles.toggleButtonWrapper,
+          {
+            transform: [{ translateX: iconAnim }],
+          }
+        ]}
+      >
         <TouchableOpacity
           style={[
             styles.toggleButton,
@@ -417,7 +416,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
             ]} />
           </View>
         </TouchableOpacity>
-      )}
+      </Animated.View>
     </>
   );
 };
@@ -544,7 +543,6 @@ const styles = StyleSheet.create({
   headerContent: {
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
-    marginBottom: responsive.padding.md,
   },
   avatar: {
     width: 48,
@@ -571,18 +569,6 @@ const styles = StyleSheet.create({
     fontSize: responsive.fontSize.sm,
     fontWeight: '500' as const,
   },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    justifyContent: 'center' as const,
-    alignItems: 'center' as const,
-    alignSelf: 'flex-end' as const,
-  },
-  closeIcon: {
-    fontSize: 14,
-    fontWeight: 'bold' as const,
-  },
   searchWrapper: {
     paddingHorizontal: responsive.padding.lg,
     marginBottom: responsive.padding.sm,
@@ -596,7 +582,6 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     fontWeight: '400',
     borderRadius: 12,
-    // textAlign: 'center',
   },
   highlightedText: {
     color: '#ffffff',
@@ -733,16 +718,18 @@ const styles = StyleSheet.create({
     textAlign: 'center' as const,
     fontWeight: '500' as const,
   },
-  toggleButton: {
+  toggleButtonWrapper: {
     position: "fixed" as any,
     top: 20,
     left: 20,
+    zIndex: 1000,
+  },
+  toggleButton: {
     width: 48,
     height: 48,
     borderRadius: 12,
     justifyContent: "center" as const,
     alignItems: "center" as const,
-    zIndex: 997,
     borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
