@@ -1,1 +1,20 @@
-{"code":"rate-limited","message":"You have hit the rate limit. Please upgrade to keep chatting.","providerLimitHit":false,"isRetryable":true}
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+
+interface AnimatedBackgroundProps {
+  children?: React.ReactNode;
+}
+
+export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ children }) => {
+  return (
+    <View style={styles.container}>
+      {children}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

@@ -8,11 +8,16 @@ export default StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#0a0a0a",
 	},
+	themeTogglePosition: {
+		position: "absolute" as const,
+		top: 40,
+		right: 20,
+		zIndex: 1000,
+	},
 	backgroundContainer: {
 		position: "absolute",
 		width: "100%",
 		height: "100%",
-
 	},
 	circle1: {
 		position: "absolute",

@@ -242,4 +242,73 @@ export default StyleSheet.create({
     fontWeight: '500' as const,
     letterSpacing: 0.2
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 450,
+    borderRadius: 24,
+    padding: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24
+  },
+  modalTitle: {
+    fontSize: 26,
+    fontWeight: '700' as const,
+    letterSpacing: 0.3
+  },
+  modalClose: {
+    fontSize: 28,
+    fontWeight: '300' as const
+  },
+  modalSection: {
+    marginBottom: 24
+  },
+  modalSectionTitle: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    marginBottom: 16,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 1
+  },
+  themeToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12
+  },
+  themeToggleLabel: {
+    fontSize: 17,
+    fontWeight: '500' as const,
+    letterSpacing: 0.2
+  },
+  modalDivider: {
+    height: 1,
+    marginVertical: 20
+  },
+  logoutButton: {
+    paddingVertical: 16,
+    borderRadius: 14,
+    alignItems: 'center'
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '600' as const,
+    letterSpacing: 0.3
+  },
 });

@@ -25,6 +25,12 @@ export default StyleSheet.create({
 		alignItems: "center",
 		...webSpecificStyles.container,
 	},
+	themeTogglePosition: {
+		position: "absolute" as const,
+		top: 40,
+		right: 40,
+		zIndex: 1000,
+	},
 	backgroundContainer: {
 		position: "absolute",
 		top: 0,

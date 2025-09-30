@@ -16,9 +16,12 @@ import {
 	NativeScrollEvent,
 	NativeSyntheticEvent,
 	Platform,
+	Modal,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { ThemeToggle } from '../../components/ThemeToggle';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ResponsiveContainer } from '../../components/ResponsiveContainer';
@@ -57,10 +60,12 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function HomeScreen() {
 	const { user, logout } = useAuth();
+	const { theme } = useTheme();
 	const navigation = useNavigation<HomeScreenNavigationProp>();
 	const [greeting, setGreeting] = useState('');
 	const dimensions = useResponsive();
 	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [menuVisible, setMenuVisible] = useState(false);
 
 	const circle1Anim = useRef(new Animated.Value(0)).current;
 	const circle2Anim = useRef(new Animated.Value(0)).current;
@@ -99,6 +104,7 @@ export default function HomeScreen() {
 	}, []);
 
 	const handleLogout = () => {
+		setMenuVisible(false);
 		console.log('handleLogout chamado');
 
 		if (Platform.OS === 'web' || deviceType.isDesktop) {
@@ -175,10 +181,10 @@ export default function HomeScreen() {
 	const rotateCircle2 = circle2Anim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
 
 	return (
-		<SafeAreaView style={styles.container}>
+		<SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
 			<StatusBar
 				barStyle="light-content"
-				backgroundColor="#0a0a0a"
+				backgroundColor={theme.background}
 				{...(Platform.OS === 'web' && { hidden: true })}
 			/>
 
@@ -189,7 +195,6 @@ export default function HomeScreen() {
 				</>
 			)}
 
-			{/* Sidebar Web */}
 			{deviceType.isDesktop && (
 				<WebSidebar
 					isOpen={sidebarOpen}
@@ -208,14 +213,17 @@ export default function HomeScreen() {
 					<View style={[styles.header, deviceType.isDesktop && styles.headerDesktop]}>
 						<View style={styles.headerTop}>
 							<View style={styles.greetingContainer}>
-								<Text style={[styles.greeting, deviceType.isDesktop && styles.greetingDesktop]}>
+								<Text style={[styles.greeting, { color: theme.text }, deviceType.isDesktop && styles.greetingDesktop]}>
 									{greeting}, {user?.name || 'Usuário'}
 								</Text>
-								<Text style={[styles.accountType, deviceType.isDesktop && styles.accountTypeDesktop]}>
+								<Text style={[styles.accountType, { color: theme.textSecondary }, deviceType.isDesktop && styles.accountTypeDesktop]}>
 									Controle de Acesso
 								</Text>
 							</View>
-							<TouchableOpacity style={styles.profileButton} onPress={handleLogout}>
+							<TouchableOpacity
+								style={[styles.profileButton, { backgroundColor: theme.border }]}
+								onPress={() => setMenuVisible(true)}
+							>
 								<Text style={styles.profileIcon}>👤</Text>
 							</TouchableOpacity>
 						</View>
@@ -241,9 +249,8 @@ export default function HomeScreen() {
 						</View>
 					)}
 
-					{/* Cards de serviço */}
 					<View style={styles.serviceCardsContainer}>
-						<Text style={[styles.sectionTitle, deviceType.isDesktop && styles.sectionTitleDesktop]}>Estatísticas de Acesso</Text>
+						<Text style={[styles.sectionTitle, { color: theme.text }, deviceType.isDesktop && styles.sectionTitleDesktop]}>Estatísticas de Acesso</Text>
 						<View style={styles.serviceCardsGrid}>
 							{serviceCards.map((card) => (
 								<AnimatedGradientCard key={card.id} card={card} />
@@ -251,9 +258,8 @@ export default function HomeScreen() {
 						</View>
 					</View>
 
-					{/* Carrossel */}
 					<View style={{ marginTop: 0 }}>
-						<Text style={[styles.sectionTitle, { paddingHorizontal: responsive.padding.md }, deviceType.isDesktop && styles.sectionTitleDesktop]}>Recomendações</Text>
+						<Text style={[styles.sectionTitle, { paddingHorizontal: responsive.padding.md, color: theme.text }, deviceType.isDesktop && styles.sectionTitleDesktop]}>Recomendações</Text>
 						<ScrollView
 							horizontal
 							pagingEnabled
@@ -303,8 +309,46 @@ export default function HomeScreen() {
 				</ResponsiveContainer>
 			</ScrollView>
 
-			{/* Footer Mobile */}
 			<MobileFooter visible={!deviceType.isDesktop} />
+
+			<Modal
+				animationType="fade"
+				transparent={true}
+				visible={menuVisible}
+				onRequestClose={() => setMenuVisible(false)}
+			>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={() => setMenuVisible(false)}
+				>
+					<View style={[styles.modalContent, { backgroundColor: theme.backgroundCard }]}>
+						<View style={styles.modalHeader}>
+							<Text style={[styles.modalTitle, { color: theme.text }]}>Configurações</Text>
+							<TouchableOpacity onPress={() => setMenuVisible(false)}>
+								<Text style={[styles.modalClose, { color: theme.textSecondary }]}>✕</Text>
+							</TouchableOpacity>
+						</View>
+
+						<View style={styles.modalSection}>
+							<Text style={[styles.modalSectionTitle, { color: theme.textSecondary }]}>Aparência</Text>
+							<View style={styles.themeToggleContainer}>
+								<Text style={[styles.themeToggleLabel, { color: theme.text }]}>Tema Escuro</Text>
+								<ThemeToggle size={54} />
+							</View>
+						</View>
+
+						<View style={[styles.modalDivider, { backgroundColor: theme.border }]} />
+
+						<TouchableOpacity
+							style={[styles.logoutButton, { backgroundColor: theme.error }]}
+							onPress={handleLogout}
+						>
+							<Text style={styles.logoutButtonText}>Sair</Text>
+						</TouchableOpacity>
+					</View>
+				</TouchableOpacity>
+			</Modal>
 		</SafeAreaView>
 	);
 }

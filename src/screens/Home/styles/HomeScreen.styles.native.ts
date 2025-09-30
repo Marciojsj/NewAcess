@@ -185,4 +185,70 @@ export default StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontWeight: '500' as const
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700' as const
+  },
+  modalClose: {
+    fontSize: 24,
+    fontWeight: '300' as const
+  },
+  modalSection: {
+    marginBottom: 20
+  },
+  modalSectionTitle: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    marginBottom: 12,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5
+  },
+  themeToggleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8
+  },
+  themeToggleLabel: {
+    fontSize: 16,
+    fontWeight: '500' as const
+  },
+  modalDivider: {
+    height: 1,
+    marginVertical: 16
+  },
+  logoutButton: {
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center'
+  },
+  logoutButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600' as const
+  },
 });

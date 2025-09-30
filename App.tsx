@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import { useAuth, AuthProvider } from './src/contexts/AuthContext';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 import HomeScreen from './src/screens/Home/HomeScreen';
 import LoginScreen from './src/screens/Login/LoginScreen';
@@ -17,7 +18,6 @@ function Routes() {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    // Opcional: mostrar tela de loading enquanto verifica AsyncStorage
     return null;
   }
 
@@ -40,10 +40,12 @@ function Routes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <NavigationContainer>
-        <Routes />
-      </NavigationContainer>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <NavigationContainer>
+          <Routes />
+        </NavigationContainer>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

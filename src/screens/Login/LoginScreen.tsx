@@ -13,10 +13,11 @@ import {
 	Easing,
 } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { ThemeToggle } from "../../components/ThemeToggle";
 import { ResponsiveContainer } from "../../components/ResponsiveContainer";
 import { responsive, deviceType, useResponsive } from "../../utils/responsive";
 
-// Importe os estilos do arquivo correto
 import styles from "./styles/LoginScreen.styles";
 
 export default function LoginScreen() {
@@ -27,6 +28,7 @@ export default function LoginScreen() {
 	const [emailError, setEmailError] = useState("");
 	const [passwordError, setPasswordError] = useState("");
 	const { login, isLoading } = useAuth();
+	const { theme } = useTheme();
 	const dimensions = useResponsive();
 
 	// Animações de entrada
@@ -249,9 +251,13 @@ export default function LoginScreen() {
 		>
 			<StatusBar
 				barStyle="light-content"
-				backgroundColor="#0a0a0a"
+				backgroundColor={theme.background}
 				{...(Platform.OS === "web" && { hidden: true })}
 			/>
+
+			<View style={styles.themeTogglePosition}>
+				<ThemeToggle size={50} />
+			</View>
 
 			{/* Fundo animado com círculos em MOVIMENTO - AGORA FUNCIONA NO WEB TAMBÉM */}
 			<View style={styles.backgroundContainer}>
@@ -332,28 +338,27 @@ export default function LoginScreen() {
 						},
 					]}
 				>
-					{/* Título */}
 					<View style={styles.headerContainer}>
-						<Text style={styles.title}>Controle de Acesso</Text>
-						<Text style={styles.subtitle}>Faça login para continuar</Text>
+						<Text style={[styles.title, { color: theme.text }]}>Controle de Acesso</Text>
+						<Text style={[styles.subtitle, { color: theme.textSecondary }]}>Faça login para continuar</Text>
 					</View>
 
 					{/* Formulário */}
 					<View style={styles.form}>
-						{/* Email */}
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Email</Text>
+							<Text style={[styles.inputLabel, { color: theme.textSecondary }]}>Email</Text>
 							<Animated.View
 								style={[
 									styles.inputWrapper,
+									{ backgroundColor: theme.backgroundCard, borderColor: theme.border },
 									emailFocused && styles.inputWrapperFocused,
 									emailError && styles.inputWrapperError,
 								]}
 							>
 								<TextInput
-									style={[styles.input, emailFocused && styles.inputFocused]}
+									style={[styles.input, { color: theme.text }, emailFocused && styles.inputFocused]}
 									placeholder="Digite seu email"
-									placeholderTextColor="#666"
+									placeholderTextColor={theme.textTertiary}
 									value={email}
 									onChangeText={(text) => {
 										setEmail(text);
@@ -374,20 +379,20 @@ export default function LoginScreen() {
 							) : null}
 						</View>
 
-						{/* Senha */}
 						<View style={styles.inputContainer}>
-							<Text style={styles.inputLabel}>Senha</Text>
+							<Text style={[styles.inputLabel, { color: theme.textSecondary }]}>Senha</Text>
 							<Animated.View
 								style={[
 									styles.inputWrapper,
+									{ backgroundColor: theme.backgroundCard, borderColor: theme.border },
 									passwordFocused && styles.inputWrapperFocused,
 									passwordError && styles.inputWrapperError,
 								]}
 							>
 								<TextInput
-									style={[styles.input, passwordFocused && styles.inputFocused]}
+									style={[styles.input, { color: theme.text }, passwordFocused && styles.inputFocused]}
 									placeholder="Digite sua senha"
-									placeholderTextColor="#666"
+									placeholderTextColor={theme.textTertiary}
 									value={password}
 									onChangeText={(text) => {
 										setPassword(text);
