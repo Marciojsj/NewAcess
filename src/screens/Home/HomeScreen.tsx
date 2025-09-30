@@ -1,365 +1,49 @@
 // src/screens/Home/HomeScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import styles from "./styles/HomeScreen.styles";
-
+import React, { useState } from 'react';
 import {
-	View,
-	Text,
-	ScrollView,
-	TouchableOpacity,
-	SafeAreaView,
-	StatusBar,
-	Dimensions,
-	Animated,
-	Easing,
-	Alert,
-	NativeScrollEvent,
-	NativeSyntheticEvent,
-	Platform,
+  View,
+  SafeAreaView,
+  StatusBar,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ResponsiveContainer } from '../../components/ResponsiveContainer';
+import { useTheme } from '../../contexts/ThemeContext';
 import { WebSidebar } from '../../components/WebSidebar';
 import { MobileFooter } from '../../components/MobileFooter';
-import { responsive, deviceType, useResponsive } from '../../utils/responsive';
-
-type RootStackParamList = {
-	Home: undefined;
-	RegistrarEntrada: undefined;
-	RegistrarSaida: undefined;
-	Visitantes: undefined;
-	Relatorios: undefined;
-};
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
-
-interface QuickAction {
-	id: string;
-	title: string;
-	icon: string;
-	color: string;
-	onPress: () => void;
-}
-
-interface ServiceCard {
-	id: string;
-	title: string;
-	subtitle: string;
-	icon: string;
-	colors: string[];
-	progress?: number;
-}
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+import { deviceType } from '../../utils/responsive';
 
 export default function HomeScreen() {
-	const { user, logout } = useAuth();
-	const navigation = useNavigation<HomeScreenNavigationProp>();
-	const [greeting, setGreeting] = useState('');
-	const dimensions = useResponsive();
-	const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { theme, isDark, toggleTheme } = useTheme();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-	const circle1Anim = useRef(new Animated.Value(0)).current;
-	const circle2Anim = useRef(new Animated.Value(0)).current;
-	const pulseAnim = useRef(new Animated.Value(1)).current;
+  const handleLogout = () => {
+    // Implementar lógica de logout
+    console.log('Logout realizado');
+  };
 
-	useEffect(() => {
-		const hour = new Date().getHours();
-		if (hour < 12) setGreeting('Bom dia');
-		else if (hour < 18) setGreeting('Boa tarde');
-		else setGreeting('Boa noite');
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <StatusBar
+        barStyle={isDark ? "light-content" : "dark-content"}
+        backgroundColor={theme.background}
+        {...(Platform.OS === 'web' && { hidden: true })}
+      />
 
-		Animated.loop(
-			Animated.timing(circle1Anim, {
-				toValue: 1,
-				duration: 30000,
-				easing: Easing.linear,
-				useNativeDriver: true,
-			})
-		).start();
+      {/* Sidebar Web */}
+      {deviceType.isDesktop && (
+        <WebSidebar
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          theme={isDark ? 'dark' : 'light'}
+          onThemeChange={toggleTheme}
+          onLogout={handleLogout}
+        />
+      )}
 
-		Animated.loop(
-			Animated.timing(circle2Anim, {
-				toValue: 1,
-				duration: 40000,
-				easing: Easing.linear,
-				useNativeDriver: true,
-			})
-		).start();
+      {/* Conteúdo principal */}
+      <View style={{ flex: 1, backgroundColor: theme.background }} />
 
-		Animated.loop(
-			Animated.sequence([
-				Animated.timing(pulseAnim, { toValue: 1.05, duration: 2000, useNativeDriver: true }),
-				Animated.timing(pulseAnim, { toValue: 1, duration: 2000, useNativeDriver: true }),
-			])
-		).start();
-	}, []);
-
-	const handleLogout = () => {
-		console.log('handleLogout chamado');
-
-		if (Platform.OS === 'web' || deviceType.isDesktop) {
-			console.log('Estamos no Web');
-			const confirmLogout = window.confirm('Deseja realmente sair?');
-			if (confirmLogout) {
-				logout();
-				console.log('Logout confirmado no Web');
-			} else {
-				console.log('Logout cancelado no Web');
-			}
-		} else {
-			console.log('Estamos no Mobile');
-			Alert.alert('Sair', 'Deseja realmente sair?', [
-				{ text: 'Cancelar', style: 'cancel' },
-				{ text: 'Sair', style: 'destructive', onPress: logout },
-			]);
-		}
-	};
-
-	const quickActionsMobile: QuickAction[] = [
-		{ id: '1', title: 'Registrar Entrada', icon: '🚪', color: '#8a2be2', onPress: () => navigation.navigate('RegistrarEntrada') },
-		{ id: '2', title: 'Registrar Saída', icon: '🏃‍♂️', color: '#00b894', onPress: () => navigation.navigate('RegistrarSaida') },
-		{ id: '3', title: 'Visitantes', icon: '🧑‍🤝‍🧑', color: '#6c5ce7', onPress: () => navigation.navigate('Visitantes') },
-		{ id: '4', title: 'Alertas', icon: '⚠️', color: '#e17055', onPress: () => Alert.alert('Alertas', 'Funcionalidade em desenvolvimento') },
-		{ id: '5', title: 'Relatórios', icon: '📊', color: '#fdcb6e', onPress: () => navigation.navigate('Relatorios') },
-	];
-
-	const quickActionsWeb: QuickAction[] = [
-		{ id: '1', title: 'Entrada', icon: '🚪', color: '#8a2be2', onPress: () => navigation.navigate('RegistrarEntrada') },
-		{ id: '2', title: 'Saída', icon: '🏃‍♂️', color: '#00b894', onPress: () => navigation.navigate('RegistrarSaida') },
-		{ id: '3', title: 'Visitantes', icon: '🧑‍🤝‍🧑', color: '#6c5ce7', onPress: () => navigation.navigate('Visitantes') },
-		{ id: '4', title: 'Alertas', icon: '⚠️', color: '#e17055', onPress: () => Alert.alert('Alertas', 'Funcionalidade em desenvolvimento') },
-		{ id: '5', title: 'Relatórios', icon: '📊', color: '#fdcb6e', onPress: () => navigation.navigate('Relatorios') },
-	];
-
-	const serviceCards: ServiceCard[] = [
-		{ id: '1', title: 'Últimas Entradas', subtitle: 'Hoje', icon: '🚪', colors: ['#8a2be2', '#da70d6'], progress: 80 },
-		{ id: '2', title: 'Últimas Saídas', subtitle: 'Hoje', icon: '🏃‍♂️', colors: ['#00b894', '#00ffe0'], progress: 65 },
-		{ id: '3', title: 'Visitantes Pendentes', subtitle: 'Hoje', icon: '🧑‍🤝‍🧑', colors: ['#6c5ce7', '#a29bfe'], progress: 45 },
-		{ id: '4', title: 'Alertas Críticos', subtitle: 'Últimas 24h', icon: '⚠️', colors: ['#e17055', '#ff6b6b'], progress: 30 },
-	];
-
-	const recommendedCards: ServiceCard[] = [
-		{ id: 'r1', title: 'Registrar Entrada', subtitle: 'Mais usado hoje', icon: '🚪', colors: ['#8a2be2', '#da70d6'] },
-		{ id: 'r2', title: 'Registrar Saída', subtitle: 'Últimos acessos', icon: '🏃‍♂️', colors: ['#00b894', '#00ffe0'] },
-		{ id: 'r3', title: 'Visitantes', subtitle: 'Pendentes', icon: '🧑‍🤝‍🧑', colors: ['#6c5ce7', '#a29bfe'] },
-	];
-
-	const loopCards = [...recommendedCards, ...recommendedCards];
-	const [activeIndex, setActiveIndex] = useState(0);
-	const scrollRef = useRef<ScrollView>(null);
-
-	useEffect(() => {
-		const interval = setInterval(() => {
-			let nextIndex = activeIndex + 1;
-			if (nextIndex >= loopCards.length / 2) {
-				scrollRef.current?.scrollTo({ x: 0, animated: false });
-				nextIndex = 1;
-			}
-			scrollRef.current?.scrollTo({ x: nextIndex * screenWidth, animated: true });
-			setActiveIndex(nextIndex);
-		}, 5000);
-		return () => clearInterval(interval);
-	}, [activeIndex]);
-
-	const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-		const cardWidth = dimensions.isMobile ? dimensions.width : Math.min(400, dimensions.width * 0.8);
-		const index = Math.round(event.nativeEvent.contentOffset.x / cardWidth);
-		setActiveIndex(index);
-	};
-
-	const rotateCircle1 = circle1Anim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-	const rotateCircle2 = circle2Anim.interpolate({ inputRange: [0, 1], outputRange: ['360deg', '0deg'] });
-
-	return (
-		<SafeAreaView style={styles.container}>
-			<StatusBar
-				barStyle="light-content"
-				backgroundColor="#0a0a0a"
-				{...(Platform.OS === 'web' && { hidden: true })}
-			/>
-
-			{!deviceType.isDesktop && (
-				<>
-					<Animated.View style={[styles.backgroundCircle, styles.circle1, { transform: [{ rotate: rotateCircle1 }, { scale: pulseAnim }] }]} />
-					<Animated.View style={[styles.backgroundCircle, styles.circle2, { transform: [{ rotate: rotateCircle2 }, { scale: pulseAnim }] }]} />
-				</>
-			)}
-
-			{/* Sidebar Web */}
-			{deviceType.isDesktop && (
-				<WebSidebar
-					isOpen={sidebarOpen}
-					onToggle={() => setSidebarOpen(!sidebarOpen)}
-				/>
-			)}
-
-			<ScrollView
-				showsVerticalScrollIndicator={false}
-				contentContainerStyle={[
-					styles.scrollContent,
-					deviceType.isDesktop && styles.scrollContentDesktop
-				]}
-			>
-				<ResponsiveContainer>
-					<View style={[styles.header, deviceType.isDesktop && styles.headerDesktop]}>
-						<View style={styles.headerTop}>
-							<View style={styles.greetingContainer}>
-								<Text style={[styles.greeting, deviceType.isDesktop && styles.greetingDesktop]}>
-									{greeting}, {user?.name || 'Usuário'}
-								</Text>
-								<Text style={[styles.accountType, deviceType.isDesktop && styles.accountTypeDesktop]}>
-									Controle de Acesso
-								</Text>
-							</View>
-							<TouchableOpacity style={styles.profileButton} onPress={handleLogout}>
-								<Text style={styles.profileIcon}>👤</Text>
-							</TouchableOpacity>
-						</View>
-					</View>
-
-					{/* Botões Mobile */}
-					{dimensions.isMobile && (
-						<View style={styles.quickActionsContainer}>
-							<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.quickActionsScroll}>
-								{quickActionsMobile.map((action) => (
-									<AnimatedQuickButton key={action.id} action={action} />
-								))}
-							</ScrollView>
-						</View>
-					)}
-
-					{/* Botões Web/Desktop */}
-					{dimensions.isDesktop && (
-						<View style={[styles.quickActionsContainerDesktop, { flexDirection: 'row', justifyContent: 'center' }]}>
-							{quickActionsWeb.map((action) => (
-								<AnimatedQuickButton key={action.id} action={action} />
-							))}
-						</View>
-					)}
-
-					{/* Cards de serviço */}
-					<View style={styles.serviceCardsContainer}>
-						<Text style={[styles.sectionTitle, deviceType.isDesktop && styles.sectionTitleDesktop]}>Estatísticas de Acesso</Text>
-						<View style={styles.serviceCardsGrid}>
-							{serviceCards.map((card) => (
-								<AnimatedGradientCard key={card.id} card={card} />
-							))}
-						</View>
-					</View>
-
-					{/* Carrossel */}
-					<View style={{ marginTop: 0 }}>
-						<Text style={[styles.sectionTitle, { paddingHorizontal: responsive.padding.md }, deviceType.isDesktop && styles.sectionTitleDesktop]}>Recomendações</Text>
-						<ScrollView
-							horizontal
-							pagingEnabled
-							ref={scrollRef}
-							showsHorizontalScrollIndicator={false}
-							onScroll={onScroll}
-							scrollEventThrottle={16}
-						>
-							{loopCards.map((card, idx) => (
-								<TouchableOpacity
-									key={idx}
-									style={{
-										width: dimensions.isMobile ? dimensions.width : Math.min(400, dimensions.width * 0.8),
-										borderRadius: 16,
-										padding: 5
-									}}
-									activeOpacity={0.8}
-									onPress={() => Alert.alert('Recomendação', `Você clicou em ${card.title}`)}
-								>
-									<LinearGradient
-										colors={[card.colors[0], card.colors[1]] as const}
-										style={{ flex: 1, borderRadius: 16, justifyContent: 'center', alignItems: 'center', height: 140 }}
-									>
-										<Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>{card.icon} {card.title}</Text>
-										<Text style={{ color: '#fff', fontSize: 14 }}>{card.subtitle}</Text>
-									</LinearGradient>
-								</TouchableOpacity>
-							))}
-						</ScrollView>
-
-						<View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-							{recommendedCards.map((_, idx) => (
-								<View
-									key={idx}
-									style={{
-										width: 8,
-										height: 8,
-										borderRadius: 4,
-										backgroundColor: activeIndex % recommendedCards.length === idx ? '#fff' : 'rgba(255,255,255,0.3)',
-										marginHorizontal: 4,
-									}}
-								/>
-							))}
-						</View>
-					</View>
-
-				</ResponsiveContainer>
-			</ScrollView>
-
-			{/* Footer Mobile */}
-			<MobileFooter visible={!deviceType.isDesktop} />
-		</SafeAreaView>
-	);
+      {/* Footer Mobile */}
+      <MobileFooter visible={!deviceType.isDesktop} />
+    </SafeAreaView>
+  );
 }
-
-const AnimatedQuickButton = ({ action }: { action: QuickAction }) => {
-	const scaleAnim = useRef(new Animated.Value(1)).current;
-
-	const handlePress = () => {
-		Animated.sequence([
-			Animated.timing(scaleAnim, { toValue: 0.85, duration: 100, useNativeDriver: true }),
-			Animated.timing(scaleAnim, { toValue: 1, duration: 100, useNativeDriver: true }),
-		]).start(action.onPress);
-	};
-	return (
-		<Animated.View style={{ transform: [{ scale: scaleAnim }], marginRight: 12 }}>
-			<TouchableOpacity
-				style={[styles.quickActionButton, { backgroundColor: action.color }]}
-				onPress={handlePress}
-				activeOpacity={0.8}
-			>
-				<Text style={styles.quickActionIcon}>{action.icon}</Text>
-				<Text style={styles.quickActionTitle}>{action.title}</Text>
-			</TouchableOpacity>
-		</Animated.View>
-	);
-};
-
-const AnimatedGradientCard = ({ card }: { card: ServiceCard }) => {
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const dimensions = useResponsive();
-	const cardWidth = dimensions.isDesktop ? '23%' : '48%';
-
-	useEffect(() => {
-		Animated.timing(fadeAnim, { toValue: 1, duration: 700, useNativeDriver: true }).start();
-	}, []);
-
-	return (
-		<Animated.View style={{ opacity: fadeAnim, width: cardWidth, marginBottom: 16, alignSelf: 'stretch' }}>
-			<LinearGradient colors={[card.colors[0], card.colors[1]]} style={styles.serviceCard}>
-				<View style={styles.serviceCardHeader}>
-					<Text style={styles.serviceCardIcon}>{card.icon}</Text>
-					<Text style={styles.serviceCardSubtitle}>{card.subtitle}</Text>
-				</View>
-				<Text style={styles.serviceCardTitle}>{card.title}</Text>
-				{card.progress !== undefined && (
-					<View style={styles.progressContainer}>
-						<View style={styles.progressBar}>
-							<View style={[styles.progressFill, { width: `${card.progress}%` }]} />
-						</View>
-						<Text style={styles.progressText}>{card.progress}% concluído</Text>
-					</View>
-				)}
-			</LinearGradient>
-		</Animated.View>
-	);
-};
-
-// ❌ REMOVA ESTA PARTE - os estilos já estão sendo importados
