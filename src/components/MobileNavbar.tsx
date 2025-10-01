@@ -10,6 +10,7 @@ import {
 	FlatList,
 	StyleSheet,
 	Dimensions,
+	Keyboard,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -82,6 +83,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 	const closeMenu = () => {
 		setIsOpen(false);
 		setSearchQuery('');
+		Keyboard.dismiss(); // Fecha o teclado
 		onMenuToggle?.(false);
 	};
 
@@ -139,6 +141,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 					useNativeDriver: true,
 				})
 			]).start();
+			Keyboard.dismiss(); // Fecha o teclado quando o menu fecha
 		}
 	}, [isOpen]);
 
@@ -161,6 +164,11 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 		setLogoutModalVisible(false);
 		logout();
 		onLogout?.();
+		closeMenu();
+	};
+
+	const handleOverlayPress = () => {
+		Keyboard.dismiss(); // Fecha o teclado ao clicar no overlay
 		closeMenu();
 	};
 
@@ -217,7 +225,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			{isOpen && (
 				<Pressable 
 					style={styles.overlay} 
-					onPress={closeMenu}
+					onPress={handleOverlayPress} // Usa a função que fecha o teclado
 				/>
 			)}
 
@@ -253,6 +261,8 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 						placeholderTextColor={appTheme.textTertiary}
 						value={searchQuery}
 						onChangeText={setSearchQuery}
+						blurOnSubmit={true}
+						returnKeyType="search"
 					/>
 				</View>
 
@@ -336,12 +346,20 @@ const SidebarButton: React.FC<{
 			style={[
 				styles.actionButton,
 				{
-					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : 'transparent',
+					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : appTheme.background + '20',
+					borderColor: hovered || isSelected ? appTheme.primary + '40' : appTheme.borderLight,
+					transform: hovered ? [{ translateY: -2 }] : [],
+					shadowColor: hovered ? '#000' : undefined,
+					shadowOpacity: hovered ? 0.15 : 0.05,
+					shadowOffset: { width: 0, height: hovered ? 2 : 1 },
+					shadowRadius: hovered ? 4 : 2,
+					elevation: hovered ? 4 : 1,
 				},
 			]}
 		>
 			<View style={[styles.actionIcon, { 
-				borderColor: isSelected ? appTheme.primary : appTheme.border 
+				borderColor: isSelected ? appTheme.primary : appTheme.border,
+				backgroundColor: hovered || isSelected ? appTheme.primary + '10' : 'transparent',
 			}]}>
 				<Text style={styles.actionIconText}>{action.icon}</Text>
 			</View>
@@ -356,6 +374,7 @@ const HoverableButton: React.FC<{
 	color: string;
 	onPress: () => void;
 }> = ({ label, color, onPress }) => {
+	const { theme: appTheme } = useTheme();
 	const [hovered, setHovered] = useState(false);
 
 	return (
@@ -365,8 +384,19 @@ const HoverableButton: React.FC<{
 			onHoverOut={() => setHovered(false)}
 			style={[
 				styles.footerButton,
+				{
+					borderColor: appTheme.borderLight,
+					borderWidth: 1,
+					backgroundColor: appTheme.background + '20',
+				},
 				hovered && {
-					backgroundColor: '#ffffff20',
+					transform: [{ translateY: -2 }],
+					shadowColor: '#000',
+					shadowOpacity: 0.15,
+					shadowOffset: { width: 0, height: 2 },
+					shadowRadius: 4,
+					elevation: 4,
+					backgroundColor: appTheme.primary + '20',
 				},
 			]}
 		>
@@ -477,7 +507,8 @@ const styles = StyleSheet.create({
 		paddingVertical: 12, 
 		paddingHorizontal: 12, 
 		borderRadius: 10, 
-		marginBottom: 4 
+		marginBottom: 4,
+		borderWidth: 1,
 	},
 	actionIcon: { 
 		width: 36, 

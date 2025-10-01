@@ -230,13 +230,14 @@ const SidebarButton: React.FC<{ action: SidebarAction; theme: 'light' | 'dark'; 
 			style={[
 				styles.actionButton,
 				{
-					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : 'transparent',
+					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : appTheme.background + '20',
+					borderColor: hovered || isSelected ? appTheme.primary + '40' : appTheme.borderLight,
 					transform: hovered ? [{ translateY: -2 }] : [],
 					shadowColor: hovered ? '#000' : undefined,
-					shadowOpacity: hovered ? 0.15 : 0,
-					shadowOffset: { width: 0, height: hovered ? 2 : 0 },
-					shadowRadius: hovered ? 4 : 0,
-					elevation: hovered ? 4 : 0,
+					shadowOpacity: hovered ? 0.15 : 0.05,
+					shadowOffset: { width: 0, height: hovered ? 2 : 1 },
+					shadowRadius: hovered ? 4 : 2,
+					elevation: hovered ? 4 : 1,
 				},
 			]}
 		>
@@ -257,6 +258,7 @@ const HoverableButton: React.FC<{
 	customStyle?: any;
 	renderContent?: () => React.ReactNode;
 }> = ({ label, color, onPress, isCircle = false, customStyle, renderContent }) => {
+	const { theme: appTheme } = useTheme();
 	const [hovered, setHovered] = useState(false);
 
 	return (
@@ -267,6 +269,10 @@ const HoverableButton: React.FC<{
 			style={[
 				isCircle ? {} : styles.footerButton,
 				customStyle,
+				{
+					borderColor: appTheme.borderLight,
+					borderWidth: 1,
+				},
 				hovered && {
 					transform: [{ translateY: -2 }],
 					shadowColor: '#000',
@@ -274,7 +280,7 @@ const HoverableButton: React.FC<{
 					shadowOffset: { width: 0, height: 2 },
 					shadowRadius: 4,
 					elevation: 4,
-					backgroundColor: '#ffffff20',
+					backgroundColor: appTheme.primary + '20',
 				},
 			]}
 		>
@@ -295,7 +301,15 @@ const styles = StyleSheet.create({
 	searchWrapper: { paddingHorizontal: 20, marginBottom: 10 },
 	searchInput: { borderRadius: 8, padding: 10, fontSize: 14 },
 	actionsContainer: { flex: 1, paddingHorizontal: 8 },
-	actionButton: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, marginBottom: 4 },
+	actionButton: { 
+		flexDirection: 'row', 
+		alignItems: 'center', 
+		paddingVertical: 12, 
+		paddingHorizontal: 12, 
+		borderRadius: 10, 
+		marginBottom: 4,
+		borderWidth: 1,
+	},
 	actionIcon: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 1 },
 	actionIconText: { fontSize: 18 },
 	actionTitle: { fontSize: 15, fontWeight: '500', flex: 1 },
@@ -305,7 +319,14 @@ const styles = StyleSheet.create({
 	toggleIconContainer: { width: 20, height: 16, justifyContent: 'space-between' },
 	toggleLine: { height: 2, borderRadius: 1, width: '100%' },
 	footer: { paddingHorizontal: 20, paddingBottom: 20 },
-	footerButton: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 10, borderRadius: 8, marginBottom: 8 },
+	footerButton: { 
+		flexDirection: 'row', 
+		alignItems: 'center', 
+		paddingVertical: 10, 
+		paddingHorizontal: 10, 
+		borderRadius: 8, 
+		marginBottom: 8,
+	},
 	footerButtonText: { fontSize: 14 },
 	modalOverlay: { flex:1, backgroundColor:'rgba(0,0,0,0.4)', justifyContent:'center', alignItems:'center' },
 	modalContent: { width:280, borderRadius:8, padding:20 },

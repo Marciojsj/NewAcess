@@ -64,7 +64,7 @@ export default function HomeScreen() {
 				visible={!deviceType.isDesktop}
 				onMenuToggle={handleMenuToggle}
 				onThemeChange={toggleTheme}
-				// onLogout={handleLogout}
+				onLogout={handleLogout}
 			/>
 		</SafeAreaView>
 	);
