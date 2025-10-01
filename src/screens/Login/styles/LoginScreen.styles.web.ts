@@ -1,4 +1,3 @@
-// src/screens/Login/styles/LoginScreen.styles.web.ts
 import { StyleSheet } from "react-native";
 import { responsive } from "../../../utils/responsive";
 
@@ -20,7 +19,7 @@ const webSpecificStyles = {
 export default StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#0a0a0a",
+		backgroundColor: "#0a0a0a", // Será theme.loginBackground
 		justifyContent: "center",
 		alignItems: "center",
 		...webSpecificStyles.container,
@@ -39,55 +38,51 @@ export default StyleSheet.create({
 		bottom: 0,
 		overflow: "hidden",
 	},
-	//  CÍRCULO 1 - Canto superior direito
 	circle1: {
 		position: "absolute",
 		width: 400,
 		height: 400,
 		borderRadius: 200,
 		borderWidth: 2,
-		borderColor: "rgba(138, 43, 226, 0.1)",
-		top: -100, // Ajustado para melhor distribuição
-		right: 100, // Movido para direita
+		borderColor: "rgba(138, 43, 226, 0.1)", // Será theme.loginCircle1
+		top: -100,
+		right: 100,
 	},
-	//  CÍRCULO 2 - Canto inferior direito (maior)
 	circle2: {
 		position: "absolute",
 		width: 750,
 		height: 750,
 		borderRadius: 400,
 		borderWidth: 2,
-		borderColor: "rgba(49, 40, 58, 0.64)",
-		bottom: -200, // Ajustado para melhor distribuição
-		right: -150, // Ajustado posição
+		borderColor: "rgba(49, 40, 58, 0.64)", // Será theme.loginCircle2
+		bottom: -200,
+		right: -150,
 	},
-	//  CÍRCULO 3 - Centro esquerdo
 	circle3: {
 		position: "absolute",
 		width: 600,
 		height: 600,
 		borderRadius: 400,
 		borderWidth: 2,
-		borderColor: "rgba(137, 43, 226, 0.19)",
+		borderColor: "rgba(137, 43, 226, 0.19)", // Será theme.loginCircle3
 		top: "30%",
 		left: "10%",
 	},
-	// CÍRCULO 4 - Centro inferior esquerdo
 	circle4: {
 		position: "absolute",
 		width: 500,
 		height: 500,
 		borderRadius: 250,
 		borderWidth: 2,
-		borderColor: "rgba(255, 255, 255, 0.08)", // Cor ajustada
-		bottom: "38%", // Posição ajustada
-		left: "5%", // Posição ajustada
+		borderColor: "rgba(255, 255, 255, 0.08)", // Será theme.loginCircle4
+		bottom: "38%",
+		left: "5%",
 	},
 	formContainer: {
 		width: "100%",
 		maxWidth: 500,
 		margin: "auto",
-		backgroundColor: "rgba(255, 255, 255, 0.05)",
+		backgroundColor: "rgba(255, 255, 255, 0.05)", // Será theme.loginCard
 		borderRadius: 20,
 		padding: responsive.padding.xl * 1.5,
 		...webSpecificStyles.formContainer,
@@ -99,13 +94,13 @@ export default StyleSheet.create({
 	title: {
 		fontSize: 36,
 		fontWeight: "bold",
-		color: "#ffffff",
+		color: "#ffffff", // Será theme.loginText
 		marginBottom: responsive.spacing.sm,
 		textAlign: "center",
 	},
 	subtitle: {
 		fontSize: responsive.fontSize.lg,
-		color: "#888",
+		color: "#888", // Será theme.loginTextSecondary
 		textAlign: "center",
 	},
 	form: {
@@ -116,41 +111,41 @@ export default StyleSheet.create({
 	},
 	inputLabel: {
 		fontSize: responsive.fontSize.sm,
-		color: "#ffffff",
+		color: "#ffffff", // Será theme.loginText
 		marginBottom: responsive.spacing.sm,
 		fontWeight: "600",
 	},
 	inputWrapper: {
-		backgroundColor: "rgba(255, 255, 255, 0.1)",
+		backgroundColor: "rgba(255, 255, 255, 0.1)", // Será theme.backgroundCard
 		borderRadius: 12,
 		borderWidth: 2,
 		borderColor: "transparent",
 		...webSpecificStyles.inputWrapper,
 	},
 	inputWrapperFocused: {
-		borderColor: "#8a2be2",
-		backgroundColor: "rgba(138, 43, 226, 0.1)",
+		borderColor: "#8a2be2", // Será theme.loginButton
+		backgroundColor: "rgba(138, 43, 226, 0.1)", // Será theme.loginCircle1
 		transform: [{ scale: 1.02 }],
 	},
 	inputWrapperError: {
-		borderColor: "#ff4757",
+		borderColor: "#ff4757", // Será theme.loginError
 	},
 	input: {
 		height: 60,
 		paddingHorizontal: responsive.padding.md,
 		fontSize: responsive.fontSize.md,
-		color: "#ffffff",
+		color: "#ffffff", // Será theme.loginInputText
 		...webSpecificStyles.input,
 	},
 	inputFocused: {},
 	errorText: {
-		color: "#ff4757",
+		color: "#ff4757", // Será theme.loginError
 		fontSize: responsive.fontSize.sm,
 		marginTop: responsive.spacing.sm,
 	},
 	loginButton: {
 		height: 60,
-		backgroundColor: "#8a2be2",
+		backgroundColor: "#8a2be2", // Será theme.loginButton
 		borderRadius: 12,
 		justifyContent: "center",
 		alignItems: "center",
@@ -162,7 +157,7 @@ export default StyleSheet.create({
 		...webSpecificStyles.loginButtonLoading,
 	},
 	loginButtonText: {
-		color: "#ffffff",
+		color: "#ffffff", // Será theme.loginButtonText
 		fontSize: responsive.fontSize.lg,
 		fontWeight: "600",
 	},
@@ -171,7 +166,7 @@ export default StyleSheet.create({
 		height: 24,
 		borderRadius: 12,
 		borderWidth: 2,
-		borderColor: "#ffffff",
+		borderColor: "#ffffff", // Será theme.loginButtonText
 		borderTopColor: "transparent",
 	},
 	linksContainer: {
@@ -184,7 +179,7 @@ export default StyleSheet.create({
 		...webSpecificStyles.linkButton,
 	},
 	linkText: {
-		color: "#8a2be2",
+		color: "#8a2be2", // Será theme.loginLink
 		fontSize: responsive.fontSize.sm,
 		fontWeight: "500",
 		...webSpecificStyles.linkText,

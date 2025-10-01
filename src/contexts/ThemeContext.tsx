@@ -8,23 +8,23 @@ export interface Theme {
   backgroundSecondary: string;
   backgroundCard: string;
   backgroundOverlay: string;
-  
+
   // Cores de texto
   text: string;
   textSecondary: string;
   textTertiary: string;
   textInverse: string;
-  
+
   // Cores de borda e separadores
   border: string;
   borderLight: string;
   divider: string;
-  
+
   // Cores principais
   primary: string;
   primaryLight: string;
   primaryDark: string;
-  
+
   // Cores de estado
   success: string;
   successLight: string;
@@ -34,7 +34,7 @@ export interface Theme {
   errorLight: string;
   info: string;
   infoLight: string;
-  
+
   // Cores específicas
   purple: string;
   purpleLight: string;
@@ -44,12 +44,37 @@ export interface Theme {
   greenLight: string;
   orange: string;
   orangeLight: string;
-  
+
+  // Cores do Login
+  loginBackground: string;
+  loginCard: string;
+  loginCircle1: string;
+  loginCircle2: string;
+  loginCircle3: string;
+  loginCircle4: string;
+  loginBorder: string;
+  loginText: string;
+  loginTextSecondary: string;
+  loginInputBackground: string;
+  loginInputBorder: string;
+  loginInputPlaceholder: string;
+  loginInputText: string;
+  loginButtonBackground: string;
+  loginButtonBackgroundDisabled: string;
+  loginButtonTextDisabled: string;
+  loginButtonText: string;
+  loginButton: string;
+  loginError: string;
+  loginLink: string;
+  loginLinkText: string;
+  loginLinkTextHover: string;
+  loginErrorText: string;
+
   // Efeitos
   shadow: string;
   overlay: string;
   glow: string;
-  
+
   // Gradientes
   gradientPrimary: string[];
   gradientSuccess: string[];
@@ -65,23 +90,23 @@ export const lightTheme: Theme = {
   backgroundSecondary: '#ffffff',
   backgroundCard: '#ffffff',
   backgroundOverlay: 'rgba(255,255,255,0.9)',
-  
+
   // Cores de texto
   text: '#878791ff',
   textSecondary: '#6e6e73',
   textTertiary: '#86868b',
   textInverse: '#ffffff',
-  
+
   // Cores de borda e separadores
   border: '#d2d2d7',
   borderLight: '#e5e5ea',
   divider: '#dee2e6',
-  
+
   // Cores principais
   primary: '#007aff',
   primaryLight: '#4da3ff',
   primaryDark: '#0056b3',
-  
+
   // Cores de estado
   success: '#34c759',
   successLight: '#34ce57',
@@ -91,7 +116,7 @@ export const lightTheme: Theme = {
   errorLight: '#e57373',
   info: '#17a2b8',
   infoLight: '#4fc3f7',
-  
+
   // Cores específicas
   purple: '#8a2be2',
   purpleLight: '#9d7bd6',
@@ -101,12 +126,37 @@ export const lightTheme: Theme = {
   greenLight: '#51cf9e',
   orange: '#e17055',
   orangeLight: '#ffa94d',
-  
+
+  // Cores do Login
+  loginBackground: '#f5f5f7',
+  loginCard: 'rgba(255, 255, 255, 0.9)',
+  loginCircle1: 'rgba(138, 43, 226, 0.1)',
+  loginCircle2: 'rgba(49, 40, 58, 0.1)',
+  loginCircle3: 'rgba(137, 43, 226, 0.15)',
+  loginCircle4: 'rgba(0, 0, 0, 0.05)',
+  loginBorder: 'rgba(0, 0, 0, 0.1)',
+  loginText: '#333333',
+  loginTextSecondary: '#666666',
+  loginInputBackground: '#ffffff',
+  loginInputBorder: '#d2d2d7',
+  loginInputPlaceholder: '#86868b',
+  loginInputText: '#333333',
+  loginButtonBackground: '#8a2be2',
+  loginButtonBackgroundDisabled: '#666666',
+  loginButtonTextDisabled: '#ffffff',
+  loginButtonText: '#ffffff',
+  loginButton: '#8a2be2',
+  loginError: '#ff4757',
+  loginLink: '#8a2be2',
+  loginLinkText: '#8a2be2',
+  loginLinkTextHover: '#6a1bb2',
+  loginErrorText: '#ff4757',
+
   // Efeitos
   shadow: 'rgba(0, 0, 0, 0.1)',
   overlay: 'rgba(0, 0, 0, 0.5)',
   glow: 'rgba(0, 122, 255, 0.3)',
-  
+
   // Gradientes
   gradientPrimary: ['#007aff', '#0056b3'],
   gradientSuccess: ['#34c759', '#00b894'],
@@ -122,23 +172,23 @@ export const darkTheme: Theme = {
   backgroundSecondary: '#252842',
   backgroundCard: '#2d3148',
   backgroundOverlay: 'rgba(37, 40, 66, 0.95)',
-  
+
   // Cores de texto
   text: '#ffffff',
   textSecondary: 'rgba(255,255,255,0.7)',
   textTertiary: 'rgba(255,255,255,0.5)',
   textInverse: '#1a1d2e',
-  
+
   // Cores de borda e separadores
   border: 'rgba(255,255,255,0.15)',
   borderLight: 'rgba(255,255,255,0.1)',
   divider: 'rgba(255,255,255,0.12)',
-  
+
   // Cores principais
   primary: '#0a84ff',
   primaryLight: '#4da3ff',
   primaryDark: '#0077e6',
-  
+
   // Cores de estado
   success: '#30d158',
   successLight: '#34ce57',
@@ -148,7 +198,7 @@ export const darkTheme: Theme = {
   errorLight: '#ff6b6b',
   info: '#5ac8fa',
   infoLight: '#4fc3f7',
-  
+
   // Cores específicas
   purple: '#bf5af2',
   purpleLight: '#d8a8ff',
@@ -158,12 +208,37 @@ export const darkTheme: Theme = {
   greenLight: '#69db7c',
   orange: '#ff9f0a',
   orangeLight: '#ffb74d',
-  
+
+  // Cores do Login
+  loginBackground: '#0a0a0a',
+  loginCard: 'rgba(255, 255, 255, 0.05)',
+  loginCircle1: 'rgba(138, 43, 226, 0.1)',
+  loginCircle2: 'rgba(49, 40, 58, 0.64)',
+  loginCircle3: 'rgba(137, 43, 226, 0.19)',
+  loginCircle4: 'rgba(255, 255, 255, 0.08)',
+  loginBorder: 'rgba(255, 255, 255, 0.12)',
+  loginText: '#ffffff',
+  loginTextSecondary: 'rgba(255, 255, 255, 0.7)',
+  loginInputBackground: '#2d3148',
+  loginInputBorder: 'rgba(255,255,255,0.15)',
+  loginInputPlaceholder: 'rgba(255,255,255,0.5)',
+  loginInputText: '#ffffff',
+  loginButtonBackground: '#8a2be2',
+  loginButtonBackgroundDisabled: '#666666',
+  loginButtonTextDisabled: '#ffffff',
+  loginButtonText: '#ffffff',
+  loginButton: '#8a2be2',
+  loginError: '#ff4757',
+  loginLink: '#8a2be2',
+  loginLinkText: '#8a2be2',
+  loginLinkTextHover: '#a855f7',
+  loginErrorText: '#ff4757',
+
   // Efeitos
   shadow: 'rgba(0, 0, 0, 0.3)',
   overlay: 'rgba(0, 0, 0, 0.7)',
   glow: 'rgba(10, 132, 255, 0.4)',
-  
+
   // Gradientes
   gradientPrimary: ['#0a84ff', '#0077e6'],
   gradientSuccess: ['#30d158', '#32d74b'],

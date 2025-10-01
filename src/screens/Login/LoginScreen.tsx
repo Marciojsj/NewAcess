@@ -1,4 +1,3 @@
-// src/screens/Login/LoginScreen.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
 	View,
@@ -28,55 +27,48 @@ export default function LoginScreen() {
 	const [emailError, setEmailError] = useState("");
 	const [passwordError, setPasswordError] = useState("");
 	const { login, isLoading } = useAuth();
-	const { theme } = useTheme();
-	const dimensions = useResponsive();
+	const { theme, isDark } = useTheme();
 
-	// Animações de entrada
-	const fadeAnim = useRef(new Animated.Value(0)).current;
-	const slideAnim = useRef(new Animated.Value(50)).current;
-	const scaleAnim = useRef(new Animated.Value(0.9)).current;
-	const buttonScale = useRef(new Animated.Value(1)).current;
-	const loadingRotation = useRef(new Animated.Value(0)).current;
+	const fadeAnimation = useRef(new Animated.Value(0)).current;
+	const slideAnimation = useRef(new Animated.Value(50)).current;
+	const scaleAnimation = useRef(new Animated.Value(0.9)).current;
+	const buttonScaleAnimation = useRef(new Animated.Value(1)).current;
+	const loadingRotationAnimation = useRef(new Animated.Value(0)).current;
 
-	// Animações para MOVIMENTO dos círculos (funciona tanto no mobile quanto web)
-	const circle1Anim = useRef(new Animated.Value(0)).current;
-	const circle2Anim = useRef(new Animated.Value(0)).current;
-	const circle3Anim = useRef(new Animated.Value(0)).current;
-	// 🆕 NOVA ANIMAÇÃO para o círculo 4 (só web)
-	const circle4Anim = useRef(new Animated.Value(0)).current;
+	const circle1Animation = useRef(new Animated.Value(0)).current;
+	const circle2Animation = useRef(new Animated.Value(0)).current;
+	const circle3Animation = useRef(new Animated.Value(0)).current;
+	const circle4Animation = useRef(new Animated.Value(0)).current;
 
 	useEffect(() => {
-		// Animação de entrada do formulário
 		Animated.parallel([
-			Animated.timing(fadeAnim, {
+			Animated.timing(fadeAnimation, {
 				toValue: 1,
 				duration: 1000,
 				useNativeDriver: true,
 			}),
-			Animated.timing(slideAnim, {
+			Animated.timing(slideAnimation, {
 				toValue: 0,
 				duration: 800,
 				useNativeDriver: true,
 			}),
-			Animated.timing(scaleAnim, {
+			Animated.timing(scaleAnimation, {
 				toValue: 1,
 				duration: 800,
 				useNativeDriver: true,
 			}),
 		]).start();
 
-		// Animações de MOVIMENTO para os círculos - FUNCIONA NO WEB TAMBÉM
 		const startCircleAnimations = () => {
-			// Círculo 1 - movimento vertical suave
 			Animated.loop(
 				Animated.sequence([
-					Animated.timing(circle1Anim, {
+					Animated.timing(circle1Animation, {
 						toValue: 1,
-						duration: 8000, // ⚡ VELOCIDADE: Mais lento para web (8 segundos)
+						duration: 8000,
 						easing: Easing.inOut(Easing.sin),
 						useNativeDriver: true,
 					}),
-					Animated.timing(circle1Anim, {
+					Animated.timing(circle1Animation, {
 						toValue: 0,
 						duration: 8000,
 						easing: Easing.inOut(Easing.sin),
@@ -85,16 +77,15 @@ export default function LoginScreen() {
 				])
 			).start();
 
-			// Círculo 2 - movimento horizontal suave
 			Animated.loop(
 				Animated.sequence([
-					Animated.timing(circle2Anim, {
+					Animated.timing(circle2Animation, {
 						toValue: 1,
-						duration: 10000, // ⚡ VELOCIDADE: Mais lento para web (10 segundos)
+						duration: 10000,
 						easing: Easing.inOut(Easing.sin),
 						useNativeDriver: true,
 					}),
-					Animated.timing(circle2Anim, {
+					Animated.timing(circle2Animation, {
 						toValue: 0,
 						duration: 10000,
 						easing: Easing.inOut(Easing.sin),
@@ -103,16 +94,15 @@ export default function LoginScreen() {
 				])
 			).start();
 
-			// Círculo 3 - movimento diagonal suave
 			Animated.loop(
 				Animated.sequence([
-					Animated.timing(circle3Anim, {
+					Animated.timing(circle3Animation, {
 						toValue: 1,
-						duration: 9000, // ⚡ VELOCIDADE: Mais lento para web (9 segundos)
+						duration: 9000,
 						easing: Easing.inOut(Easing.sin),
 						useNativeDriver: true,
 					}),
-					Animated.timing(circle3Anim, {
+					Animated.timing(circle3Animation, {
 						toValue: 0,
 						duration: 9000,
 						easing: Easing.inOut(Easing.sin),
@@ -121,17 +111,16 @@ export default function LoginScreen() {
 				])
 			).start();
 
-			// 🆕 Círculo 4 - movimento vertical (só no web)
 			if (Platform.OS === 'web') {
 				Animated.loop(
 					Animated.sequence([
-						Animated.timing(circle4Anim, {
+						Animated.timing(circle4Animation, {
 							toValue: 1,
-							duration: 7000, // ⚡ VELOCIDADE: 7 segundos
+							duration: 7000,
 							easing: Easing.inOut(Easing.sin),
 							useNativeDriver: true,
 						}),
-						Animated.timing(circle4Anim, {
+						Animated.timing(circle4Animation, {
 							toValue: 0,
 							duration: 7000,
 							easing: Easing.inOut(Easing.sin),
@@ -143,12 +132,12 @@ export default function LoginScreen() {
 		};
 
 		startCircleAnimations();
-	}, [fadeAnim, slideAnim, scaleAnim, circle1Anim, circle2Anim, circle3Anim, circle4Anim]);
+	}, [fadeAnimation, slideAnimation, scaleAnimation, circle1Animation, circle2Animation, circle3Animation, circle4Animation]);
 
 	useEffect(() => {
 		if (isLoading) {
 			const loadingAnimation = Animated.loop(
-				Animated.timing(loadingRotation, {
+				Animated.timing(loadingRotationAnimation, {
 					toValue: 1,
 					duration: 1000,
 					useNativeDriver: true,
@@ -159,34 +148,32 @@ export default function LoginScreen() {
 		}
 	}, [isLoading]);
 
-	// Interpolações para MOVIMENTO dos círculos - VALORES MAIORES PARA WEB
-	const circle1TranslateY = circle1Anim.interpolate({
+	const circle1TranslateY = circle1Animation.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, -60], // 📍 MOVIMENTO: Distância maior para web (-60px)
+		outputRange: [0, -60],
 	});
 
-	const circle2TranslateX = circle2Anim.interpolate({
+	const circle2TranslateX = circle2Animation.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, 80], // 📍 MOVIMENTO: Distância maior para web (80px)
+		outputRange: [0, 80],
 	});
 
-	const circle3TranslateY = circle3Anim.interpolate({
+	const circle3TranslateY = circle3Animation.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, -40], // 📍 MOVIMENTO: Distância maior para web (-40px)
+		outputRange: [0, -40],
 	});
 
-	const circle3TranslateX = circle3Anim.interpolate({
+	const circle3TranslateX = circle3Animation.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, -30], // 📍 MOVIMENTO: Distância maior para web (-30px)
+		outputRange: [0, -30],
 	});
 
-	// 🆕 INTERPOLAÇÃO para o círculo 4 (só web)
-	const circle4TranslateY = circle4Anim.interpolate({
+	const circle4TranslateY = circle4Animation.interpolate({
 		inputRange: [0, 1],
-		outputRange: [0, -50], // 📍 MOVIMENTO: Vertical para cima (-50px)
+		outputRange: [0, -50],
 	});
 
-	const loadingRotationInterpolate = loadingRotation.interpolate({
+	const loadingRotationInterpolate = loadingRotationAnimation.interpolate({
 		inputRange: [0, 1],
 		outputRange: ["0deg", "360deg"],
 	});
@@ -225,12 +212,12 @@ export default function LoginScreen() {
 		if (!isEmailValid || !isPasswordValid) return;
 
 		Animated.sequence([
-			Animated.timing(buttonScale, {
+			Animated.timing(buttonScaleAnimation, {
 				toValue: 0.95,
 				duration: 100,
 				useNativeDriver: true,
 			}),
-			Animated.timing(buttonScale, {
+			Animated.timing(buttonScaleAnimation, {
 				toValue: 1,
 				duration: 100,
 				useNativeDriver: true,
@@ -246,12 +233,12 @@ export default function LoginScreen() {
 
 	return (
 		<KeyboardAvoidingView
-			style={styles.container}
+			style={[styles.container, { backgroundColor: theme.loginBackground }]}
 			behavior={Platform.OS === "ios" ? "padding" : "height"}
 		>
 			<StatusBar
-				barStyle="light-content"
-				backgroundColor={theme.background}
+				barStyle={isDark ? "light-content" : "dark-content"}
+				backgroundColor={theme.loginBackground}
 				{...(Platform.OS === "web" && { hidden: true })}
 			/>
 
@@ -259,48 +246,27 @@ export default function LoginScreen() {
 				<ThemeToggle size={50} />
 			</View>
 
-			{/* Fundo animado com círculos em MOVIMENTO - AGORA FUNCIONA NO WEB TAMBÉM */}
 			<View style={styles.backgroundContainer}>
-				{/* 
-          🎨 CÍRCULO 1 - Configurações web:
-          - TAMANHO: 400x400 (definido no CSS web)
-          - COR: rgba(138, 43, 226, 0.1) (definido no CSS web)
-          - MOVIMENTO: Vertical suave
-        */}
 				<Animated.View
 					style={[
 						styles.circle1,
 						{
-							transform: [
-								{ translateY: circle1TranslateY }
-							]
+							transform: [{ translateY: circle1TranslateY }],
+							borderColor: theme.loginCircle1
 						},
 					]}
 				/>
 
-				{/* 
-          🎨 CÍRCULO 2 - Configurações web:
-          - TAMANHO: 600x600 (definido no CSS web)
-          - COR: rgba(138, 43, 226, 0.05) (definido no CSS web)
-          - MOVIMENTO: Horizontal suave
-        */}
 				<Animated.View
 					style={[
 						styles.circle2,
 						{
-							transform: [
-								{ translateX: circle2TranslateX }
-							]
+							transform: [{ translateX: circle2TranslateX }],
+							borderColor: theme.loginCircle2
 						},
 					]}
 				/>
 
-				{/* 
-          🎨 CÍRCULO 3 - Configurações web:
-          - TAMANHO: 300x300 (definido no CSS web)
-          - COR: rgba(138, 43, 226, 0.08) (definido no CSS web)
-          - MOVIMENTO: Diagonal suave
-        */}
 				<Animated.View
 					style={[
 						styles.circle3,
@@ -308,20 +274,19 @@ export default function LoginScreen() {
 							transform: [
 								{ translateY: circle3TranslateY },
 								{ translateX: circle3TranslateX }
-							]
+							],
+							borderColor: theme.loginCircle3
 						},
 					]}
 				/>
 
-				{/* 🆕 CÍRCULO 4 - SÓ APARECE NO WEB */}
 				{Platform.OS === 'web' && (
 					<Animated.View
 						style={[
 							styles.circle4,
 							{
-								transform: [
-									{ translateY: circle4TranslateY }
-								]
+								transform: [{ translateY: circle4TranslateY }],
+								borderColor: theme.loginCircle4
 							},
 						]}
 					/>
@@ -333,32 +298,43 @@ export default function LoginScreen() {
 					style={[
 						styles.formContainer,
 						{
-							opacity: fadeAnim,
-							transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+							opacity: fadeAnimation,
+							transform: [{ translateY: slideAnimation }, { scale: scaleAnimation }],
+							// backgroundColor: theme.loginCard
 						},
 					]}
 				>
 					<View style={styles.headerContainer}>
-						<Text style={[styles.title, { color: theme.text }]}>Controle de Acesso</Text>
-						<Text style={[styles.subtitle, { color: theme.textSecondary }]}>Faça login para continuar</Text>
+						<Text style={[styles.title, { color: theme.loginText }]}>Controle de Acesso</Text>
+						<Text style={[styles.subtitle, { color: theme.loginTextSecondary }]}>Faça login para continuar</Text>
 					</View>
 
-					{/* Formulário */}
 					<View style={styles.form}>
 						<View style={styles.inputContainer}>
-							<Text style={[styles.inputLabel, { color: theme.textSecondary }]}>Email</Text>
+							<Text style={[styles.inputLabel, { color: theme.loginTextSecondary }]}>Email</Text>
 							<Animated.View
 								style={[
 									styles.inputWrapper,
-									{ backgroundColor: theme.backgroundCard, borderColor: theme.border },
-									emailFocused && styles.inputWrapperFocused,
-									emailError && styles.inputWrapperError,
+									{ 
+										backgroundColor: theme.backgroundCard, 
+										borderColor: emailFocused ? theme.loginButton : theme.loginBorder 
+									},
+									emailFocused && {
+										...styles.inputWrapperFocused,
+										borderColor: theme.loginButton,
+										backgroundColor: theme.loginCircle1,
+										shadowColor: theme.loginButton
+									},
+									emailError && {
+										borderColor: theme.loginError,
+										backgroundColor: theme.errorLight
+									},
 								]}
 							>
 								<TextInput
-									style={[styles.input, { color: theme.text }, emailFocused && styles.inputFocused]}
+									style={[styles.input, { color: theme.loginInputText }]}
 									placeholder="Digite seu email"
-									placeholderTextColor={theme.textTertiary}
+									placeholderTextColor={theme.loginInputPlaceholder}
 									value={email}
 									onChangeText={(text) => {
 										setEmail(text);
@@ -375,24 +351,35 @@ export default function LoginScreen() {
 								/>
 							</Animated.View>
 							{emailError ? (
-								<Text style={styles.errorText}>{emailError}</Text>
+								<Text style={[styles.errorText, { color: theme.loginError }]}>{emailError}</Text>
 							) : null}
 						</View>
 
 						<View style={styles.inputContainer}>
-							<Text style={[styles.inputLabel, { color: theme.textSecondary }]}>Senha</Text>
+							<Text style={[styles.inputLabel, { color: theme.loginTextSecondary }]}>Senha</Text>
 							<Animated.View
 								style={[
 									styles.inputWrapper,
-									{ backgroundColor: theme.backgroundCard, borderColor: theme.border },
-									passwordFocused && styles.inputWrapperFocused,
-									passwordError && styles.inputWrapperError,
+									{ 
+										backgroundColor: theme.backgroundCard, 
+										borderColor: passwordFocused ? theme.loginButton : theme.loginBorder 
+									},
+									passwordFocused && {
+										...styles.inputWrapperFocused,
+										borderColor: theme.loginButton,
+										backgroundColor: theme.loginCircle1,
+										shadowColor: theme.loginButton
+									},
+									passwordError && {
+										borderColor: theme.loginError,
+										backgroundColor: theme.errorLight
+									},
 								]}
 							>
 								<TextInput
-									style={[styles.input, { color: theme.text }, passwordFocused && styles.inputFocused]}
+									style={[styles.input, { color: theme.loginInputText }]}
 									placeholder="Digite sua senha"
-									placeholderTextColor={theme.textTertiary}
+									placeholderTextColor={theme.loginInputPlaceholder}
 									value={password}
 									onChangeText={(text) => {
 										setPassword(text);
@@ -407,14 +394,17 @@ export default function LoginScreen() {
 								/>
 							</Animated.View>
 							{passwordError ? (
-								<Text style={styles.errorText}>{passwordError}</Text>
+								<Text style={[styles.errorText, { color: theme.loginError }]}>{passwordError}</Text>
 							) : null}
 						</View>
 
-						{/* Botão */}
-						<Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+						<Animated.View style={{ transform: [{ scale: buttonScaleAnimation }] }}>
 							<TouchableOpacity
-								style={[styles.loginButton, isLoading && styles.loginButtonLoading]}
+								style={[
+									styles.loginButton, 
+									{ backgroundColor: theme.loginButton },
+									isLoading && { backgroundColor: theme.loginButtonBackgroundDisabled }
+								]}
 								onPress={handleLogin}
 								disabled={isLoading}
 								activeOpacity={0.8}
@@ -423,33 +413,32 @@ export default function LoginScreen() {
 									<Animated.View
 										style={[
 											styles.loadingIcon,
-											{ transform: [{ rotate: loadingRotationInterpolate }] },
+											{ 
+												transform: [{ rotate: loadingRotationInterpolate }],
+												borderColor: theme.loginButtonText,
+												borderTopColor: "transparent"
+											},
 										]}
 									/>
 								) : (
-									<Text style={styles.loginButtonText}>Entrar</Text>
+									<Text style={[styles.loginButtonText, { color: theme.loginButtonText }]}>Entrar</Text>
 								)}
 							</TouchableOpacity>
 						</Animated.View>
 
-						{/* Links */}
 						<View style={styles.linksContainer}>
 							<TouchableOpacity
 								style={styles.linkButton}
-								onPress={() =>
-									Alert.alert("Info", "Funcionalidade em desenvolvimento")
-								}
+								onPress={() => Alert.alert("Info", "Funcionalidade em desenvolvimento")}
 							>
-								<Text style={styles.linkText}>Esqueci minha senha</Text>
+								<Text style={[styles.linkText, { color: theme.loginLink }]}>Esqueci minha senha</Text>
 							</TouchableOpacity>
 
 							<TouchableOpacity
 								style={styles.linkButton}
-								onPress={() =>
-									Alert.alert("Info", "Funcionalidade em desenvolvimento")
-								}
+								onPress={() => Alert.alert("Info", "Funcionalidade em desenvolvimento")}
 							>
-								<Text style={styles.linkText}>Criar conta</Text>
+								<Text style={[styles.linkText, { color: theme.loginLink }]}>Criar conta</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
