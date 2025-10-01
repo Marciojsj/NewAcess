@@ -11,9 +11,26 @@ import {
   Switch,
   StyleSheet,
   FlatList,
+  Modal,
 } from 'react-native';
 import { responsive, deviceType } from '../utils/responsive';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAuth } from '../contexts/AuthContext';
+
+
+type RootStackParamList = {
+  Login: undefined;
+  Home: undefined;
+  RegistrarEntrada: undefined;
+  RegistrarSaida: undefined;
+  Visitantes: undefined;
+  Relatorios: undefined;
+  Alertas: undefined;
+};
+
+type WebSidebarNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 interface SidebarAction {
   id: string;
@@ -39,7 +56,8 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
   onThemeChange,
   onLogout
 }) => {
-  const { theme: appTheme } = useTheme();
+  const { theme: appTheme, isDark } = useTheme();
+  const navigation = useNavigation<WebSidebarNavigationProp>();
   const slideAnim = useRef(new Animated.Value(-320)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const iconAnim = useRef(new Animated.Value(0)).current;
@@ -47,50 +65,61 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredActions, setFilteredActions] = useState<SidebarAction[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
+  const { user, logout } = useAuth();
 
   const sidebarActions: SidebarAction[] = [
     {
       id: '1',
       title: 'Dashboard',
       icon: '📊',
-      color: appTheme.purple,
+      color: appTheme.purple || '#8b5cf6',
       keywords: ['dashboard', 'início', 'home', 'principal'],
-      onPress: () => Alert.alert('Dashboard', 'Navegando para dashboard'),
+      onPress: () => showAlert('Dashboard', 'Navegando para dashboard'),
     },
     {
       id: '2',
       title: 'Usuários',
       icon: '👥',
-      color: appTheme.blue,
+      color: appTheme.blue || '#06b6d4',
       keywords: ['usuários', 'users', 'pessoas', 'clientes'],
-      onPress: () => Alert.alert('Usuários', 'Gerenciar usuários'),
+      onPress: () => showAlert('Usuários', 'Gerenciar usuários'),
     },
     {
       id: '3',
       title: 'Relatórios',
       icon: '📈',
-      color: appTheme.green,
+      color: appTheme.green || '#10b981',
       keywords: ['relatórios', 'reports', 'análise', 'métricas'],
-      onPress: () => Alert.alert('Relatórios', 'Visualizar relatórios'),
+      onPress: () => showAlert('Relatórios', 'Visualizar relatórios'),
     },
     {
       id: '4',
       title: 'Configurações',
       icon: '⚙️',
-      color: appTheme.orange,
+      color: appTheme.orange || '#f59e0b',
       keywords: ['configurações', 'settings', 'preferências', 'opções'],
-      onPress: () => Alert.alert('Configurações', 'Configurações do sistema'),
+      onPress: () => showAlert('Configurações', 'Configurações do sistema'),
     },
     {
       id: '5',
       title: 'Suporte',
       icon: '💬',
-      color: appTheme.error,
+      color: appTheme.error || '#ef4444',
       keywords: ['suporte', 'help', 'ajuda', 'contato'],
-      onPress: () => Alert.alert('Suporte', 'Entre em contato conosco'),
+      onPress: () => showAlert('Suporte', 'Entre em contato conosco'),
     },
   ];
+
+  // Função universal para mostrar alertas (funciona em web e mobile)
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}\n\n${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -168,14 +197,39 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sair',
-      'Tem certeza que deseja sair?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Sair', style: 'destructive', onPress: onLogout }
-      ]
-    );
+    if (Platform.OS === 'web') {
+      setLogoutModalVisible(true);
+    } else {
+      Alert.alert(
+        'Sair',
+        'Tem certeza que deseja sair?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Sair', 
+            style: 'destructive', 
+            onPress: () => {
+              onLogout?.();
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            }
+          }
+        ]
+      );
+    }
+  };
+
+  const confirmLogout = () => {
+    setLogoutModalVisible(false);
+    onLogout?.();
+    
+    logout();
+  };
+
+  const cancelLogout = () => {
+    setLogoutModalVisible(false);
   };
 
   const highlightText = (text: string, query: string) => {
@@ -208,6 +262,49 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
 
   return (
     <>
+      {/* Modal de Logout para Web */}
+      <Modal
+        visible={logoutModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={cancelLogout}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[
+            styles.modalContent,
+            { 
+              backgroundColor: appTheme.backgroundCard,
+              borderColor: appTheme.border 
+            }
+          ]}>
+            <Text style={[styles.modalTitle, { color: appTheme.text }]}>
+              Sair da Aplicação
+            </Text>
+            <Text style={[styles.modalMessage, { color: appTheme.textTertiary }]}>
+              Tem certeza que deseja sair? Você será redirecionado para a tela de login.
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton, { borderColor: appTheme.border }]}
+                onPress={cancelLogout}
+              >
+                <Text style={[styles.cancelButtonText, { color: appTheme.text }]}>
+                  Cancelar
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.confirmButton, { backgroundColor: appTheme.error }]}
+                onPress={confirmLogout}
+              >
+                <Text style={styles.confirmButtonText}>
+                  Sair
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {isOpen && (
         <Animated.View
           style={[
@@ -234,7 +331,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
       >
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <View style={[styles.avatar, { backgroundColor: appTheme.purpleLight }]}>
+            <View style={[styles.avatar, { backgroundColor: appTheme.purpleLight || '#8b5cf620' }]}>
               <Text style={styles.avatarText}>👤</Text>
             </View>
             <View style={styles.headerText}>
@@ -244,7 +341,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
               ]}>
                 Admin User
               </Text>
-              <Text style={[styles.userRole, { color: appTheme.purple }]}>
+              <Text style={[styles.userRole, { color: appTheme.purple || '#8b5cf6' }]}>
                 Administrador
               </Text>
             </View>
@@ -506,6 +603,65 @@ const SidebarButton: React.FC<{
 };
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+  },
+  modalContent: {
+    width: 400,
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
+    borderWidth: 1,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelButton: {
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+  },
+  confirmButton: {
+    backgroundColor: '#ef4444',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  confirmButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
   overlay: {
     position: 'fixed' as any,
     top: 0,

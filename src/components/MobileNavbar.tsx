@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { responsive, deviceType } from '../utils/responsive';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarAction {
     id: string;
@@ -54,6 +55,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
     const [filteredActions, setFilteredActions] = useState<SidebarAction[]>([]);
     const [selectedIndex, setSelectedIndex] = useState(-1);
     const searchInputRef = useRef<TextInput>(null);
+    const { user, logout } = useAuth();
 
     const sidebarActions: SidebarAction[] = [
         {
@@ -218,19 +220,10 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
     };
 
     const handleLogout = () => {
-        Alert.alert(
-            'Sair',
-            'Tem certeza que deseja sair?',
-            [
-                { text: 'Cancelar', style: 'cancel' },
-                {
-                    text: 'Sair', style: 'destructive', onPress: () => {
-                        onLogout?.();
-                        closeMenu();
-                    }
-                }
-            ]
-        );
+        Alert.alert('Sair', 'Deseja realmente sair?', [
+            { text: 'Cancelar', style: 'cancel' },
+            { text: 'Sair', style: 'destructive', onPress: logout },
+        ]);
     };
 
     const highlightText = (text: string, query: string) => {
@@ -686,9 +679,8 @@ const styles = StyleSheet.create({
         marginTop: responsive.padding.md,
     },
     searchInput: {
-        //   flex: 1,
         fontSize: responsive.fontSize.md,
-        height: 44, // 🔑 controla a altura fixa do campo
+        height: 44,
         paddingHorizontal: responsive.padding.md,
         backgroundColor: 'transparent',
         borderWidth: 0,
