@@ -25,6 +25,8 @@ type RootStackParamList = {
 	Visitantes: undefined;
 	Relatorios: undefined;
 	Alertas: undefined;
+	Entidade: undefined;
+	RegistroEntidade: undefined;
 };
 
 type WebSidebarNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -71,6 +73,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); onToggle(); } },
 		{ id: '5', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); onToggle(); } },
 		{ id: '6', title: 'Alertas', icon: '⚠️', onPress: () => { navigation.navigate('Alertas'); onToggle(); } },
+		{ id: '7', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); onToggle(); } },
 	];
 
 	useEffect(() => {
@@ -132,7 +135,11 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
 				<View style={styles.searchWrapper}>
 					<TextInput
 						ref={searchInputRef}
-						style={[styles.searchInput, { color: appTheme.text, backgroundColor: appTheme.background + '40' }]}
+						style={[styles.searchInput, { 
+							color: appTheme.text, 
+							backgroundColor: appTheme.background + '40',
+							borderColor: appTheme.border 
+						}]}
 						placeholder="Buscar funcionalidades..."
 						placeholderTextColor={appTheme.textTertiary}
 						value={searchQuery}
@@ -233,15 +240,19 @@ const SidebarButton: React.FC<{ action: SidebarAction; theme: 'light' | 'dark'; 
 					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : appTheme.background + '20',
 					borderColor: hovered || isSelected ? appTheme.primary + '40' : appTheme.borderLight,
 					transform: hovered ? [{ translateY: -2 }] : [],
-					shadowColor: hovered ? '#000' : undefined,
-					shadowOpacity: hovered ? 0.15 : 0.05,
-					shadowOffset: { width: 0, height: hovered ? 2 : 1 },
-					shadowRadius: hovered ? 4 : 2,
+					// CORREÇÃO: Para web, podemos usar boxShadow condicional
+					...(Platform.OS === 'web' && {
+						boxShadow: hovered ? '0 2px 8px rgba(0,0,0,0.15)' : '0 1px 3px rgba(0,0,0,0.1)' as any,
+					}),
+					// Para mobile, usamos elevation
 					elevation: hovered ? 4 : 1,
 				},
 			]}
 		>
-			<View style={[styles.actionIcon, { borderColor: isSelected ? appTheme.primary : appTheme.border }]}>
+			<View style={[styles.actionIcon, { 
+				borderColor: isSelected ? appTheme.primary : appTheme.border,
+				backgroundColor: hovered || isSelected ? appTheme.primary + '10' : 'transparent',
+			}]}>
 				<Text style={styles.actionIconText}>{action.icon}</Text>
 			</View>
 			<Text style={[styles.actionTitle, { color: appTheme.text }]}>{action.title}</Text>
@@ -272,14 +283,16 @@ const HoverableButton: React.FC<{
 				{
 					borderColor: appTheme.borderLight,
 					borderWidth: 1,
+					backgroundColor: appTheme.background + '20',
+					// CORREÇÃO: Para web, boxShadow condicional
+					...(Platform.OS === 'web' && {
+						boxShadow: hovered ? '0 2px 8px rgba(0,0,0,0.15)' : '0 1px 3px rgba(0,0,0,0.1)' as any,
+					}),
+					// Para mobile, elevation
+					elevation: hovered ? 4 : 1,
 				},
 				hovered && {
 					transform: [{ translateY: -2 }],
-					shadowColor: '#000',
-					shadowOpacity: 0.15,
-					shadowOffset: { width: 0, height: 2 },
-					shadowRadius: 4,
-					elevation: 4,
 					backgroundColor: appTheme.primary + '20',
 				},
 			]}
@@ -292,14 +305,40 @@ const HoverableButton: React.FC<{
 };
 
 const styles = StyleSheet.create({
-	overlay: { position: 'fixed' as any, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.4)' },
+	overlay: { 
+		position: 'fixed' as any, 
+		top: 0, 
+		left: 0, 
+		right: 0, 
+		bottom: 0, 
+		backgroundColor: 'rgba(0,0,0,0.4)' 
+	},
 	overlayTouchable: { flex: 1 },
-	sidebar: { position: "fixed" as any, top: 0, left: 0, bottom: 0, width: 280, paddingTop: 32, zIndex: 999 },
+	sidebar: { 
+		position: "fixed" as any, 
+		top: 0, 
+		left: 0, 
+		bottom: 0, 
+		width: 280, 
+		paddingTop: 32, 
+		zIndex: 999,
+		// CORREÇÃO: Para web, usar boxShadow
+		...(Platform.OS === 'web' && {
+			boxShadow: '2px 0 10px rgba(0,0,0,0.3)' as any,
+		}),
+		// Para mobile, elevation
+		elevation: 10,
+	},
 	header: { paddingHorizontal: 20, marginBottom: 20 },
 	userName: { fontSize: 16, fontWeight: '600' },
 	userRole: { fontSize: 13, fontWeight: '400', marginTop: 2 },
 	searchWrapper: { paddingHorizontal: 20, marginBottom: 10 },
-	searchInput: { borderRadius: 8, padding: 10, fontSize: 14 },
+	searchInput: { 
+		borderRadius: 8, 
+		padding: 10, 
+		fontSize: 14,
+		borderWidth: 1,
+	},
 	actionsContainer: { flex: 1, paddingHorizontal: 8 },
 	actionButton: { 
 		flexDirection: 'row', 
@@ -310,12 +349,33 @@ const styles = StyleSheet.create({
 		marginBottom: 4,
 		borderWidth: 1,
 	},
-	actionIcon: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginRight: 12, borderWidth: 1 },
+	actionIcon: { 
+		width: 36, 
+		height: 36, 
+		borderRadius: 18, 
+		justifyContent: 'center', 
+		alignItems: 'center', 
+		marginRight: 12, 
+		borderWidth: 1 
+	},
 	actionIconText: { fontSize: 18 },
 	actionTitle: { fontSize: 15, fontWeight: '500', flex: 1 },
 	chevronText: { fontSize: 18, fontWeight: '600', opacity: 0.5 },
 	toggleButtonWrapper: { position: "fixed" as any, top: 20, left: 20, zIndex: 1000 },
-	toggleButton: { width: 44, height: 44, borderRadius: 12, borderWidth: 1, justifyContent: 'center', alignItems: 'center' },
+	toggleButton: { 
+		width: 44, 
+		height: 44, 
+		borderRadius: 12, 
+		borderWidth: 1, 
+		justifyContent: 'center', 
+		alignItems: 'center',
+		// CORREÇÃO: Para web, boxShadow
+		...(Platform.OS === 'web' && {
+			boxShadow: '0 2px 8px rgba(0,0,0,0.15)' as any,
+		}),
+		// Para mobile, elevation
+		elevation: 3,
+	},
 	toggleIconContainer: { width: 20, height: 16, justifyContent: 'space-between' },
 	toggleLine: { height: 2, borderRadius: 1, width: '100%' },
 	footer: { paddingHorizontal: 20, paddingBottom: 20 },
@@ -328,10 +388,31 @@ const styles = StyleSheet.create({
 		marginBottom: 8,
 	},
 	footerButtonText: { fontSize: 14 },
-	modalOverlay: { flex:1, backgroundColor:'rgba(0,0,0,0.4)', justifyContent:'center', alignItems:'center' },
-	modalContent: { width:280, borderRadius:8, padding:20 },
+	modalOverlay: { 
+		flex:1, 
+		backgroundColor:'rgba(0,0,0,0.4)', 
+		justifyContent:'center', 
+		alignItems:'center' 
+	},
+	modalContent: { 
+		width:280, 
+		borderRadius:8, 
+		padding:20,
+		// CORREÇÃO: Para web, boxShadow
+		...(Platform.OS === 'web' && {
+			boxShadow: '0 4px 20px rgba(0,0,0,0.3)' as any,
+		}),
+		// Para mobile, elevation
+		elevation: 8,
+	},
 	modalTitle: { fontSize:16, fontWeight:'600', marginBottom:20 },
 	modalActions: { flexDirection:'row', justifyContent:'space-between' },
-	modalButton: { flex:1, padding:10, borderRadius:8, marginHorizontal:5, alignItems:'center' },
+	modalButton: { 
+		flex:1, 
+		padding:10, 
+		borderRadius:8, 
+		marginHorizontal:5, 
+		alignItems:'center' 
+	},
 	modalButtonText: { fontSize:14, fontWeight:'500' },
 });

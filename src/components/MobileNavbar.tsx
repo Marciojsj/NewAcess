@@ -25,6 +25,8 @@ type RootStackParamList = {
 	Visitantes: undefined;
 	Relatorios: undefined;
 	Alertas: undefined;
+	Entidade: undefined;
+	RegistroEntidade: undefined;
 };
 
 type MobileNavbarNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -71,6 +73,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); closeMenu(); } },
 		{ id: '5', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); closeMenu(); } },
 		{ id: '6', title: 'Alertas', icon: '⚠️', onPress: () => { navigation.navigate('Alertas'); closeMenu(); } },
+		{ id: '7', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
 	];
 
 	// Controle do menu
@@ -349,10 +352,7 @@ const SidebarButton: React.FC<{
 					backgroundColor: hovered || isSelected ? appTheme.primary + '20' : appTheme.background + '20',
 					borderColor: hovered || isSelected ? appTheme.primary + '40' : appTheme.borderLight,
 					transform: hovered ? [{ translateY: -2 }] : [],
-					shadowColor: hovered ? '#000' : undefined,
-					shadowOpacity: hovered ? 0.15 : 0.05,
-					shadowOffset: { width: 0, height: hovered ? 2 : 1 },
-					shadowRadius: hovered ? 4 : 2,
+					// CORREÇÃO: Removidas as shadow props e usando apenas elevation
 					elevation: hovered ? 4 : 1,
 				},
 			]}
@@ -388,14 +388,11 @@ const HoverableButton: React.FC<{
 					borderColor: appTheme.borderLight,
 					borderWidth: 1,
 					backgroundColor: appTheme.background + '20',
+					// CORREÇÃO: Removidas as shadow props e usando apenas elevation
+					elevation: hovered ? 4 : 1,
 				},
 				hovered && {
 					transform: [{ translateY: -2 }],
-					shadowColor: '#000',
-					shadowOpacity: 0.15,
-					shadowOffset: { width: 0, height: 2 },
-					shadowRadius: 4,
-					elevation: 4,
 					backgroundColor: appTheme.primary + '20',
 				},
 			]}
@@ -425,10 +422,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		justifyContent: 'center',
 		alignItems: 'center',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
+		// CORREÇÃO: Removidas shadow props e usando elevation
 		elevation: 3,
 		marginLeft: 20,
 	},
@@ -459,10 +453,7 @@ const styles = StyleSheet.create({
 		width: 280,
 		zIndex: 1001,
 		paddingTop: 80,
-		shadowColor: '#000',
-		shadowOffset: { width: 2, height: 0 },
-		shadowOpacity: 0.3,
-		shadowRadius: 10,
+		// CORREÇÃO: Removidas shadow props e usando elevation
 		elevation: 10,
 	},
 	contentContainer: {
