@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { Entity } from '../../types/entityTypes';
 import { useTheme } from '../../contexts/ThemeContext';
-import styles from './EntityTable.styles';
+import styles from './EntityList.styles';
 
-interface EntityTableProps {
+interface EntityListProps {
   entities: Entity[];
   loading: boolean;
   onEdit: (entity: Entity) => void;
@@ -12,7 +12,7 @@ interface EntityTableProps {
   onCreate: () => void;
 }
 
-export const EntityTable: React.FC<EntityTableProps> = ({
+export const EntityList: React.FC<EntityListProps> = ({
   entities,
   loading,
   onEdit,

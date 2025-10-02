@@ -3,7 +3,7 @@ import { View, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Entity } from '../../types/entityTypes';
 import { useEntities } from '../../hooks/useEntities';
-import { EntityTable } from '../../components/entity/EntityTable';
+import { EntityList } from '../../components/entity/EntityList';
 import { useTheme } from '../../contexts/ThemeContext';
 import styles from './styles/entidadeScreen.styles';
 
@@ -49,7 +49,7 @@ export const EntidadeScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <EntityTable
+      <EntityList
         entities={entities}
         loading={loading || refreshing}
         onEdit={handleEdit}
