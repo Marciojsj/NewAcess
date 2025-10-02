@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { responsive } from "../../../utils/responsive";
+import { responsive } from "../../../utils/responsive";	
 
 const { width, height } = Dimensions.get("window");
 

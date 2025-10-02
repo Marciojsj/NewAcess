@@ -13,7 +13,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import { responsive } from '../utils/responsive';
+import { responsive } from '../../utils/responsive';
 
 interface SearchableItem {
   id: string;

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Animated, ViewStyle } from 'react-native';
-import { responsive } from '../utils/responsive';
+import { responsive } from '../../utils/responsive';
 
 // Interface para props do componente LoadingSpinner
 // Define opções de customização para tamanho, cor e estilo

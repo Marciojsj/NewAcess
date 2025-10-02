@@ -10,9 +10,9 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import { responsive, deviceType } from '../utils/responsive';
-import { useTheme } from '../contexts/ThemeContext';
-import { SearchModal } from './SearchModal';
+import { responsive, deviceType } from '../../utils/responsive';
+import { useTheme } from '../../contexts/ThemeContext';
+import { SearchModal } from '../ui/SearchModal';
 
 interface FooterAction {
   id: string;

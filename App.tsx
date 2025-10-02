@@ -12,8 +12,6 @@ import RegistrarSaidaScreen from './src/screens/registrarSaida/RegistrarSaidaScr
 import VisitantesScreen from './src/screens/visitantes/VisitantesScreen';
 import RelatoriosScreen from './src/screens/relatorios/RelatoriosScreen';
 // import AlertasScreen from './src/screens/alertas/AlertasScreen';
-
-// Import das telas de Entidade
 import { EntidadeScreen } from './src/screens/entidade/entidadeScreen';
 import { RegistroEntidadeScreen } from './src/screens/entidade/RegistroEntidadeScreen';
 
@@ -36,8 +34,6 @@ function Routes() {
           <Stack.Screen name="Visitantes" component={VisitantesScreen} />
           <Stack.Screen name="Relatorios" component={RelatoriosScreen} />
           {/* <Stack.Screen name="Alertas" component={AlertasScreen} /> */}
-          
-          {/* Adicione estas duas linhas para as telas de Entidade */}
           <Stack.Screen name="Entidade" component={EntidadeScreen} />
           <Stack.Screen name="RegistroEntidade" component={RegistroEntidadeScreen} />
         </>

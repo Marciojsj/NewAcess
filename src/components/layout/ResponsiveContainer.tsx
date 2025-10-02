@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Animated, ViewStyle, StyleProp } from 'react-native';
-import { responsive, deviceType } from '../utils/responsive';
+import { responsive, deviceType } from '../../utils/responsive';
 
 interface ResponsiveContainerProps {
 	children: React.ReactNode;

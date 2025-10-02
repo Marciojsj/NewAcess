@@ -1,43 +1,25 @@
 import { StyleSheet } from "react-native";
-import { responsive } from "../utils/responsive";
-
-const webSpecificStyles = {
-  createButton: { 
-    cursor: "pointer" as any, 
-    transition: "all 0.2s ease" as any 
-  },
-  actionButton: { 
-    cursor: "pointer" as any 
-  },
-  // Use boxShadow em vez de shadow props
-  tableHeader: {
-    boxShadow: "0 2px 4px rgba(0,0,0,0.1)" as any,
-  },
-  tableRow: {
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)" as any,
-  },
-};
+import { responsive } from "../../utils/responsive";
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
+    padding: 16,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 24,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
   },
   createButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 8,
-    ...webSpecificStyles.createButton,
   },
   createButtonText: {
     color: "#fff",
@@ -48,82 +30,79 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 40,
+    padding: 20,
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: 12,
     fontSize: 16,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 60,
+    padding: 40,
   },
   emptyText: {
-    fontSize: 18,
-    marginBottom: 24,
+    fontSize: 16,
+    marginBottom: 20,
     textAlign: "center",
   },
   emptyButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
     borderRadius: 8,
   },
   emptyButtonText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 16,
   },
   tableContainer: {
     flex: 1,
   },
   tableHeader: {
     flexDirection: "row",
-    padding: 16,
+    padding: 12,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
-    ...webSpecificStyles.tableHeader,
   },
   headerCell: {
     flex: 1,
     fontWeight: "600",
-    fontSize: 14,
+    fontSize: 12,
   },
   tableRow: {
     flexDirection: "row",
-    padding: 16,
+    padding: 12,
     borderBottomWidth: 1,
-    ...webSpecificStyles.tableRow,
+    alignItems: "center",
   },
   cell: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 12,
   },
   statusCell: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
   statusBadge: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   statusText: {
-    fontSize: 14,
+    fontSize: 12,
   },
   actionsCell: {
     flex: 1,
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-    ...webSpecificStyles.actionButton,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
   },
   editButton: {
     backgroundColor: "#ffc107",
@@ -133,7 +112,7 @@ export default StyleSheet.create({
   },
   actionButtonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: "600",
   },
 });

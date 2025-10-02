@@ -8,7 +8,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import { responsive, deviceType } from '../utils/responsive';
+import { responsive, deviceType } from '../../utils/responsive';
 
 interface AnimatedInputProps extends TextInputProps {
   label: string;

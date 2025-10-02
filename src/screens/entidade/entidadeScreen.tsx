@@ -3,7 +3,7 @@ import { View, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Entity } from '../../types/entityTypes';
 import { useEntities } from '../../hooks/useEntities';
-import { EntityTable } from '../../components/EntityTable';
+import { EntityTable } from '../../components/entity/EntityTable';
 import { useTheme } from '../../contexts/ThemeContext';
 import styles from './styles/entidadeScreen.styles';
 

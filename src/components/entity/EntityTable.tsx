@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
-import { Entity } from '../types/entityTypes';
-import { useTheme } from '../contexts/ThemeContext';
+import { Entity } from '../../types/entityTypes';
+import { useTheme } from '../../contexts/ThemeContext';
 import styles from './EntityTable.styles';
 
 interface EntityTableProps {

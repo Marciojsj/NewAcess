@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // Importação corrigida
 import { useTheme } from '../../contexts/ThemeContext';
-import { WebSidebar } from '../../components/WebSidebar';
+import { WebSidebar } from '../../components/layout/WebSidebar';
 import { MobileNavbar } from '../../components/MobileNavbar';
 import { deviceType } from '../../utils/responsive';
 

@@ -3,7 +3,7 @@ import { View, Alert, ScrollView } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Entity, EntityFormData } from '../../types/entityTypes';
 import { useEntities } from '../../hooks/useEntities';
-import { EntityForm } from '../../components/EntityForm';
+import { EntityForm } from '../../components/entity/EntityForm';
 import { useTheme } from '../../contexts/ThemeContext';
 import styles from './styles/RegistroEntidadeScreen.styles';
 

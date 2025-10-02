@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Platform, StatusBar } from 'react-native';
-import { ResponsiveContainer } from '../../components/ResponsiveContainer';
-import { responsive, deviceType } from '../../utils/responsive';
+import { ResponsiveContainer } from '../../components/layout/ResponsiveContainer';
+import { responsive, deviceType }  from "../../utils/responsive";
 
 export default function RelatoriosScreen({ navigation }: any) {
   return (

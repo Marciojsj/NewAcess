@@ -13,9 +13,9 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { responsive, deviceType } from '../utils/responsive';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
+import { responsive, deviceType } from '../../utils/responsive';
 
 type RootStackParamList = {
 	Login: undefined;

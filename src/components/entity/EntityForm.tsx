@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Switch, TouchableOpacity, Alert } from 'react-native';
-import { Entity, EntityFormData } from '../types/entityTypes';
-import { useTheme } from '../contexts/ThemeContext';
+import { Entity, EntityFormData } from '../../types/entityTypes';
+import { useTheme } from '../../contexts/ThemeContext';
 import styles from './EntityForm.styles';
 
 interface EntityFormProps {

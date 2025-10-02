@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { responsive } from "../../../utils/responsive";
+import { responsive } from "../../../utils/responsive";	
 
 // Estilos específicos para web que não são suportados pelo StyleSheet
 const webSpecificStyles = {

@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
-import { ThemeToggle } from "../../components/ThemeToggle";
-import { ResponsiveContainer } from "../../components/ResponsiveContainer";
+import { ThemeToggle } from '../../components/ui/ThemeToggle';
+import { ResponsiveContainer } from '../../components/layout/ResponsiveContainer';
 import { responsive, deviceType, useResponsive } from "../../utils/responsive";
 
 import styles from "./styles/LoginScreen.styles";
