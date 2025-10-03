@@ -13,6 +13,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { WebNavbar } from '../../components/layout/WebNavbar';
 import { WebSidebar } from '../../components/layout/WebSidebar';
 import { deviceType } from '../../utils/responsive';
+import { Platform } from 'react-native';
 import styles from './styles/entidadeScreen.styles';
 
 // Tipos para os dados da entidade
@@ -241,9 +242,8 @@ export const EntidadeScreen: React.FC = () => {
       <WebNavbar
         screenName="Entidade"
         searchPlaceholder="Search or type a command (Ctrl + G)"
-        viewModeLabel="Exibição em Lista"
-        actionsLabel="Ações"
-        addButtonLabel="+ Adicionar Entidade"
+        viewModeLabel= {Platform.OS === 'web' ? "Exibição em Lista" : " + "}
+        addButtonLabel={Platform.OS === 'web' ? "+ Adicionar Entidade" : " + "}
         searchText={searchText}
         onSearchChange={setSearchText}
         onAddPress={handleAdicionarEntidade}

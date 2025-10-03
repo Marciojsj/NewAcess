@@ -10,6 +10,7 @@ import {
     Platform,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
+import { responsiveValue } from '../../utils/responsive';
 
 interface WebNavbarProps {
     screenName: string;
@@ -57,9 +58,9 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     backgroundColor: theme.backgroundCard,
                     borderBottomWidth: 1,
                     borderBottomColor: theme.borderLight,
-                    paddingHorizontal: 16,
-                    paddingTop: Platform.OS === 'web' ? 18 : 14,
-                    paddingBottom: Platform.OS === 'web' ? 12 : 10,
+                    paddingHorizontal: responsiveValue({ default: 16, mobile: 12, desktop: 24 }),
+                    paddingTop: responsiveValue({ default: Platform.OS === 'web' ? 18 : 14, mobile: 50, desktop: 20 }),
+                    paddingBottom: responsiveValue({ default: Platform.OS === 'web' ? 10 : 10, mobile: 8, desktop: 16 }),
                     shadowColor: theme.shadow,
                     shadowOffset: { width: 0, height: 6 },
                     shadowOpacity: Platform.OS === 'web' ? 0.08 : 0.2,
@@ -68,9 +69,9 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                 },
                 actionBar: {
                     backgroundColor: theme.backgroundCard,
-                    paddingHorizontal: 16,
-                    paddingTop: Platform.OS === 'web' ? 10 : 8,
-                    paddingBottom: Platform.OS === 'web' ? 14 : 12,
+                    paddingHorizontal: responsiveValue({ default: 16, mobile: 12, desktop: 24 }),
+                    paddingTop: responsiveValue({ default: Platform.OS === 'web' ? 10 : 8, mobile: 6, desktop: 14 }),
+                    paddingBottom: responsiveValue({ default: Platform.OS === 'web' ? 12 : 12, mobile: 5, desktop: 10}),
                     shadowColor: theme.shadow,
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: Platform.OS === 'web' ? 0.06 : 0.16,
@@ -89,7 +90,7 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                 },
                 centerSection: {
                     flex: 2,
-                    paddingHorizontal: 16,
+                    paddingHorizontal: responsiveValue({ default: 16, mobile: 8, desktop: 24 }),
                 },
                 rightSection: {
                     flexDirection: 'row',
@@ -98,8 +99,8 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     flex: 1,
                 },
                 iconButton: {
-                    width: 44,
-                    height: 44,
+                    width: responsiveValue({ default: 44, mobile: 36, desktop: 48 }),
+                    height: responsiveValue({ default: 44, mobile: 36, desktop: 48 }),
                     borderRadius: 12,
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -117,24 +118,28 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     color: theme.text,
                 },
                 searchInput: {
-                    width: '37%',
+                    width:   responsiveValue({ default: 180, mobile: 260, desktop: 370 }),
                     borderWidth: 1,
                     borderRadius: 12,
-                    paddingHorizontal: 18,
-                    paddingVertical: Platform.select({ ios: 10, android: 8, default: 10 }),
+                    paddingHorizontal: responsiveValue({ default: 18, mobile: 12, desktop: 22 }),
+                    paddingVertical: responsiveValue({
+                        default: Platform.OS === 'android' ? 8 : 10,
+                        mobile: Platform.OS === 'android' ? 6 : 8,
+                        desktop: 12,
+                    }),
                     fontSize: 14,
                     backgroundColor: theme.background,
                     color: theme.text,
                     borderColor: theme.borderLight,
                 },
                 actionButton: {
-                    paddingHorizontal: 14,
-                    paddingVertical: 10,
+                    paddingHorizontal: responsiveValue({ default: 14, mobile: 12, desktop: 18 }),
+                    paddingVertical: responsiveValue({ default: 10, mobile: 8, desktop: 12 }),
                     borderRadius: 10,
                     backgroundColor: theme.background,
                     borderWidth: 1,
                     borderColor: theme.borderLight,
-                    marginLeft: 12,
+                    marginLeft: responsiveValue({ default: 12, mobile: 8, desktop: 16 }),
                     shadowColor: theme.shadow,
                     shadowOffset: { width: 0, height: 3 },
                     shadowOpacity: Platform.OS === 'web' ? 0.06 : 0.15,
@@ -147,11 +152,11 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     fontWeight: '500',
                 },
                 addButton: {
-                    paddingHorizontal: 18,
-                    paddingVertical: 10,
+                    paddingHorizontal: responsiveValue({ default: 18, mobile: 14, desktop: 22 }),
+                    paddingVertical: responsiveValue({ default: 10, mobile: 8, desktop: 12 }),
                     borderRadius: 10,
                     backgroundColor: theme.primary,
-                    marginLeft: 12,
+                    marginLeft: responsiveValue({ default: 12, mobile: 8, desktop: 16 }),
                     shadowColor: theme.shadow,
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: Platform.OS === 'web' ? 0.12 : 0.25,
@@ -273,13 +278,23 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                             value={searchText}
                             onChangeText={onSearchChange}
                         />
+
+                                               
+
                         <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={onAddPress}
+                            activeOpacity={0.9}
+                        >
+                            <Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
+                        </TouchableOpacity>
+                        {/* <TouchableOpacity
                             style={styles.menuTrigger}
                             onPress={() => setMenuVisible(prev => !prev)}
                             activeOpacity={0.85}
                         >
                             <Text style={styles.menuTriggerText}>⚙</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
 
@@ -338,22 +353,14 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                         >
                             <Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={onViewModePress}
-                            activeOpacity={0.85}
-                        >
-                            <Text style={styles.actionButtonText}>{effectiveViewModeLabel}</Text>
-                        </TouchableOpacity>
-
+{/* 
                         <TouchableOpacity
                             style={styles.addButton}
                             onPress={onAddPress}
                             activeOpacity={0.9}
                         >
                             <Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity> */}
                     </View>
                 </View>
             </View>

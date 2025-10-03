@@ -26,6 +26,8 @@ export const deviceType = {
   isTablet: screenWidth >= breakpoints.tablet && screenWidth < breakpoints.desktop,
   // Desktop: largura maior ou igual a 1024px
   isDesktop: screenWidth >= breakpoints.desktop,
+  // Large Desktop: largura maior ou igual a 1440px
+  isLargeDesktop: screenWidth >= breakpoints.largeDesktop,
   // Web: plataforma web (independente do tamanho)
   isWeb: Platform.OS === 'web',
 };
@@ -110,6 +112,7 @@ export const useResponsive = () => {
     isMobile: dimensions.width < breakpoints.tablet,
     isTablet: dimensions.width >= breakpoints.tablet && dimensions.width < breakpoints.desktop,
     isDesktop: dimensions.width >= breakpoints.desktop,
+    isLargeDesktop: dimensions.width >= breakpoints.largeDesktop,
   };
 };
 
@@ -117,4 +120,45 @@ export const useResponsive = () => {
 // Permite diferentes estilos para web e mobile de forma limpa
 export const platformStyles = (webStyle: any, mobileStyle: any) => {
   return Platform.OS === 'web' ? webStyle : mobileStyle;
+};
+
+type ResponsiveValueConfig<T> = {
+  default: T;
+  mobile?: T;
+  tablet?: T;
+  desktop?: T;
+  largeDesktop?: T;
+  web?: T;
+  ios?: T;
+  android?: T;
+};
+
+// Função auxiliar para retornar valores responsivos para dimensões
+// Permite definir valores distintos para mobile, tablet, desktop e plataformas específicas
+export const responsiveValue = <T>(config: ResponsiveValueConfig<T>): T => {
+  let value: T = config.default;
+
+  if (Platform.OS === 'web' && config.web !== undefined) {
+    value = config.web;
+  }
+
+  if (Platform.OS === 'ios' && config.ios !== undefined) {
+    value = config.ios;
+  }
+
+  if (Platform.OS === 'android' && config.android !== undefined) {
+    value = config.android;
+  }
+
+  if (deviceType.isMobile && config.mobile !== undefined) {
+    value = config.mobile;
+  } else if (deviceType.isTablet && config.tablet !== undefined) {
+    value = config.tablet;
+  } else if (deviceType.isLargeDesktop && config.largeDesktop !== undefined) {
+    value = config.largeDesktop;
+  } else if (deviceType.isDesktop && config.desktop !== undefined) {
+    value = config.desktop;
+  }
+
+  return value;
 };
