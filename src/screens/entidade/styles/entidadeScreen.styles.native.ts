@@ -1,8 +1,311 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+  },
+  homeWrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  homeCard: {
+    width: '100%',
+    maxWidth: 360,
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  homeTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  homeSubtitle: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  primaryButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#007bff',
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 14,
+    elevation: 4,
+    alignSelf: 'flex-start',
+  },
+  primaryButtonHover: {
+    backgroundColor: '#0056d2',
+  },
+  primaryButtonPressed: {
+    transform: [{ scale: 0.97 }],
+    shadowOpacity: 0.2,
+  },
+  primaryButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  homeButton: {
+    marginTop: 20,
+    alignSelf: 'stretch',
+  },
+  listWrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+  },
+  header: {
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    elevation: 4,
+    flexWrap: 'wrap',
+  },
+  headerButton: {
+    minWidth: 160,
+    alignSelf: 'auto',
+  },
+  headerButtonMobile: {
+    width: '100%',
+    marginTop: 12,
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+  },
+  loaderContainer: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+  },
+  loaderText: {
+    marginTop: 12,
+    fontSize: 14,
+  },
+  scrollArea: {
+    flex: 1,
+    width: '100%',
+  },
+  cardGrid: {
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  cardGridMobile: {
+    flexDirection: 'column',
+  },
+  cardGridDesktop: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  card: {
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  cardHovered: {
+    transform: [{ translateY: -3 }],
+    shadowOpacity: 0.15,
+  },
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+  },
+  cardMobile: {
+    width: '100%',
+  },
+  cardDesktop: {
+    width: '48%',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  cardCode: {
+    marginTop: 4,
+    fontSize: 13,
+  },
+  statusBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  cardDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+  cardMetaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  metaLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  metaValue: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  emptyState: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  emptyStateTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  emptyStateDescription: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  detailsWrapper: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+  },
+  detailsHeader: {
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    elevation: 4,
+    flexWrap: 'wrap',
+  },
+  detailsTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginLeft: 16,
+    flex: 1,
+    textAlign: 'right',
+  },
+  detailsTitleMobile: {
+    width: '100%',
+    marginLeft: 0,
+    marginTop: 12,
+    textAlign: 'left',
+  },
+  detailsButton: {
+    minWidth: 150,
+    alignSelf: 'auto',
+  },
+  detailsButtonMobile: {
+    width: '100%',
+  },
+  detailsScroll: {
+    flex: 1,
+    width: '100%',
+  },
+  detailsContent: {
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
+    marginTop: 24,
+    marginBottom: 32,
+    padding: 24,
+    borderRadius: 18,
+    borderWidth: 1,
+    shadowOpacity: 0.12,
+    shadowOffset: { width: 0, height: 10 },
+    shadowRadius: 18,
+    elevation: 6,
+  },
+  detailsBadgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  statusBadgeLarge: {
+    borderRadius: 999,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+  },
+  statusTextLarge: {
+    fontSize: 14,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  detailsCode: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  section: {
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  sectionGrid: {
+    marginTop: 16,
+    flexDirection: 'column',
+  },
+  sectionDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 12,
+  },
+  detailItem: {
+    marginBottom: 16,
+  },
+  detailItemLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    marginBottom: 4,
+  },
+  detailItemValue: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
