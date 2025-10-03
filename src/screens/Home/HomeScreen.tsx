@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'; // Importação corrigida
 import { useTheme } from '../../contexts/ThemeContext';
 import { WebSidebar } from '../../components/layout/WebSidebar';
-import { MobileNavbar } from '../../components/MobileNavbar';
+import { MobileSidebar } from '../../components/layout/MobileSidebar';
 import { deviceType } from '../../utils/responsive';
 
 export default function HomeScreen() {
@@ -60,7 +60,7 @@ export default function HomeScreen() {
 			/>
 
 			{/* Navbar Mobile */}
-			<MobileNavbar
+			<MobileSidebar
 				visible={!deviceType.isDesktop}
 				onMenuToggle={handleMenuToggle}
 				onThemeChange={toggleTheme}

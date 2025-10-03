@@ -15,6 +15,9 @@ import { WebSidebar } from '../../components/layout/WebSidebar';
 import { deviceType } from '../../utils/responsive';
 import { Platform } from 'react-native';
 import styles from './styles/entidadeScreen.styles';
+import { MobileSidebar } from '../../components/layout/MobileSidebar';
+import MobileNavbar from "../../components/layout/MobileNavbar";
+
 
 // Tipos para os dados da entidade
 interface Entidade {
@@ -114,6 +117,7 @@ export const EntidadeScreen: React.FC = () => {
   const [filtroCriadoPor, setFiltroCriadoPor] = useState('');
   const [filtroTag, setFiltroTag] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Função para alternar seleção individual
   const toggleSelecao = (id: string) => {
@@ -166,6 +170,14 @@ export const EntidadeScreen: React.FC = () => {
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Funcionalidade de logout será implementada');
+  };
+
+    const handleMobileSidebarToggle = () => {
+    setMobileSidebarOpen(prev => !prev);
+  };
+
+  const handleMobileMenuToggle = (isOpen: boolean) => {
+    setMobileSidebarOpen(isOpen);
   };
 
   // Renderizar cada item da lista
@@ -238,21 +250,22 @@ export const EntidadeScreen: React.FC = () => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      
-      <WebNavbar
-        screenName="Entidade"
-        searchPlaceholder="Search or type a command (Ctrl + G)"
-        viewModeLabel= {Platform.OS === 'web' ? "Exibição em Lista" : " + "}
-        addButtonLabel={Platform.OS === 'web' ? "+ Adicionar Entidade" : " + "}
-        searchText={searchText}
-        onSearchChange={setSearchText}
-        onAddPress={handleAdicionarEntidade}
-        onViewModePress={handleViewModePress}
-        onActionsPress={handleActionsPress}
-        onSidebarToggle={handleSidebarToggle}
-      />
+      {Platform.OS === 'web' && (
+        <WebNavbar
+          screenName="Entidade"
+          searchPlaceholder="Search or type a command (Ctrl + G)"
+          viewModeLabel={Platform.OS === 'web' ? "Exibição em Lista" : " + "}
+          addButtonLabel={Platform.OS === 'web' ? "+ Adicionar Entidade" : " + "}
+          searchText={searchText}
+          onSearchChange={setSearchText}
+          onAddPress={handleAdicionarEntidade}
+          onViewModePress={handleViewModePress}
+          onActionsPress={handleActionsPress}
+          onSidebarToggle={handleSidebarToggle}
+        />
+      )}
 
-      {deviceType.isDesktop && (
+      {Platform.OS === 'web' && (
         <WebSidebar
           isOpen={sidebarOpen}
           onToggle={handleSidebarToggle}
@@ -261,6 +274,27 @@ export const EntidadeScreen: React.FC = () => {
           onLogout={handleLogout}
         />
       )}
+
+       {/* Componentes Mobile */}
+      {Platform.OS !== 'web' && (
+        <MobileNavbar
+          visible={true}
+          onMenuToggle={handleMobileMenuToggle}
+          onThemeChange={toggleTheme}
+          onLogout={handleLogout}
+        />
+      )}
+
+      {Platform.OS !== 'web' && (
+        <MobileSidebar
+          visible={true}
+          onMenuToggle={handleMobileMenuToggle}
+          onThemeChange={toggleTheme}
+          onLogout={handleLogout}
+        />
+      )}
+
+     
 
 
 

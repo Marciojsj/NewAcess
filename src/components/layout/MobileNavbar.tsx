@@ -1,4 +1,4 @@
-// src/components/MobileNavbar.tsx
+// src/components/MobileSidebar.tsx
 import React, { useRef, useEffect, useState } from 'react';
 import {
 	View,
@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
-import { responsive, deviceType } from '../../utils/responsive';
+import { deviceType } from '../../utils/responsive';
 
 type RootStackParamList = {
 	Home: undefined;
@@ -29,7 +29,7 @@ type RootStackParamList = {
 	RegistroEntidade: undefined;
 };
 
-type MobileNavbarNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type MobileSidebarNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 interface SidebarAction {
 	id: string;
@@ -38,7 +38,7 @@ interface SidebarAction {
 	onPress: () => void;
 }
 
-interface MobileNavbarProps {
+interface MobileSidebarProps {
 	visible?: boolean;
 	onMenuToggle?: (isOpen: boolean) => void;
 	onThemeChange?: (theme: 'light' | 'dark') => void;
@@ -47,14 +47,14 @@ interface MobileNavbarProps {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export const MobileNavbar: React.FC<MobileNavbarProps> = ({
+export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 	visible = true,
 	onMenuToggle,
 	onThemeChange,
 	onLogout
 }) => {
 	const { theme: appTheme, isDark, toggleTheme } = useTheme();
-	const navigation = useNavigation<MobileNavbarNavigationProp>();
+	const navigation = useNavigation<MobileSidebarNavigationProp>();
 	const slideAnim = useRef(new Animated.Value(visible ? 0 : -100)).current;
 	const menuAnim = useRef(new Animated.Value(-300)).current;
 	const contentAnim = useRef(new Animated.Value(0)).current;
@@ -193,9 +193,9 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 					styles.container,
 					{
 						transform: [{ translateY: slideAnim }],
-						backgroundColor: appTheme.backgroundSecondary,
-						borderBottomWidth: 1,
-						borderBottomColor: appTheme.border,
+						// backgroundColor: appTheme.backgroundSecondary,
+						// borderBottomWidth: 1,
+						// borderBottomColor: appTheme.border,
 					},
 				]}
 			>
@@ -264,7 +264,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 						placeholderTextColor={appTheme.textTertiary}
 						value={searchQuery}
 						onChangeText={setSearchQuery}
-						blurOnSubmit={true}
+						submitBehavior="blurAndSubmit"
 						returnKeyType="search"
 					/>
 				</View>
@@ -576,3 +576,5 @@ const styles = StyleSheet.create({
 		fontWeight: '600' 
 	},
 });
+
+export default MobileSidebar;
