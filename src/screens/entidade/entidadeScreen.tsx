@@ -117,12 +117,12 @@ export const EntidadeScreen: React.FC = () => {
   const [filtroCriadoPor, setFiltroCriadoPor] = useState('');
   const [filtroTag, setFiltroTag] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Função para alternar seleção individual
   const toggleSelecao = (id: string) => {
     setEntidades(prev => prev.map(entidade =>
-      entidade.id === id 
+      entidade.id === id
         ? { ...entidade, selecionado: !entidade.selecionado }
         : entidade
     ));
@@ -140,7 +140,7 @@ export const EntidadeScreen: React.FC = () => {
   // Função para alternar favorito
   const toggleFavorito = (id: string) => {
     setEntidades(prev => prev.map(entidade =>
-      entidade.id === id 
+      entidade.id === id
         ? { ...entidade, favorito: !entidade.favorito }
         : entidade
     ));
@@ -172,81 +172,9 @@ export const EntidadeScreen: React.FC = () => {
     Alert.alert('Logout', 'Funcionalidade de logout será implementada');
   };
 
-    const handleMobileSidebarToggle = () => {
-    setMobileSidebarOpen(prev => !prev);
-  };
-
   const handleMobileMenuToggle = (isOpen: boolean) => {
     setMobileSidebarOpen(isOpen);
   };
-
-  // Renderizar cada item da lista
-  const renderItem = ({ item }: { item: Entidade }) => (
-    <View style={[styles.tableRow, { 
-      backgroundColor: theme.backgroundCard,
-      borderBottomColor: theme.borderLight 
-    }]}>
-      {/* Checkbox de seleção */}
-      <View style={styles.cell}>
-        <TouchableOpacity onPress={() => toggleSelecao(item.id)}>
-          <View style={[
-            styles.checkbox,
-            { 
-              borderColor: theme.primary,
-              backgroundColor: item.selecionado ? theme.primary : 'transparent'
-            }
-          ]}>
-            {item.selecionado && (
-              <Text style={styles.checkboxText}>✓</Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
-
-      {/* Nome */}
-      <Text style={[styles.cell, { color: theme.text }]}>{item.nome}</Text>
-
-      {/* Status */}
-      <View style={styles.cell}>
-        <View style={[
-          styles.statusBadge,
-          { backgroundColor: item.status === 'Ativo' ? theme.success : theme.error }
-        ]}>
-          <Text style={styles.statusText}>{item.status}</Text>
-        </View>
-      </View>
-
-      {/* Razão Social */}
-      <Text style={[styles.cell, { color: theme.text }]}>{item.razaoSocial}</Text>
-
-      {/* Indicador de IE */}
-      <Text style={[styles.cell, { color: theme.text }]}>{item.indicadorIE}</Text>
-
-      {/* ID */}
-      <Text style={[styles.cell, { color: theme.text }]}>{item.id}</Text>
-
-      {/* Última atualização */}
-      <Text style={[styles.cell, { color: theme.text }]}>{item.ultimaAtualizacao}</Text>
-
-      {/* Ações - Comentários e Favoritos */}
-      <View style={styles.actionsCell}>
-        <TouchableOpacity style={styles.commentButton}>
-          <Text style={[styles.commentText, { color: theme.textSecondary }]}>
-            💬 {item.comentarios}
-          </Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity onPress={() => toggleFavorito(item.id)}>
-          <Text style={[
-            styles.favoriteIcon,
-            { color: item.favorito ? theme.warning : theme.textSecondary }
-          ]}>
-            {item.favorito ? '★' : '☆'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -275,13 +203,16 @@ export const EntidadeScreen: React.FC = () => {
         />
       )}
 
-       {/* Componentes Mobile */}
+      {/* // No entidadeScreen.tsx, ajuste as props do MobileNavbar */}
       {Platform.OS !== 'web' && (
         <MobileNavbar
           visible={true}
           onMenuToggle={handleMobileMenuToggle}
-          onThemeChange={toggleTheme}
-          onLogout={handleLogout}
+          onAddPress={handleAdicionarEntidade}
+          addButtonLabel="+"
+          searchPlaceholder="Buscar entidades..."
+          searchText={searchText}
+          onSearchChange={setSearchText}
         />
       )}
 
@@ -294,7 +225,7 @@ export const EntidadeScreen: React.FC = () => {
         />
       )}
 
-     
+
 
 
 
