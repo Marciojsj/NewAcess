@@ -16,11 +16,16 @@ import { deviceType } from '../../utils/responsive';
 interface MobileNavbarProps {
 	visible?: boolean;
 	onMenuToggle?: (isOpen: boolean) => void;
+	onActionsPress?: () => void;
 	onAddPress: () => void;
 	addButtonLabel?: string;
 	searchPlaceholder?: string;
 	searchText: string;
 	onSearchChange: (text: string) => void;
+	screenName: string;
+	actionsLabel?: string;
+
+
 }
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -32,7 +37,11 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 	addButtonLabel,
 	searchPlaceholder,
 	searchText,
-	onSearchChange
+	onSearchChange,
+	screenName,
+	onActionsPress,
+	actionsLabel
+
 }) => {
 	const { theme: appTheme } = useTheme();
 	const slideAnim = useRef(new Animated.Value(visible ? 0 : -100)).current;
@@ -41,6 +50,8 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 
 	const effectiveAddButtonLabel = addButtonLabel ?? '+ Add Entity';
 	const effectiveSearchPlaceholder = searchPlaceholder ?? 'Search or type a command';
+	const effectiveActionsLabel = actionsLabel ?? '⚙️';
+
 
 	const toggleMenu = () => {
 		const newState = !isOpen;
@@ -71,21 +82,19 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 	const styles = useMemo(() => StyleSheet.create({
 		container: {
 			backgroundColor: appTheme.backgroundCard,
-			borderBottomWidth: 1,
-			borderBottomColor: appTheme.borderLight,
-			paddingHorizontal: 16,
 			paddingTop: 50,
-			paddingBottom: 10,
+			paddingBottom: 0, // não afasta a borda
 			shadowColor: appTheme.shadow,
-			shadowOffset: { width: 0, height: 6 },
-			shadowOpacity: 0.08,
-			shadowRadius: 12,
-			elevation: 4,
+			shadowOffset: { width: 0, height: 2 }, // reduzido para não sobrepor a borda
+			shadowOpacity: 0.04,
+			shadowRadius: 6,
+			elevation: 2,
 		},
 		row: {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
+			width: '100%',
 		},
 		leftSection: {
 			flexDirection: 'row',
@@ -97,9 +106,12 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			alignItems: 'center',
 			justifyContent: 'flex-end',
 			flex: 1,
+			height: 55,
+			width: '100%',
+
 		},
 		searchInput: {
-			width: 200,
+			width: 220,
 			borderWidth: 1,
 			borderRadius: 12,
 			paddingHorizontal: 16,
@@ -111,8 +123,10 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			marginRight: 12,
 		},
 		addButton: {
-			paddingHorizontal: 18,
-			paddingVertical: 10,
+			width: 65,
+			height: 40,
+			justifyContent: 'center',
+			alignItems: 'center',
 			borderRadius: 10,
 			backgroundColor: appTheme.primary,
 			shadowColor: appTheme.shadow,
@@ -120,6 +134,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			shadowOpacity: 0.12,
 			shadowRadius: 8,
 			elevation: 3,
+			marginRight: 12,
 		},
 		addButtonText: {
 			fontSize: 14,
@@ -153,15 +168,54 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			justifyContent: 'center',
 			alignItems: 'center',
 		},
+		actionBar: {
+			backgroundColor: appTheme.backgroundCard,
+			paddingHorizontal: 14,
+			// paddingTop: 14,
+			// paddingBottom: 10,
+			shadowColor: appTheme.shadow,
+			shadowOffset: { width: 0, height: 4 },
+			shadowOpacity: 0.06,
+			shadowRadius: 10,
+			elevation: 3,
+		},
+		actionButton: {
+			width: 65,
+			height: 40,
+			justifyContent: 'center',
+			alignItems: 'center',
+			borderRadius: 10,
+			 backgroundColor: appTheme.background,
+			borderWidth: 1,
+			borderColor: appTheme.background,
+			marginLeft: 16,
+			shadowColor: appTheme.shadow,
+			shadowOffset: { width: 0, height: 3 },
+			shadowOpacity: 0.06,
+			shadowRadius: 6,
+			elevation: 2,
+		},
+		actionButtonText: {
+			fontSize: 14,
+			color: appTheme.text,
+			fontWeight: '500',
+		},
+		screenName: {
+			fontSize: 18,
+			fontWeight: '600',
+			color: appTheme.text,
+		},
 	}), [appTheme]);
 
 	if (deviceType.isDesktop) return null;
 
 	return (
-		<Animated.View style={[styles.container, { transform: [{ translateY: slideAnim }] }]}>
-			<View style={styles.row}>
-
-				<View style={styles.rightSection}>
+		<Animated.View style={[styles.container, { transform: [{ translateY: slideAnim }] }]} > 
+			<View nativeID="div1" style={styles.row}>
+				<View style={[styles.rightSection, {
+					borderBottomWidth: 2, 
+					borderBottomColor: appTheme.borderLight, 
+				}]} > 
 					<TextInput
 						style={styles.searchInput}
 						placeholder={effectiveSearchPlaceholder}
@@ -172,6 +226,25 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 					<TouchableOpacity style={styles.addButton} onPress={onAddPress} activeOpacity={0.9}>
 						<Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
 					</TouchableOpacity>
+				</View>
+			</View>
+
+			<View nativeID="div2" style={styles.actionBar}>
+				<View style={styles.row}>
+					<View style={styles.leftSection}>
+						<Text style={styles.screenName}>{screenName}</Text>
+					</View>
+
+					<View style={styles.rightSection}>
+						<TouchableOpacity
+							style={styles.actionButton}
+							onPress={onActionsPress}
+							activeOpacity={0.85}
+						>
+							<Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
+						</TouchableOpacity>
+
+					</View>
 				</View>
 			</View>
 		</Animated.View>

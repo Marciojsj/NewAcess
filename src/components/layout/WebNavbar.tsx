@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 
-interface WebNavbarProps {
+export interface WebNavbarProps {
     screenName: string;
     searchText: string;
     onSearchChange: (text: string) => void;
@@ -21,6 +21,7 @@ interface WebNavbarProps {
     onSidebarToggle?: () => void;
     onSettingsPress?: () => void;
     onLogoutPress?: () => void;
+
     searchPlaceholder?: string;
     actionsLabel?: string;
     viewModeLabel?: string;
@@ -127,9 +128,12 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     color: theme.text,
                     borderColor: theme.borderLight,
                 },
+                //aqui
                 actionButton: {
-                    paddingHorizontal: 18,
-                    paddingVertical: 12,
+                    width: 200,
+                    height: 44,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     borderRadius: 10,
                     backgroundColor: theme.background,
                     borderWidth: 1,
@@ -146,9 +150,12 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     color: theme.text,
                     fontWeight: '500',
                 },
+                //aqui
                 addButton: {
-                    paddingHorizontal: 22,
-                    paddingVertical: 12,
+                    width: 200,
+                    height: 44,
+                    justifyContent: 'center',
+                    alignItems: 'center',
                     borderRadius: 10,
                     backgroundColor: theme.primary,
                     marginLeft: 16,
@@ -202,7 +209,7 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                 menuItemLast: {
                     borderBottomWidth: 0,
                 },
-                                logoWrapper: {
+                logoWrapper: {
                     width: '10%',
                     height: 50,
                     borderRadius: 50,
@@ -255,16 +262,6 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
         <>
             <View style={styles.container}>
                 <View style={styles.row}>
-                    <View style={styles.leftSection}>
-                        {/* <View style={styles.logoWrapper}>
-                            {logoSource ? (
-                                <Image source={logoSource} style={styles.logo} resizeMode="contain" />
-                            ) : (
-                                <Text style={styles.logoFallbackText}>AC</Text>
-                            )}
-                        </View> */}
-                    </View>
-
                     <View style={styles.rightSection}>
                         <TextInput
                             style={styles.searchInput}
@@ -274,7 +271,7 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                             onChangeText={onSearchChange}
                         />
 
-                                               
+
 
                         <TouchableOpacity
                             style={styles.addButton}
@@ -292,46 +289,6 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                         </TouchableOpacity> */}
                     </View>
                 </View>
-
-
-                <Modal
-                    visible={menuVisible}
-                    transparent
-                    animationType="fade"
-                    onRequestClose={closeMenu}
-                >
-                    <TouchableWithoutFeedback onPress={closeMenu}>
-                        <View style={styles.modalOverlay}>
-                            <TouchableWithoutFeedback>
-                                <View style={styles.menuContainer}>
-                                    <TouchableOpacity
-                                        style={styles.menuItem}
-                                        onPress={handleToggleTheme}
-                                        activeOpacity={0.85}
-                                    >
-                                        <Text style={styles.menuItemText}>Switch Theme</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        style={styles.menuItem}
-                                        onPress={handleSettings}
-                                        activeOpacity={0.85}
-                                    >
-                                        <Text style={styles.menuItemText}>Settings</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity
-                                        style={[styles.menuItem, styles.menuItemLast]}
-                                        onPress={handleLogout}
-                                        activeOpacity={0.85}
-                                    >
-                                        <Text style={styles.menuItemText}>Logout</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </TouchableWithoutFeedback>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </Modal>
             </View>
 
             <View style={styles.actionBar}>
@@ -348,14 +305,6 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                         >
                             <Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
                         </TouchableOpacity>
-{/* 
-                        <TouchableOpacity
-                            style={styles.addButton}
-                            onPress={onAddPress}
-                            activeOpacity={0.9}
-                        >
-                            <Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
-                        </TouchableOpacity> */}
                     </View>
                 </View>
             </View>

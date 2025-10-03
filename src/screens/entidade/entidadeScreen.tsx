@@ -206,6 +206,7 @@ export const EntidadeScreen: React.FC = () => {
       {/* // No entidadeScreen.tsx, ajuste as props do MobileNavbar */}
       {Platform.OS !== 'web' && (
         <MobileNavbar
+          screenName="Entidade"
           visible={true}
           onMenuToggle={handleMobileMenuToggle}
           onAddPress={handleAdicionarEntidade}
