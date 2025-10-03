@@ -4,208 +4,136 @@ export default StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  headerLeft: {
+  listWrapper: {
     flex: 1,
-  },
-  headerCenter: {
-    flex: 2,
-    paddingHorizontal: 20,
-  },
-  headerRight: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    width: '100%',
     alignItems: 'center',
-    gap: 12,
   },
-  breadcrumb: {
-    fontSize: 14,
+  list: {
+    flex: 1,
+    width: '100%',
+  },
+  searchSection: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 16,
+  },
+  searchTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 12,
   },
   searchInput: {
-    padding: 12,
-    borderRadius: 8,
+    width: '100%',
     borderWidth: 1,
-    fontSize: 14,
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  listContent: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+    paddingBottom: 40,
+  },
+  listContentMobile: {
+    flexDirection: 'column',
+  },
+  listContentDesktop: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    gap: 16,
+  },
+  card: {
+    width: 320,
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 16,
+    elevation: 3,
+    minHeight: 200,
+  },
+  cardMobile: {
     width: '100%',
   },
-  headerButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    cursor: 'pointer',
+  cardDesktop: {
+    flexGrow: 0,
   },
-  headerButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  addButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 6,
-    cursor: 'pointer',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  mainContent: {
-    flex: 1,
+  cardHeader: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 14,
   },
-  sidebar: {
-    width: 280,
-    padding: 20,
-    borderRightWidth: 1,
+  cardHeaderInfo: {
+    flex: 1,
+    marginRight: 12,
   },
-  sidebarTitle: {
+  cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 20,
+    overflow: 'hidden',
   },
-  filterGroup: {
-    marginBottom: 16,
-  },
-  filterLabel: {
+  cardSubtitle: {
     fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  filterInput: {
-    padding: 10,
-    borderRadius: 6,
-    borderWidth: 1,
-    fontSize: 14,
-    width: '100%',
-  },
-  saveFilterButton: {
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 10,
-    cursor: 'pointer',
-  },
-  saveFilterButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  tableArea: {
-    flex: 1,
-    padding: 20,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    padding: 16,
-    borderBottomWidth: 1,
-    alignItems: 'center',
-  },
-  headerCell: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  tableList: {
-    flex: 1,
-  },
-  tableRow: {
-    flexDirection: 'row',
-    padding: 16,
-    borderBottomWidth: 1,
-    alignItems: 'center',
-  },
-  cell: {
-    flex: 1,
-    fontSize: 14,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    cursor: 'pointer',
-  },
-  checkboxText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
+    marginTop: 4,
+    overflow: 'hidden',
   },
   statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
     alignSelf: 'flex-start',
   },
   statusText: {
-    color: '#fff',
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
+    textTransform: 'uppercase',
   },
-  actionsCell: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  commentButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-    cursor: 'pointer',
-  },
-  commentText: {
-    fontSize: 12,
-  },
-  favoriteIcon: {
-    fontSize: 18,
-    cursor: 'pointer',
-  },
-  footer: {
+  cardMetaRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    borderTopWidth: 1,
-  },
-  footerText: {
-    fontSize: 14,
-  },
-  pagination: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  pageButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    cursor: 'pointer',
-  },
-  pageButtonText: {
-    fontSize: 14,
-  },
-  pageInfo: {
-    fontSize: 14,
-  },
-  filtersContainer: {
-    flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-    height: 40,
+    marginTop: 12,
   },
-  
+  metaItem: {
+    flex: 1,
+    minWidth: 140,
+    marginTop: 8,
+  },
+  metaLabel: {
+    fontSize: 12,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+  },
+  metaValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    overflow: 'hidden',
+  },
+  emptyState: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  emptyStateDescription: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 360,
+  },
 });

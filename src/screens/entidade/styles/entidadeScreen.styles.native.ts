@@ -65,9 +65,31 @@ export default StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  list: {
+    flex: 1,
+    width: '100%',
+  },
+  searchSection: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  searchTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  searchInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
   header: {
     width: '100%',
-    maxWidth: 1200,
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingVertical: 14,
@@ -105,9 +127,22 @@ export default StyleSheet.create({
     flex: 1,
     width: '100%',
   },
+  listContent: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 32,
+  },
+  listContentMobile: {
+    flexDirection: 'column',
+  },
+  listContentDesktop: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
   cardGrid: {
     width: '100%',
-    maxWidth: 1200,
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingVertical: 24,
@@ -124,11 +159,12 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderRadius: 16,
     padding: 20,
-    marginBottom: 20,
+    marginBottom: 16,
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 8 },
     shadowRadius: 16,
     elevation: 3,
+    minHeight: 200,
   },
   cardHovered: {
     transform: [{ translateY: -3 }],
@@ -141,7 +177,8 @@ export default StyleSheet.create({
     width: '100%',
   },
   cardDesktop: {
-    width: '48%',
+    width: '47%',
+    marginHorizontal: 8,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -149,9 +186,19 @@ export default StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 12,
   },
+  cardHeaderInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
+    overflow: 'hidden',
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    marginTop: 4,
+    overflow: 'hidden',
   },
   cardCode: {
     marginTop: 4,
@@ -177,6 +224,12 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 6,
+    flexWrap: 'wrap',
+  },
+  metaItem: {
+    flex: 1,
+    minWidth: 100,
+    marginTop: 8,
   },
   metaLabel: {
     fontSize: 12,
@@ -186,6 +239,7 @@ export default StyleSheet.create({
   metaValue: {
     fontSize: 14,
     fontWeight: '500',
+    overflow: 'hidden',
   },
   emptyState: {
     width: '100%',
@@ -210,7 +264,6 @@ export default StyleSheet.create({
   },
   detailsHeader: {
     width: '100%',
-    maxWidth: 1200,
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -247,7 +300,6 @@ export default StyleSheet.create({
   },
   detailsContent: {
     width: '100%',
-    maxWidth: 1200,
     alignSelf: 'center',
     marginTop: 24,
     marginBottom: 32,

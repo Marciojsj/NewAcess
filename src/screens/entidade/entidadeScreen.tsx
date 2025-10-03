@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  ScrollView,
   TextInput,
   FlatList,
-  Switch,
   Alert,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -23,6 +20,7 @@ import MobileNavbar from "../../components/layout/MobileNavbar";
 interface Entidade {
   id: string;
   nome: string;
+  email: string;
   razaoSocial: string;
   tipoPessoa: 'Física' | 'Jurídica';
   status: 'Ativo' | 'Inativo';
@@ -38,6 +36,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '001',
     nome: 'Companhia Siderurgica Nacional',
+  email: 'contato@csn.com.br',
     razaoSocial: 'COMPANHIA SIDERURGICA NACIONAL',
     tipoPessoa: 'Jurídica',
     status: 'Ativo',
@@ -50,6 +49,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '002',
     nome: 'VILLARES METALS SA',
+  email: 'relacoes@villaresmetals.com',
     razaoSocial: 'VILLARES METALS S.A.',
     tipoPessoa: 'Jurídica',
     status: 'Ativo',
@@ -62,6 +62,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '003',
     nome: 'ARCELORMITTAL BRASIL S.A.',
+  email: 'contato@arcelormittal.com',
     razaoSocial: 'ARCELORMITTAL BRASIL S.A.',
     tipoPessoa: 'Jurídica',
     status: 'Ativo',
@@ -74,6 +75,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '004',
     nome: 'GERDAU S.A.',
+  email: 'investidores@gerdau.com',
     razaoSocial: 'GERDAU S.A.',
     tipoPessoa: 'Jurídica',
     status: 'Ativo',
@@ -86,6 +88,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '005',
     nome: 'Banco Bradesco S.A.',
+  email: 'contato@bradesco.com.br',
     razaoSocial: 'BANCO BRADESCO S.A.',
     tipoPessoa: 'Jurídica',
     status: 'Inativo',
@@ -98,6 +101,7 @@ const mockEntidades: Entidade[] = [
   {
     id: '006',
     nome: 'Itau Unibanco S.A.',
+  email: 'relacionamento@itau.com.br',
     razaoSocial: 'ITAU UNIBANCO S.A.',
     tipoPessoa: 'Jurídica',
     status: 'Ativo',
@@ -118,6 +122,113 @@ export const EntidadeScreen: React.FC = () => {
   const [filtroTag, setFiltroTag] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const isDesktop = deviceType.isDesktop;
+
+  const filteredEntidades = useMemo(() => {
+    const normalized = searchText.trim().toLowerCase();
+
+    if (!normalized) {
+      return entidades;
+    }
+
+    return entidades.filter(entidade => {
+      const nomeMatch = entidade.nome.toLowerCase().includes(normalized);
+      const emailMatch = entidade.email.toLowerCase().includes(normalized);
+      const statusMatch = entidade.status.toLowerCase().includes(normalized);
+      return nomeMatch || emailMatch || statusMatch;
+    });
+  }, [entidades, searchText]);
+
+  const renderEntidade = ({ item }: { item: Entidade }) => {
+    const isAtivo = item.status === 'Ativo';
+
+    return (
+      <View
+        style={[
+          styles.card,
+          isDesktop ? styles.cardDesktop : styles.cardMobile,
+          {
+            backgroundColor: theme.backgroundCard,
+            borderColor: theme.borderLight,
+            shadowColor: theme.shadow,
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.cardHeaderInfo}>
+            <Text
+              style={[styles.cardTitle, { color: theme.text }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.nome}
+            </Text>
+            <Text
+              style={[styles.cardSubtitle, { color: theme.textSecondary }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.email}
+            </Text>
+          </View>
+
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor: isAtivo ? theme.successLight : theme.errorLight,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                { color: isAtivo ? theme.success : theme.error },
+              ]}
+            >
+              {item.status}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.cardMetaRow}>
+          <View style={styles.metaItem}>
+            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Código</Text>
+            <Text
+              style={[styles.metaValue, { color: theme.text }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.id}
+            </Text>
+          </View>
+
+          <View style={styles.metaItem}>
+            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Tipo</Text>
+            <Text
+              style={[styles.metaValue, { color: theme.text }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.tipoPessoa}
+            </Text>
+          </View>
+
+          <View style={styles.metaItem}>
+            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Atualizado</Text>
+            <Text
+              style={[styles.metaValue, { color: theme.text }]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {item.ultimaAtualizacao}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   // Função para alternar seleção individual
   const toggleSelecao = (id: string) => {
@@ -230,7 +341,53 @@ export const EntidadeScreen: React.FC = () => {
 
 
 
-      {/* Resto do código comentado permanece igual */}
+      <View style={[styles.listWrapper, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.searchSection,
+            {
+              backgroundColor: theme.backgroundSecondary,
+            },
+          ]}
+        >
+          <Text style={[styles.searchTitle, { color: theme.text }]}>Entidades</Text>
+
+          <TextInput
+            style={[
+              styles.searchInput,
+              {
+                backgroundColor: theme.background,
+                color: theme.text,
+                borderColor: theme.borderLight,
+              },
+            ]}
+            placeholder="Buscar por nome, e-mail ou status"
+            placeholderTextColor={theme.textSecondary}
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
+
+        <FlatList
+          data={filteredEntidades}
+          keyExtractor={(item) => item.id}
+          renderItem={renderEntidade}
+          showsVerticalScrollIndicator={false}
+          style={styles.list}
+          contentContainerStyle={[
+            styles.listContent,
+            isDesktop ? styles.listContentDesktop : styles.listContentMobile,
+          ]}
+          ListEmptyComponent={() => (
+            <View style={styles.emptyState}>
+              <Text style={[styles.emptyStateTitle, { color: theme.text }]}>Nenhuma entidade encontrada</Text>
+              <Text style={[styles.emptyStateDescription, { color: theme.textSecondary }]}>
+                Ajuste os termos da busca ou adicione uma nova entidade.
+              </Text>
+            </View>
+          )}
+        />
+      </View>
     </View>
   );
 };
