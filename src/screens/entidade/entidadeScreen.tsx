@@ -195,7 +195,7 @@ export const EntidadeScreen: React.FC = () => {
 			if (event?.nativeEvent) {
 				const { pageX, pageY } = event.nativeEvent;
 				// Posicionar dropdown próximo ao botão clicado
-				setMenuPosition({ 
+				setMenuPosition({
 					top: pageY + 5, // Pequeno offset para baixo
 					right: 20 // Margem da direita
 				});
@@ -210,7 +210,7 @@ export const EntidadeScreen: React.FC = () => {
 		<Animated.View
 			style={[
 				styles.tableRow,
-				
+
 				{
 					opacity: fadeAnim,
 					transform: [{ translateY: slideAnim }],
@@ -218,7 +218,7 @@ export const EntidadeScreen: React.FC = () => {
 					// width: '100%',
 
 				},
-				
+
 			]}
 		>
 			<TouchableOpacity
@@ -286,8 +286,16 @@ export const EntidadeScreen: React.FC = () => {
 			animationType="fade"
 			onRequestClose={handleCloseForm}
 		>
-			<View style={styles.modalOverlay}>
-				<View style={styles.modalContent}>
+			<TouchableOpacity
+				style={styles.modalOverlay}
+				activeOpacity={1}
+				onPress={handleCloseForm}
+			>
+				<TouchableOpacity
+					style={styles.modalContent}
+					activeOpacity={1}
+					onPress={(e) => e.stopPropagation()}
+				>
 					<View style={styles.modalHeader}>
 						<Text style={styles.modalTitle}>
 							{formMode === 'create' && 'Nova Entidade'}
@@ -481,8 +489,8 @@ export const EntidadeScreen: React.FC = () => {
 							</TouchableOpacity>
 						</View>
 					)}
-				</View>
-			</View>
+				</TouchableOpacity>
+			</TouchableOpacity>
 		</Modal>
 	);
 
@@ -497,61 +505,54 @@ export const EntidadeScreen: React.FC = () => {
 						onThemeChange={toggleTheme}
 						onLogout={handleLogout}
 					/>
-					<WebNavbar
-						screenName="Entidades"
-						searchPlaceholder="Buscar entidades..."
-						viewModeLabel="Lista"
-						addButtonLabel="+ Nova Entidade"
-						searchText={searchText}
-						onSearchChange={setSearchText}
-						onAddPress={() => handleOpenForm('create')}
-						onViewModePress={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
-						onActionsPress={() => Alert.alert('Ações', 'Menu de ações')}
-						onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-					/>
+					
+					{/* Overlay do sidebar - aparece quando sidebar está aberto */}
+					{sidebarOpen && (
+						<TouchableOpacity
+							style={styles.sidebarOverlay}
+							activeOpacity={1}
+							onPress={() => setSidebarOpen(false)}
+						/>
+					)}
 				</>
 			)}
 
 			{Platform.OS !== 'web' && (
-				<>
-					<MobileNavbar
-						screenName="Entidades"
-						visible={true}
-						onMenuToggle={() => { }}
-						onAddPress={() => handleOpenForm('create')}
-						addButtonLabel="+"
-						searchPlaceholder="Buscar entidades..."
-						searchText={searchText}
-						onSearchChange={setSearchText}
-					/>
-					<MobileSidebar
-						visible={false}
-						onMenuToggle={() => { }}
-						onThemeChange={toggleTheme}
-						onLogout={handleLogout}
-					/>
-				</>
+				<MobileSidebar
+					visible={false}
+					onMenuToggle={() => { }}
+					onThemeChange={toggleTheme}
+					onLogout={handleLogout}
+				/>
 			)}
 
 			<View style={styles.content}>
-				{Platform.OS !== 'web' && (
-					<View style={styles.mobileHeader}>
-						<Text style={styles.mobileTitle}>Entidades</Text>
+				{/* Header compacto e minimalista: título + busca + botão */}
+				<View style={styles.screenHeader}>
+					<Text style={styles.screenTitle}>Entidades</Text>
+
+					<View style={styles.actionsContainer}>
+						<View style={styles.searchContainer}>
+							<TextInput
+								style={styles.searchInput}
+								placeholder="Buscar..."
+								placeholderTextColor={isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'}
+								value={searchText}
+								onChangeText={setSearchText}
+							/>
+							<Text style={styles.searchIcon}>🔍</Text>
+						</View>
+
 						<TouchableOpacity
 							style={styles.addButton}
 							onPress={() => handleOpenForm('create')}
 						>
-							<Text style={styles.addButtonText}>+ Nova</Text>
+							<Text style={styles.addButtonText}>+ Nova Entidade</Text>
 						</TouchableOpacity>
 					</View>
-				)}
+				</View>
 
 				<View style={styles.listContainer}>
-					<View style={styles.listHeader}>
-						<Text style={styles.listCount}>
-							{filteredEntidades.length} {filteredEntidades.length === 1 ? 'entidade' : 'entidades'}
-						</Text>
-					</View>
 
 					<ScrollView
 						horizontal
@@ -561,28 +562,28 @@ export const EntidadeScreen: React.FC = () => {
 						<View style={styles.tableContainer}>
 							{/* Cabeçalho da tabela */}
 							<View style={styles.tableHeader}>
-									<View style={styles.tableCell}>
-										<Text style={styles.headerText}>Nome</Text>
-									</View>
-									<View style={styles.tableCell}>
-										<Text style={styles.headerText}>CNPJ</Text>
-									</View>
-									<View style={styles.tableCellSmall}>
-										<Text style={styles.headerText}>Tipo</Text>
-									</View>
-									<View style={styles.tableCell}>
-										<Text style={styles.headerText}>Email</Text>
-									</View>
-									<View style={styles.tableCellSmall}>
-										<Text style={styles.headerText}>Cidade/UF</Text>
-									</View>
-									<View style={styles.tableCellSmall}>
-										<Text style={styles.headerText}>Status</Text>
-									</View>
-									<View style={styles.actionsCell}>
-										<Text style={styles.headerText}>Ações</Text>
-									</View>
+								<View style={styles.tableCell}>
+									<Text style={styles.headerText}>Nome</Text>
 								</View>
+								<View style={styles.tableCell}>
+									<Text style={styles.headerText}>CNPJ</Text>
+								</View>
+								<View style={styles.tableCellSmall}>
+									<Text style={styles.headerText}>Tipo</Text>
+								</View>
+								<View style={styles.tableCell}>
+									<Text style={styles.headerText}>Email</Text>
+								</View>
+								<View style={styles.tableCellSmall}>
+									<Text style={styles.headerText}>Cidade/UF</Text>
+								</View>
+								<View style={styles.tableCellSmall}>
+									<Text style={styles.headerText}>Status</Text>
+								</View>
+								<View style={styles.actionsCell}>
+									<Text style={styles.headerText}>Ações</Text>
+								</View>
+							</View>
 
 							<FlatList
 								data={filteredEntidades}
@@ -626,9 +627,9 @@ export const EntidadeScreen: React.FC = () => {
 							setMenuPosition(null);
 						}}
 					/>
-					
+
 					{/* Menu dropdown */}
-					<View 
+					<View
 						style={[
 							styles.dropdownMenu,
 							{

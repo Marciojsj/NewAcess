@@ -49,7 +49,7 @@ export const responsive = {
     // Medium: 16px mobile, 20px desktop - para espaçamentos padrão
     md: deviceType.isMobile ? 16 : 20,
     // Large: 20px mobile, 24px desktop - para espaçamentos grandes
-    lg: deviceType.isMobile ? 20 : 24,
+    lg: deviceType.isMobile ? 10 : 24,
     // Extra Large: 24px mobile, 32px desktop - para espaçamentos máximos
     xl: deviceType.isMobile ? 24 : 32,
   },

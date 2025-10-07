@@ -235,53 +235,119 @@ export const createStyles = (theme: Theme, isDark: boolean) =>
       }),
     },
     
-    // Mobile Header
-    mobileHeader: {
+    // Screen Header (título + busca + botão) - Layout compacto e minimalista
+    screenHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: responsive.padding.lg,
-      paddingVertical: responsive.padding.md,
-      backgroundColor: theme.backgroundCard,
+      gap: responsive.spacing.md,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      backgroundColor: theme.background,
       borderBottomWidth: 1,
-      borderBottomColor: theme.borderLight,
+      borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+      ...Platform.select({
+        web: {
+          position: 'sticky' as any,
+          top: 0,
+          zIndex: 100,
+        },
+      }),
     },
     
-    mobileTitle: {
+    screenTitle: {
       fontSize: responsive.fontSize.xl,
-      fontWeight: '700',
+      fontWeight: '600',
       color: theme.text,
+      letterSpacing: -0.3,
+      minWidth: 100,
+      left: 70,
+      marginTop: 8,
+
+    },
+    
+    // Container para agrupar busca e botão lado a lado
+    actionsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: responsive.spacing.sm,
+      flex: 1,
+      justifyContent: 'flex-end',
     },
     
     addButton: {
       backgroundColor: theme.primary,
-      paddingHorizontal: responsive.padding.lg,
-      paddingVertical: responsive.padding.sm,
-      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      borderRadius: 6,
+      ...Platform.select({
+        web: {
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+          ':hover': {
+            backgroundColor: isDark ? '#7c3aed' : '#5b21b6',
+            transform: 'scale(1.02)',
+          },
+        },
+      }),
     },
     
     addButtonText: {
       color: theme.textInverse,
-      fontSize: responsive.fontSize.md,
       fontWeight: '600',
+      fontSize: responsive.fontSize.sm,
     },
     
-    // Search
+    // Search/Filter - Layout compacto integrado
     searchContainer: {
-      paddingHorizontal: responsive.padding.lg,
-      paddingVertical: responsive.padding.md,
-      backgroundColor: theme.backgroundCard,
+      position: 'relative',
+      width: 300,
+      ...Platform.select({
+        web: {
+          minWidth: 250,
+        },
+        default: {
+          width: 200,
+        },
+      }),
     },
     
     searchInput: {
-      backgroundColor: theme.background,
+      backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
       borderWidth: 1,
-      borderColor: theme.border,
+      borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)',
       borderRadius: 8,
-      paddingHorizontal: responsive.padding.md,
-      paddingVertical: responsive.padding.sm,
-      fontSize: responsive.fontSize.md,
+      paddingHorizontal: 12,
+      paddingVertical: 12,
+      paddingRight: 40,
+      fontSize: responsive.fontSize.sm,
       color: theme.text,
+      ...Platform.select({
+        web: {
+          outline: 'none',
+          transition: 'all 0.2s ease',
+          ':focus': {
+            borderColor: theme.primary,
+            boxShadow: `0 0 0 3px ${isDark ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)'}`,
+          },
+        },
+      }),
+    },
+    
+    searchIcon: {
+      position: 'absolute',
+      right: 12,
+      top: '50%',
+      fontSize: 16,
+      opacity: 0.4,
+      ...Platform.select({
+        web: {
+          transform: 'translateY(-50%)',
+        },
+        default: {
+          top: 8,
+        },
+      }),
     },
     
     // List
@@ -292,17 +358,16 @@ export const createStyles = (theme: Theme, isDark: boolean) =>
     },
     
     listHeader: {
-      paddingHorizontal: responsive.padding.lg,
-      paddingVertical: responsive.padding.md,
-      backgroundColor: theme.backgroundCard,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.borderLight,
+      paddingHorizontal: responsive.padding.xl,
+      paddingVertical: responsive.padding.sm,
+      backgroundColor: theme.background,
     },
     
     listCount: {
       fontSize: responsive.fontSize.sm,
       color: theme.textSecondary,
       fontWeight: '600',
+      opacity: 0.7,
     },
     
     tableContainer: {
@@ -598,6 +663,22 @@ export const createStyles = (theme: Theme, isDark: boolean) =>
       color: theme.textSecondary,
       textAlign: 'center',
       maxWidth: 400,
+    },
+    
+    // Overlays
+    sidebarOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.4)',
+      zIndex: 50,
+      ...Platform.select({
+        web: {
+          backdropFilter: 'blur(2px)',
+        },
+      }),
     },
     
     // Modal
