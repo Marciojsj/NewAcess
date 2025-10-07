@@ -3,7 +3,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Alert } from 'react-native';
-import LoginScreen from '../../src/screens/Login/LoginScreen';
+import LoginScreen from '../../src/screens/login/LoginScreen';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { useTheme } from '../../src/contexts/ThemeContext';
 

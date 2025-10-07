@@ -19,16 +19,12 @@ import { WebSidebar } from '../../components/layout/WebSidebar';
 import { MobileSidebar } from '../../components/layout/MobileSidebar';
 import MobileNavbar from '../../components/layout/MobileNavbar';
 import { deviceType } from '../../utils/responsive';
-import { createStyles } from './entidadeService';
+import { Entidade, FormMode, ViewMode } from './entidade.types';
 import * as EntidadeService from './entidadeService';
-import { Entidade } from './entidadeService';
-
-type ViewMode = 'list' | 'grid';
-type FormMode = 'create' | 'edit' | 'view' | null;
+import styles from './styles/EntidadeScreen.styles';
 
 export const EntidadeScreen: React.FC = () => {
 	const { theme, isDark, toggleTheme } = useTheme();
-	const styles = createStyles(theme, isDark);
 
 	const [entidades, setEntidades] = useState<Entidade[]>([]);
 	const [filteredEntidades, setFilteredEntidades] = useState<Entidade[]>([]);

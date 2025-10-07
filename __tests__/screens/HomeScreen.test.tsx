@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
-import HomeScreen from '../../src/screens/Home/HomeScreen';
+import HomeScreen from '../../src/screens/home/HomeScreen';
 import { useTheme } from '../../src/contexts/ThemeContext';
 
 // Mock dos contexts

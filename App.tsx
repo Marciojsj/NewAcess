@@ -5,14 +5,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth, AuthProvider } from './src/contexts/AuthContext';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 
-import HomeScreen from './src/screens/Home/HomeScreen';
-import LoginScreen from './src/screens/Login/LoginScreen';
+import HomeScreen from './src/screens/home/HomeScreen';
+import LoginScreen from './src/screens/login/LoginScreen';
 import RegistrarEntradaScreen from './src/screens/registrarEntrada/RegistrarEntradaScreen';
 import RegistrarSaidaScreen from './src/screens/registrarSaida/RegistrarSaidaScreen';
 import VisitantesScreen from './src/screens/visitantes/VisitantesScreen';
 import RelatoriosScreen from './src/screens/relatorios/RelatoriosScreen';
 // import AlertasScreen from './src/screens/alertas/AlertasScreen';
-import { EntidadeScreen } from './src/screens/entidade/entidadeScreen';
+import { EntidadeScreen } from './src/screens/entidade/EntidadeScreen';
 // import { RegistroEntidadeScreen } from './src/screens/entidade/RegistroEntidadeScreen';
 
 const Stack = createStackNavigator();
