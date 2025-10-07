@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
+import { Theme } from '../../../contexts/ThemeContext';
 
-export default StyleSheet.create({
+export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -361,3 +362,5 @@ export default StyleSheet.create({
     fontWeight: '600',
   },
 });
+
+export default createStyles;

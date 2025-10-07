@@ -21,10 +21,11 @@ import MobileNavbar from '../../components/layout/MobileNavbar';
 import { deviceType } from '../../utils/responsive';
 import { Entidade, FormMode, ViewMode } from './entidade.types';
 import * as EntidadeService from './entidadeService';
-import styles from './styles/EntidadeScreen.styles';
+import { createStyles } from './styles/EntidadeScreen.styles';
 
 export const EntidadeScreen: React.FC = () => {
 	const { theme, isDark, toggleTheme } = useTheme();
+	const styles = createStyles(theme, isDark);
 
 	const [entidades, setEntidades] = useState<Entidade[]>([]);
 	const [filteredEntidades, setFilteredEntidades] = useState<Entidade[]>([]);
