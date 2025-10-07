@@ -1,393 +1,674 @@
-import React, { useMemo, useState } from 'react';
+// src/screens/entidade/entidadeScreen.tsx
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  Alert,
+	View,
+	Text,
+	TextInput,
+	FlatList,
+	Alert,
+	Animated,
+	Modal,
+	ScrollView,
+	TouchableOpacity,
+	SafeAreaView,
+	Platform,
 } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
 import { WebNavbar } from '../../components/layout/WebNavbar';
 import { WebSidebar } from '../../components/layout/WebSidebar';
-import { deviceType } from '../../utils/responsive';
-import { Platform } from 'react-native';
-import styles from './styles/entidadeScreen.styles';
 import { MobileSidebar } from '../../components/layout/MobileSidebar';
-import MobileNavbar from "../../components/layout/MobileNavbar";
+import MobileNavbar from '../../components/layout/MobileNavbar';
+import { deviceType } from '../../utils/responsive';
+import { createStyles } from './entidadeService';
+import * as EntidadeService from './entidadeService';
+import { Entidade } from './entidadeService';
 
-
-// Tipos para os dados da entidade
-interface Entidade {
-  id: string;
-  nome: string;
-  email: string;
-  razaoSocial: string;
-  tipoPessoa: 'Física' | 'Jurídica';
-  status: 'Ativo' | 'Inativo';
-  indicadorIE: string;
-  ultimaAtualizacao: string;
-  comentarios: number;
-  favorito: boolean;
-  selecionado: boolean;
-}
-
-// Dados mockados baseados nas imagens
-const mockEntidades: Entidade[] = [
-  {
-    id: '001',
-    nome: 'Companhia Siderurgica Nacional',
-  email: 'contato@csn.com.br',
-    razaoSocial: 'COMPANHIA SIDERURGICA NACIONAL',
-    tipoPessoa: 'Jurídica',
-    status: 'Ativo',
-    indicadorIE: 'Não Contribuinte',
-    ultimaAtualizacao: '2 dias',
-    comentarios: 3,
-    favorito: true,
-    selecionado: false,
-  },
-  {
-    id: '002',
-    nome: 'VILLARES METALS SA',
-  email: 'relacoes@villaresmetals.com',
-    razaoSocial: 'VILLARES METALS S.A.',
-    tipoPessoa: 'Jurídica',
-    status: 'Ativo',
-    indicadorIE: 'Contribuinte',
-    ultimaAtualizacao: '1 dia',
-    comentarios: 1,
-    favorito: false,
-    selecionado: false,
-  },
-  {
-    id: '003',
-    nome: 'ARCELORMITTAL BRASIL S.A.',
-  email: 'contato@arcelormittal.com',
-    razaoSocial: 'ARCELORMITTAL BRASIL S.A.',
-    tipoPessoa: 'Jurídica',
-    status: 'Ativo',
-    indicadorIE: 'Não Contribuinte',
-    ultimaAtualizacao: '5 dias',
-    comentarios: 0,
-    favorito: true,
-    selecionado: false,
-  },
-  {
-    id: '004',
-    nome: 'GERDAU S.A.',
-  email: 'investidores@gerdau.com',
-    razaoSocial: 'GERDAU S.A.',
-    tipoPessoa: 'Jurídica',
-    status: 'Ativo',
-    indicadorIE: 'Contribuinte',
-    ultimaAtualizacao: '3 dias',
-    comentarios: 2,
-    favorito: false,
-    selecionado: false,
-  },
-  {
-    id: '005',
-    nome: 'Banco Bradesco S.A.',
-  email: 'contato@bradesco.com.br',
-    razaoSocial: 'BANCO BRADESCO S.A.',
-    tipoPessoa: 'Jurídica',
-    status: 'Inativo',
-    indicadorIE: 'Não Contribuinte',
-    ultimaAtualizacao: '7 dias',
-    comentarios: 0,
-    favorito: false,
-    selecionado: false,
-  },
-  {
-    id: '006',
-    nome: 'Itau Unibanco S.A.',
-  email: 'relacionamento@itau.com.br',
-    razaoSocial: 'ITAU UNIBANCO S.A.',
-    tipoPessoa: 'Jurídica',
-    status: 'Ativo',
-    indicadorIE: 'Contribuinte',
-    ultimaAtualizacao: '1 dia',
-    comentarios: 5,
-    favorito: true,
-    selecionado: false,
-  },
-];
+type ViewMode = 'list' | 'grid';
+type FormMode = 'create' | 'edit' | 'view' | null;
 
 export const EntidadeScreen: React.FC = () => {
-  const { theme, isDark, toggleTheme } = useTheme();
-  const [entidades, setEntidades] = useState<Entidade[]>(mockEntidades);
-  const [searchText, setSearchText] = useState('');
-  const [filtroAtribuido, setFiltroAtribuido] = useState('');
-  const [filtroCriadoPor, setFiltroCriadoPor] = useState('');
-  const [filtroTag, setFiltroTag] = useState('');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+	const { theme, isDark, toggleTheme } = useTheme();
+	const styles = createStyles(theme, isDark);
 
-  const isDesktop = deviceType.isDesktop;
+	const [entidades, setEntidades] = useState<Entidade[]>([]);
+	const [filteredEntidades, setFilteredEntidades] = useState<Entidade[]>([]);
+	const [searchText, setSearchText] = useState('');
+	const [viewMode, setViewMode] = useState<ViewMode>('list');
+	const [sidebarOpen, setSidebarOpen] = useState(false);
+	const [menuVisible, setMenuVisible] = useState<string | null>(null);
+	const [menuPosition, setMenuPosition] = useState<{ top: number; right: number } | null>(null);
 
-  const filteredEntidades = useMemo(() => {
-    const normalized = searchText.trim().toLowerCase();
+	// Form state
+	const [formMode, setFormMode] = useState<FormMode>(null);
+	const [selectedEntidade, setSelectedEntidade] = useState<Entidade | null>(null);
+	const [formData, setFormData] = useState<Partial<Entidade>>({
+		nome: '',
+		cnpj: '',
+		tipo: 'Jurídica',
+		endereco: '',
+		cidade: '',
+		estado: '',
+		email: '',
+		telefone: '',
+		status: 'Ativo',
+	});
 
-    if (!normalized) {
-      return entidades;
-    }
+	// Animation
+	const fadeAnim = useState(new Animated.Value(0))[0];
+	const slideAnim = useState(new Animated.Value(50))[0];
 
-    return entidades.filter(entidade => {
-      const nomeMatch = entidade.nome.toLowerCase().includes(normalized);
-      const emailMatch = entidade.email.toLowerCase().includes(normalized);
-      const statusMatch = entidade.status.toLowerCase().includes(normalized);
-      return nomeMatch || emailMatch || statusMatch;
-    });
-  }, [entidades, searchText]);
+	useEffect(() => {
+		loadEntidades();
+		Animated.parallel([
+			Animated.timing(fadeAnim, {
+				toValue: 1,
+				duration: 600,
+				useNativeDriver: true,
+			}),
+			Animated.timing(slideAnim, {
+				toValue: 0,
+				duration: 600,
+				useNativeDriver: true,
+			}),
+		]).start();
+	}, []);
 
-  const renderEntidade = ({ item }: { item: Entidade }) => {
-    const isAtivo = item.status === 'Ativo';
+	useEffect(() => {
+		filterEntidades();
+	}, [searchText, entidades]);
 
-    return (
-      <View
-        style={[
-          styles.card,
-          isDesktop ? styles.cardDesktop : styles.cardMobile,
-          {
-            backgroundColor: theme.backgroundCard,
-            borderColor: theme.borderLight,
-            shadowColor: theme.shadow,
-          },
-        ]}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.cardHeaderInfo}>
-            <Text
-              style={[styles.cardTitle, { color: theme.text }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.nome}
-            </Text>
-            <Text
-              style={[styles.cardSubtitle, { color: theme.textSecondary }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.email}
-            </Text>
-          </View>
+	const loadEntidades = () => {
+		const data = EntidadeService.getAll();
+		setEntidades(data);
+		setFilteredEntidades(data);
+	};
 
-          <View
-            style={[
-              styles.statusBadge,
-              {
-                backgroundColor: isAtivo ? theme.successLight : theme.errorLight,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.statusText,
-                { color: isAtivo ? theme.success : theme.error },
-              ]}
-            >
-              {item.status}
-            </Text>
-          </View>
-        </View>
+	const filterEntidades = () => {
+		if (!searchText.trim()) {
+			setFilteredEntidades(entidades);
+			return;
+		}
 
-        <View style={styles.cardMetaRow}>
-          <View style={styles.metaItem}>
-            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Código</Text>
-            <Text
-              style={[styles.metaValue, { color: theme.text }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.id}
-            </Text>
-          </View>
+		const results = EntidadeService.search(searchText);
+		setFilteredEntidades(results);
+	};
 
-          <View style={styles.metaItem}>
-            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Tipo</Text>
-            <Text
-              style={[styles.metaValue, { color: theme.text }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.tipoPessoa}
-            </Text>
-          </View>
+	const handleOpenForm = (mode: FormMode, entidade?: Entidade) => {
+		setFormMode(mode);
+		if (entidade) {
+			setSelectedEntidade(entidade);
+			setFormData(entidade);
+		} else {
+			setSelectedEntidade(null);
+			setFormData({
+				nome: '',
+				cnpj: '',
+				tipo: 'Jurídica',
+				endereco: '',
+				cidade: '',
+				estado: '',
+				email: '',
+				telefone: '',
+				status: 'Ativo',
+			});
+		}
+	};
 
-          <View style={styles.metaItem}>
-            <Text style={[styles.metaLabel, { color: theme.textSecondary }]}>Atualizado</Text>
-            <Text
-              style={[styles.metaValue, { color: theme.text }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {item.ultimaAtualizacao}
-            </Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
+	const handleCloseForm = () => {
+		setFormMode(null);
+		setSelectedEntidade(null);
+		setFormData({
+			nome: '',
+			cnpj: '',
+			tipo: 'Jurídica',
+			endereco: '',
+			cidade: '',
+			estado: '',
+			email: '',
+			telefone: '',
+			status: 'Ativo',
+		});
+	};
 
-  // Função para alternar seleção individual
-  const toggleSelecao = (id: string) => {
-    setEntidades(prev => prev.map(entidade =>
-      entidade.id === id
-        ? { ...entidade, selecionado: !entidade.selecionado }
-        : entidade
-    ));
-  };
+	const handleSave = () => {
+		// Validação
+		if (!formData.nome?.trim()) {
+			Alert.alert('Erro', 'Nome é obrigatório');
+			return;
+		}
+		if (!formData.cnpj?.trim()) {
+			Alert.alert('Erro', 'CNPJ é obrigatório');
+			return;
+		}
+		if (!formData.email?.trim()) {
+			Alert.alert('Erro', 'Email é obrigatório');
+			return;
+		}
 
-  // Função para selecionar/desselecionar todos
-  const toggleSelecionarTodos = () => {
-    const todosSelecionados = entidades.every(entidade => entidade.selecionado);
-    setEntidades(prev => prev.map(entidade => ({
-      ...entidade,
-      selecionado: !todosSelecionados
-    })));
-  };
+		try {
+			if (formMode === 'create') {
+				EntidadeService.create(formData as Omit<Entidade, 'id' | 'createdAt' | 'updatedAt'>);
+				Alert.alert('Sucesso', 'Entidade criada com sucesso!');
+			} else if (formMode === 'edit' && selectedEntidade) {
+				EntidadeService.update(selectedEntidade.id, formData);
+				Alert.alert('Sucesso', 'Entidade atualizada com sucesso!');
+			}
 
-  // Função para alternar favorito
-  const toggleFavorito = (id: string) => {
-    setEntidades(prev => prev.map(entidade =>
-      entidade.id === id
-        ? { ...entidade, favorito: !entidade.favorito }
-        : entidade
-    ));
-  };
+			loadEntidades();
+			handleCloseForm();
+		} catch (error) {
+			Alert.alert('Erro', 'Erro ao salvar entidade');
+		}
+	};
 
-  // Função para adicionar nova entidade
-  const handleAdicionarEntidade = () => {
-    Alert.alert('Adicionar Entidade', 'Funcionalidade de adição será implementada');
-  };
+	const handleDelete = (entidade: Entidade) => {
+		Alert.alert(
+			'Confirmar Exclusão',
+			`Deseja realmente excluir ${entidade.nome}?`,
+			[
+				{ text: 'Cancelar', style: 'cancel' },
+				{
+					text: 'Excluir',
+					style: 'destructive',
+					onPress: () => {
+						EntidadeService.deleteEntidade(entidade.id);
+						loadEntidades();
+						Alert.alert('Sucesso', 'Entidade excluída com sucesso!');
+					},
+				},
+			]
+		);
+	};
 
-  // Função para aplicar filtros
-  const aplicarFiltros = () => {
-    Alert.alert('Filtros Aplicados', 'Filtros salvos com sucesso');
-  };
+	const handleLogout = () => {
+		Alert.alert('Logout', 'Funcionalidade de logout será implementada');
+	};
 
-  const handleViewModePress = () => {
-    Alert.alert('Modo de Visualização', 'Alterar modo de visualização');
-  };
+	const toggleMenu = (id: string, event?: any) => {
+		console.log('Toggle menu for ID:', id, 'Current visible:', menuVisible);
+		if (menuVisible === id) {
+			setMenuVisible(null);
+			setMenuPosition(null);
+		} else {
+			setMenuVisible(id);
+			// Capturar posição do toque/clique
+			if (event?.nativeEvent) {
+				const { pageX, pageY } = event.nativeEvent;
+				// Posicionar dropdown próximo ao botão clicado
+				setMenuPosition({ 
+					top: pageY + 5, // Pequeno offset para baixo
+					right: 20 // Margem da direita
+				});
+			} else {
+				// Fallback se não houver evento
+				setMenuPosition({ top: 100, right: 20 });
+			}
+		}
+	};
 
-  const handleActionsPress = () => {
-    Alert.alert('Ações', 'Menu de ações disponíveis');
-  };
+	const renderEntityRow = ({ item }: { item: Entidade }) => (
+		<Animated.View
+			style={[
+				styles.tableRow,
+				
+				{
+					opacity: fadeAnim,
+					transform: [{ translateY: slideAnim }],
+					// backgroundColor: "red",
+					// width: '100%',
 
-  const handleSidebarToggle = () => {
-    setSidebarOpen(prev => !prev);
-  };
+				},
+				
+			]}
+		>
+			<TouchableOpacity
+				style={styles.rowClickable}
+				onPress={() => handleOpenForm('view', item)}
+				activeOpacity={0.7}
+			>
+				<View style={styles.tableCell}>
+					<Text style={styles.cellText} numberOfLines={1}>
+						{item.nome}
+					</Text>
+				</View>
 
-  const handleLogout = () => {
-    Alert.alert('Logout', 'Funcionalidade de logout será implementada');
-  };
+				<View style={styles.tableCell}>
+					<Text style={styles.cellText} numberOfLines={1}>
+						{item.cnpj}
+					</Text>
+				</View>
 
-  const handleMobileMenuToggle = (isOpen: boolean) => {
-    setMobileSidebarOpen(isOpen);
-  };
+				<View style={styles.tableCellSmall}>
+					<Text style={styles.cellText}>{item.tipo}</Text>
+				</View>
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {Platform.OS === 'web' && (
-        <WebNavbar
-          screenName="Entidade"
-          searchPlaceholder="Search or type a command (Ctrl + G)"
-          viewModeLabel={Platform.OS === 'web' ? "Exibição em Lista" : " + "}
-          addButtonLabel={Platform.OS === 'web' ? "+ Adicionar Entidade" : " + "}
-          searchText={searchText}
-          onSearchChange={setSearchText}
-          onAddPress={handleAdicionarEntidade}
-          onViewModePress={handleViewModePress}
-          onActionsPress={handleActionsPress}
-          onSidebarToggle={handleSidebarToggle}
-        />
-      )}
+				<View style={styles.tableCell}>
+					<Text style={styles.cellText} numberOfLines={1}>
+						{item.email}
+					</Text>
+				</View>
 
-      {Platform.OS === 'web' && (
-        <WebSidebar
-          isOpen={sidebarOpen}
-          onToggle={handleSidebarToggle}
-          theme={isDark ? 'dark' : 'light'}
-          onThemeChange={toggleTheme}
-          onLogout={handleLogout}
-        />
-      )}
+				<View style={styles.tableCellSmall}>
+					<Text style={styles.cellText}>
+						{item.cidade}/{item.estado}
+					</Text>
+				</View>
 
-      {/* // No entidadeScreen.tsx, ajuste as props do MobileNavbar */}
-      {Platform.OS !== 'web' && (
-        <MobileNavbar
-          screenName="Entidade"
-          visible={true}
-          onMenuToggle={handleMobileMenuToggle}
-          onAddPress={handleAdicionarEntidade}
-          addButtonLabel="+"
-          searchPlaceholder="Buscar entidades..."
-          searchText={searchText}
-          onSearchChange={setSearchText}
-        />
-      )}
+				<View style={styles.tableCellSmall}>
+					<View
+						style={[
+							styles.statusBadge,
+							item.status === 'Ativo' ? styles.statusActive : styles.statusInactive,
+						]}
+					>
+						<Text style={styles.statusText}>{item.status}</Text>
+					</View>
+				</View>
+			</TouchableOpacity>
 
-      {Platform.OS !== 'web' && (
-        <MobileSidebar
-          visible={true}
-          onMenuToggle={handleMobileMenuToggle}
-          onThemeChange={toggleTheme}
-          onLogout={handleLogout}
-        />
-      )}
+			{/* Menu de ações */}
+			<View style={styles.actionsCell}>
+				<TouchableOpacity
+					style={styles.menuButton}
+					onPress={(e) => toggleMenu(item.id, e)}
+					activeOpacity={0.7}
+				>
+					<Text style={styles.menuIcon}>⋮</Text>
+				</TouchableOpacity>
+			</View>
+		</Animated.View>
+	);
 
+	const renderForm = () => (
+		<Modal
+			visible={formMode !== null}
+			transparent
+			animationType="fade"
+			onRequestClose={handleCloseForm}
+		>
+			<View style={styles.modalOverlay}>
+				<View style={styles.modalContent}>
+					<View style={styles.modalHeader}>
+						<Text style={styles.modalTitle}>
+							{formMode === 'create' && 'Nova Entidade'}
+							{formMode === 'edit' && 'Editar Entidade'}
+							{formMode === 'view' && 'Visualizar Entidade'}
+						</Text>
+						<TouchableOpacity onPress={handleCloseForm}>
+							<Text style={styles.closeButton}>×</Text>
+						</TouchableOpacity>
+					</View>
 
+					<ScrollView style={styles.formContainer}>
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Nome *</Text>
+							<TextInput
+								style={styles.formInput}
+								value={formData.nome}
+								onChangeText={(text) => setFormData({ ...formData, nome: text })}
+								placeholder="Nome da entidade"
+								placeholderTextColor={theme.textSecondary}
+								editable={formMode !== 'view'}
+							/>
+						</View>
 
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>CNPJ *</Text>
+							<TextInput
+								style={styles.formInput}
+								value={formData.cnpj}
+								onChangeText={(text) => setFormData({ ...formData, cnpj: text })}
+								placeholder="00.000.000/0000-00"
+								placeholderTextColor={theme.textSecondary}
+								keyboardType="numeric"
+								editable={formMode !== 'view'}
+							/>
+						</View>
 
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Tipo</Text>
+							<View style={styles.radioGroup}>
+								<TouchableOpacity
+									style={styles.radioButton}
+									onPress={() =>
+										formMode !== 'view' && setFormData({ ...formData, tipo: 'Física' })
+									}
+									disabled={formMode === 'view'}
+								>
+									<View
+										style={[
+											styles.radioCircle,
+											formData.tipo === 'Física' && styles.radioCircleSelected,
+										]}
+									/>
+									<Text style={styles.radioLabel}>Física</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={styles.radioButton}
+									onPress={() =>
+										formMode !== 'view' && setFormData({ ...formData, tipo: 'Jurídica' })
+									}
+									disabled={formMode === 'view'}
+								>
+									<View
+										style={[
+											styles.radioCircle,
+											formData.tipo === 'Jurídica' && styles.radioCircleSelected,
+										]}
+									/>
+									<Text style={styles.radioLabel}>Jurídica</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
 
-      <View style={[styles.listWrapper, { backgroundColor: theme.backgroundSecondary }]}>
-        <View
-          style={[
-            styles.searchSection,
-            {
-              backgroundColor: theme.backgroundSecondary,
-            },
-          ]}
-        >
-          <Text style={[styles.searchTitle, { color: theme.text }]}>Entidades</Text>
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Status</Text>
+							<View style={styles.radioGroup}>
+								<TouchableOpacity
+									style={styles.radioButton}
+									onPress={() =>
+										formMode !== 'view' && setFormData({ ...formData, status: 'Ativo' })
+									}
+									disabled={formMode === 'view'}
+								>
+									<View
+										style={[
+											styles.radioCircle,
+											formData.status === 'Ativo' && styles.radioCircleSelected,
+										]}
+									/>
+									<Text style={styles.radioLabel}>Ativo</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={styles.radioButton}
+									onPress={() =>
+										formMode !== 'view' && setFormData({ ...formData, status: 'Inativo' })
+									}
+									disabled={formMode === 'view'}
+								>
+									<View
+										style={[
+											styles.radioCircle,
+											formData.status === 'Inativo' && styles.radioCircleSelected,
+										]}
+									/>
+									<Text style={styles.radioLabel}>Inativo</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
 
-          <TextInput
-            style={[
-              styles.searchInput,
-              {
-                backgroundColor: theme.background,
-                color: theme.text,
-                borderColor: theme.borderLight,
-              },
-            ]}
-            placeholder="Buscar por nome, e-mail ou status"
-            placeholderTextColor={theme.textSecondary}
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View>
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Endereço</Text>
+							<TextInput
+								style={styles.formInput}
+								value={formData.endereco}
+								onChangeText={(text) => setFormData({ ...formData, endereco: text })}
+								placeholder="Endereço completo"
+								placeholderTextColor={theme.textSecondary}
+								editable={formMode !== 'view'}
+							/>
+						</View>
 
-        <FlatList
-          data={filteredEntidades}
-          keyExtractor={(item) => item.id}
-          renderItem={renderEntidade}
-          showsVerticalScrollIndicator={false}
-          style={styles.list}
-          contentContainerStyle={[
-            styles.listContent,
-            isDesktop ? styles.listContentDesktop : styles.listContentMobile,
-          ]}
-          ListEmptyComponent={() => (
-            <View style={styles.emptyState}>
-              <Text style={[styles.emptyStateTitle, { color: theme.text }]}>Nenhuma entidade encontrada</Text>
-              <Text style={[styles.emptyStateDescription, { color: theme.textSecondary }]}>
-                Ajuste os termos da busca ou adicione uma nova entidade.
-              </Text>
-            </View>
-          )}
-        />
-      </View>
-    </View>
-  );
+						<View style={styles.formRow}>
+							<View style={[styles.formGroup, { flex: 2, marginRight: 8 }]}>
+								<Text style={styles.formLabel}>Cidade</Text>
+								<TextInput
+									style={styles.formInput}
+									value={formData.cidade}
+									onChangeText={(text) => setFormData({ ...formData, cidade: text })}
+									placeholder="Cidade"
+									placeholderTextColor={theme.textSecondary}
+									editable={formMode !== 'view'}
+								/>
+							</View>
+							<View style={[styles.formGroup, { flex: 1 }]}>
+								<Text style={styles.formLabel}>UF</Text>
+								<TextInput
+									style={styles.formInput}
+									value={formData.estado}
+									onChangeText={(text) => setFormData({ ...formData, estado: text })}
+									placeholder="UF"
+									placeholderTextColor={theme.textSecondary}
+									maxLength={2}
+									editable={formMode !== 'view'}
+								/>
+							</View>
+						</View>
+
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Email *</Text>
+							<TextInput
+								style={styles.formInput}
+								value={formData.email}
+								onChangeText={(text) => setFormData({ ...formData, email: text })}
+								placeholder="email@exemplo.com"
+								placeholderTextColor={theme.textSecondary}
+								keyboardType="email-address"
+								autoCapitalize="none"
+								editable={formMode !== 'view'}
+							/>
+						</View>
+
+						<View style={styles.formGroup}>
+							<Text style={styles.formLabel}>Telefone</Text>
+							<TextInput
+								style={styles.formInput}
+								value={formData.telefone}
+								onChangeText={(text) => setFormData({ ...formData, telefone: text })}
+								placeholder="(00) 00000-0000"
+								placeholderTextColor={theme.textSecondary}
+								keyboardType="phone-pad"
+								editable={formMode !== 'view'}
+							/>
+						</View>
+					</ScrollView>
+
+					{formMode !== 'view' && (
+						<View style={styles.formActions}>
+							<TouchableOpacity
+								style={[styles.formButton, styles.cancelButton]}
+								onPress={handleCloseForm}
+							>
+								<Text style={styles.formButtonText}>Cancelar</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								style={[styles.formButton, styles.saveButton]}
+								onPress={handleSave}
+							>
+								<Text style={[styles.formButtonText, styles.saveButtonText]}>
+									{formMode === 'create' ? 'Criar' : 'Salvar'}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					)}
+				</View>
+			</View>
+		</Modal>
+	);
+
+	return (
+		<SafeAreaView style={styles.container}>
+			{Platform.OS === 'web' && (
+				<>
+					<WebSidebar
+						isOpen={sidebarOpen}
+						onToggle={() => setSidebarOpen(!sidebarOpen)}
+						theme={isDark ? 'dark' : 'light'}
+						onThemeChange={toggleTheme}
+						onLogout={handleLogout}
+					/>
+					<WebNavbar
+						screenName="Entidades"
+						searchPlaceholder="Buscar entidades..."
+						viewModeLabel="Lista"
+						addButtonLabel="+ Nova Entidade"
+						searchText={searchText}
+						onSearchChange={setSearchText}
+						onAddPress={() => handleOpenForm('create')}
+						onViewModePress={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
+						onActionsPress={() => Alert.alert('Ações', 'Menu de ações')}
+						onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
+					/>
+				</>
+			)}
+
+			{Platform.OS !== 'web' && (
+				<>
+					<MobileNavbar
+						screenName="Entidades"
+						visible={true}
+						onMenuToggle={() => { }}
+						onAddPress={() => handleOpenForm('create')}
+						addButtonLabel="+"
+						searchPlaceholder="Buscar entidades..."
+						searchText={searchText}
+						onSearchChange={setSearchText}
+					/>
+					<MobileSidebar
+						visible={false}
+						onMenuToggle={() => { }}
+						onThemeChange={toggleTheme}
+						onLogout={handleLogout}
+					/>
+				</>
+			)}
+
+			<View style={styles.content}>
+				{Platform.OS !== 'web' && (
+					<View style={styles.mobileHeader}>
+						<Text style={styles.mobileTitle}>Entidades</Text>
+						<TouchableOpacity
+							style={styles.addButton}
+							onPress={() => handleOpenForm('create')}
+						>
+							<Text style={styles.addButtonText}>+ Nova</Text>
+						</TouchableOpacity>
+					</View>
+				)}
+
+				<View style={styles.listContainer}>
+					<View style={styles.listHeader}>
+						<Text style={styles.listCount}>
+							{filteredEntidades.length} {filteredEntidades.length === 1 ? 'entidade' : 'entidades'}
+						</Text>
+					</View>
+
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={Platform.OS === 'web'}
+						contentContainerStyle={{ flexGrow: 1 }}
+					>
+						<View style={styles.tableContainer}>
+							{/* Cabeçalho da tabela */}
+							<View style={styles.tableHeader}>
+									<View style={styles.tableCell}>
+										<Text style={styles.headerText}>Nome</Text>
+									</View>
+									<View style={styles.tableCell}>
+										<Text style={styles.headerText}>CNPJ</Text>
+									</View>
+									<View style={styles.tableCellSmall}>
+										<Text style={styles.headerText}>Tipo</Text>
+									</View>
+									<View style={styles.tableCell}>
+										<Text style={styles.headerText}>Email</Text>
+									</View>
+									<View style={styles.tableCellSmall}>
+										<Text style={styles.headerText}>Cidade/UF</Text>
+									</View>
+									<View style={styles.tableCellSmall}>
+										<Text style={styles.headerText}>Status</Text>
+									</View>
+									<View style={styles.actionsCell}>
+										<Text style={styles.headerText}>Ações</Text>
+									</View>
+								</View>
+
+							<FlatList
+								data={filteredEntidades}
+								renderItem={renderEntityRow}
+								keyExtractor={(item) => item.id}
+								contentContainerStyle={{ flexGrow: 1 }}
+								style={{ flex: 1 }}
+								ListEmptyComponent={
+									<View style={styles.emptyContainer}>
+										<Text style={styles.emptyText}>📋</Text>
+										<Text style={styles.emptyTitle}>Nenhuma entidade encontrada</Text>
+										<Text style={styles.emptySubtitle}>
+											{searchText ? 'Tente ajustar sua busca' : 'Crie sua primeira entidade'}
+										</Text>
+									</View>
+								}
+							/>
+						</View>
+					</ScrollView>
+				</View>
+			</View>
+
+			{renderForm()}
+
+			{/* Dropdown global - renderizado fora da tabela para aparecer sempre na frente */}
+			{menuVisible && menuPosition && (
+				<>
+					{/* Área invisível para fechar o menu ao clicar fora - SEM overlay escuro */}
+					<TouchableOpacity
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							zIndex: 99998,
+						}}
+						activeOpacity={1}
+						onPress={() => {
+							setMenuVisible(null);
+							setMenuPosition(null);
+						}}
+					/>
+					
+					{/* Menu dropdown */}
+					<View 
+						style={[
+							styles.dropdownMenu,
+							{
+								position: 'absolute',
+								top: menuPosition.top,
+								right: menuPosition.right,
+								backgroundColor: isDark ? '#1a1a2e' : '#ffffff',
+							}
+						]}
+					>
+						<TouchableOpacity
+							style={styles.dropdownItem}
+							onPress={() => {
+								const selectedEntity = entidades.find(e => e.id === menuVisible);
+								setMenuVisible(null);
+								setMenuPosition(null);
+								if (selectedEntity) handleOpenForm('edit', selectedEntity);
+							}}
+							activeOpacity={0.7}
+						>
+							<Text style={styles.dropdownIcon}>✏️</Text>
+							<Text style={styles.dropdownText}>Editar</Text>
+						</TouchableOpacity>
+
+						<TouchableOpacity
+							style={[styles.dropdownItem, styles.dropdownItemDanger]}
+							onPress={() => {
+								const selectedEntity = entidades.find(e => e.id === menuVisible);
+								setMenuVisible(null);
+								setMenuPosition(null);
+								if (selectedEntity) handleDelete(selectedEntity);
+							}}
+							activeOpacity={0.7}
+						>
+							<Text style={styles.dropdownIcon}>🗑️</Text>
+							<Text style={[styles.dropdownText, styles.dropdownTextDanger]}>Excluir</Text>
+						</TouchableOpacity>
+					</View>
+				</>
+			)}
+		</SafeAreaView>
+	);
 };

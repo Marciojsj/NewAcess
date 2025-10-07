@@ -13,7 +13,7 @@ import VisitantesScreen from './src/screens/visitantes/VisitantesScreen';
 import RelatoriosScreen from './src/screens/relatorios/RelatoriosScreen';
 // import AlertasScreen from './src/screens/alertas/AlertasScreen';
 import { EntidadeScreen } from './src/screens/entidade/entidadeScreen';
-import { RegistroEntidadeScreen } from './src/screens/entidade/RegistroEntidadeScreen';
+// import { RegistroEntidadeScreen } from './src/screens/entidade/RegistroEntidadeScreen';
 
 const Stack = createStackNavigator();
 
@@ -35,7 +35,7 @@ function Routes() {
           <Stack.Screen name="Relatorios" component={RelatoriosScreen} />
           {/* <Stack.Screen name="Alertas" component={AlertasScreen} /> */}
           <Stack.Screen name="Entidade" component={EntidadeScreen} />
-          <Stack.Screen name="RegistroEntidade" component={RegistroEntidadeScreen} />
+          {/* <Stack.Screen name="RegistroEntidade" component={RegistroEntidadeScreen} /> */}
         </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />

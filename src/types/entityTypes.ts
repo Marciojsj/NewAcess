@@ -2,6 +2,7 @@
 
 export interface Entity {
   id: string; // UUID v7
+  name?: string; // VAR(255) - nome da entidade
   cpf: string; // VAR(14)
   rg: string; // VAR(9)
   type: string; // VAR(255)

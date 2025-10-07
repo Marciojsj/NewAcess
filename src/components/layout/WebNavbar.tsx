@@ -263,13 +263,13 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
             <View style={styles.container}>
                 <View style={styles.row}>
                     <View style={styles.rightSection}>
-                        <TextInput
+                        {/* <TextInput
                             style={styles.searchInput}
                             placeholder={effectiveSearchPlaceholder}
                             placeholderTextColor={theme.textSecondary}
                             value={searchText}
                             onChangeText={onSearchChange}
-                        />
+                        /> */}
 
 
 
@@ -279,6 +279,14 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                             activeOpacity={0.9}
                         >
                             <Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
+                        </TouchableOpacity>
+
+                                                <TouchableOpacity
+                            style={styles.actionButton}
+                            onPress={onActionsPress}
+                            activeOpacity={0.85}
+                        >
+                            <Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
                         </TouchableOpacity>
                         {/* <TouchableOpacity
                             style={styles.menuTrigger}
@@ -290,7 +298,7 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     </View>
                 </View>
             </View>
-
+{/* 
             <View style={styles.actionBar}>
                 <View style={styles.row}>
                     <View style={styles.leftSection}>
@@ -307,7 +315,7 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                         </TouchableOpacity>
                     </View>
                 </View>
-            </View>
+            </View> */}
         </>
     );
 };
