@@ -40,8 +40,11 @@ interface SidebarAction {
 
 interface MobileSidebarProps {
 	visible?: boolean;
+	isOpen?: boolean;
+	onToggle?: () => void;
 	onMenuToggle?: (isOpen: boolean) => void;
-	onThemeChange?: (theme: 'light' | 'dark') => void;
+	theme?: 'light' | 'dark';
+	onThemeChange?: (theme?: 'light' | 'dark') => void;
 	onLogout?: () => void;
 }
 
@@ -49,7 +52,10 @@ const { width: screenWidth } = Dimensions.get('window');
 
 export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 	visible = true,
+	isOpen: externalIsOpen = false,
+	onToggle,
 	onMenuToggle,
+	theme: externalTheme,
 	onThemeChange,
 	onLogout
 }) => {
@@ -59,7 +65,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 	const menuAnim = useRef(new Animated.Value(-300)).current;
 	const contentAnim = useRef(new Animated.Value(0)).current;
 	const iconAnim = useRef(new Animated.Value(0)).current;
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpen, setIsOpen] = useState(externalIsOpen);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [filteredActions, setFilteredActions] = useState<SidebarAction[]>([]);
 	const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -76,11 +82,17 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 		{ id: '7', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
 	];
 
+	// Sincronizar isOpen externo com interno
+	useEffect(() => {
+		setIsOpen(externalIsOpen);
+	}, [externalIsOpen]);
+
 	// Controle do menu
 	const toggleMenu = () => {
 		const newState = !isOpen;
 		setIsOpen(newState);
 		onMenuToggle?.(newState);
+		onToggle?.();
 	};
 
 	const closeMenu = () => {
@@ -88,6 +100,7 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 		setSearchQuery('');
 		Keyboard.dismiss(); // Fecha o teclado
 		onMenuToggle?.(false);
+		onToggle?.();
 	};
 
 	// Animação do container principal (navbar)
@@ -110,12 +123,6 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 					stiffness: 90,
 					useNativeDriver: true,
 				}),
-				Animated.spring(contentAnim, {
-					toValue: screenWidth * 0.7,
-					damping: 20,
-					stiffness: 90,
-					useNativeDriver: true,
-				}),
 				Animated.spring(iconAnim, {
 					toValue: screenWidth * 0.75,
 					damping: 20,
@@ -127,12 +134,6 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 			Animated.parallel([
 				Animated.spring(menuAnim, {
 					toValue: -300,
-					damping: 20,
-					stiffness: 90,
-					useNativeDriver: true,
-				}),
-				Animated.spring(contentAnim, {
-					toValue: 0,
 					damping: 20,
 					stiffness: 90,
 					useNativeDriver: true,
@@ -291,16 +292,6 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 					/>
 				</View>
 			</Animated.View>
-
-			{/* CONTEÚDO COM ANIMAÇÃO */}
-			<Animated.View
-				style={[
-					styles.contentContainer,
-					{
-						transform: [{ translateX: contentAnim }],
-					},
-				]}
-			/>
 
 			{/* LOGOUT MODAL */}
 			<Modal visible={logoutModalVisible} transparent animationType="fade" onRequestClose={() => setLogoutModalVisible(false)}>

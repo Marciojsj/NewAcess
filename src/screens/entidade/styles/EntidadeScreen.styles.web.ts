@@ -143,11 +143,13 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     alignItems: 'flex-start',
   },
   
-  // Grid Layout for Cards
+  // Grid Layout for Cards - Espaçamento proporcional
   cardWrapper: {
-    width: 'calc(33.333% - 11px)' as any, // 3 columns with gap (web-only CSS)
-    minWidth: 364,
-    maxWidth: 450,
+    width: 'calc(33.333% - 14px)' as any, // 3 colunas com gap de 20px: (20 * 2) / 3 = ~14px
+    minWidth: 340,
+    maxWidth: 480,
+    flexGrow: 0,
+    flexShrink: 0,
   },
   
   // Card de Entidade (Web - matching mobile)
@@ -162,6 +164,7 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     shadowOpacity: 0.08,
     shadowRadius: 8,
     height: '100%',
+    width: '100%',
   },
   
   cardHeader: {
