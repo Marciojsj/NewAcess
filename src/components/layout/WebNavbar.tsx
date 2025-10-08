@@ -54,115 +54,86 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
     const styles = useMemo(
         () =>
             StyleSheet.create({
+                // Container principal
                 container: {
                     backgroundColor: theme.backgroundCard,
                     borderBottomWidth: 1,
                     borderBottomColor: theme.borderLight,
-                    paddingHorizontal: 24,
-                    paddingTop: 18,
+                    paddingHorizontal: 32,
+                    paddingTop: 15,
                     paddingBottom: 10,
                     shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 6 },
+                    shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.08,
                     shadowRadius: 12,
                     elevation: 4,
                 },
-                actionBar: {
-                    backgroundColor: theme.backgroundCard,
-                    paddingHorizontal: 24,
-                    paddingTop: 14,
-                    paddingBottom: 10,
-                    shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 4 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 10,
-                    elevation: 3,
-                },
-                row: {
+
+                // LINHA 1: Título centralizado e input à direita
+                titleRow: {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    gap: 2,
+                    width: '100%',
                 },
-                leftSection: {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    flex: 1,
-                },
-                centerSection: {
-                    flex: 2,
-                    paddingHorizontal: 24,
-                },
-                rightSection: {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'flex-end',
-                    flex: 1,
-                },
-                iconButton: {
-                    width: 48,
-                    height: 48,
-                    borderRadius: 12,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: theme.background,
-                    borderWidth: 1,
-                    borderColor: theme.borderLight,
-                    shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 6,
-                    elevation: 2,
-                },
-                iconText: {
-                    fontSize: 20,
+                screenName: {
+                    fontSize: 24,
+                    fontWeight: '700',
                     color: theme.text,
+                    letterSpacing: -0.5,
+                    textAlign: 'center',
+                    flex: 1,
+                    width: '10%',
+                    maxWidth: '12%',
+                    // backgroundColor: 'red'
                 },
+
+                // LINHA 2: Busca + Botões
+                actionsRow: {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 1,
+                },
+
+                // Campo de busca
                 searchInput: {
-                    width: 370,
-                    borderWidth: 1,
-                    borderRadius: 12,
-                    paddingHorizontal: 22,
-                    paddingVertical: 12,
-                    fontSize: 14,
-                    backgroundColor: theme.background,
-                    color: theme.text,
-                    borderColor: theme.borderLight,
-                },
-                //aqui
-                actionButton: {
-                    width: 200,
+                    width: '30%',
                     height: 44,
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    borderWidth: 1,
                     borderRadius: 10,
-                    backgroundColor: theme.background,
-                    borderWidth: 1,
-                    borderColor: theme.borderLight,
-                    marginLeft: 16,
-                    shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.06,
-                    shadowRadius: 6,
-                    elevation: 2,
-                },
-                actionButtonText: {
+                    paddingHorizontal: 16,
+                    paddingVertical: 10,
                     fontSize: 14,
+                    backgroundColor: theme.background,
                     color: theme.text,
-                    fontWeight: '500',
+                    borderColor: theme.borderLight,
+                    shadowColor: theme.shadow,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.04,
+                    shadowRadius: 4,
+                    elevation: 1,
                 },
-                //aqui
+
+                // Grupo de botões
+                buttonsGroup: {
+                    flexDirection: 'row',
+                    gap: 1,
+                },
+
+                // Botão adicionar (primário)
                 addButton: {
-                    width: 200,
+                    minWidth: 140,
                     height: 44,
+                    paddingHorizontal: 20,
                     justifyContent: 'center',
                     alignItems: 'center',
                     borderRadius: 10,
                     backgroundColor: theme.primary,
-                    marginLeft: 16,
                     shadowColor: theme.shadow,
-                    shadowOffset: { width: 0, height: 4 },
+                    shadowOffset: { width: 0, height: 3 },
                     shadowOpacity: 0.12,
-                    shadowRadius: 8,
+                    shadowRadius: 6,
                     elevation: 3,
                 },
                 addButtonText: {
@@ -170,10 +141,28 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
                     color: '#ffffff',
                     fontWeight: '600',
                 },
-                screenName: {
-                    fontSize: 18,
-                    fontWeight: '600',
+
+                // Botão de ação secundário
+                actionButton: {
+                    minWidth: 120,
+                    height: 44,
+                    paddingHorizontal: 16,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    borderRadius: 10,
+                    backgroundColor: theme.background,
+                    borderWidth: 1,
+                    borderColor: theme.borderLight,
+                    shadowColor: theme.shadow,
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.04,
+                    shadowRadius: 4,
+                    elevation: 2,
+                },
+                actionButtonText: {
+                    fontSize: 14,
                     color: theme.text,
+                    fontWeight: '500',
                 },
                 modalOverlay: {
                     flex: 1,
@@ -259,63 +248,19 @@ export const WebNavbar: React.FC<WebNavbarProps> = ({
     };
 
     return (
-        <>
-            <View style={styles.container}>
-                <View style={styles.row}>
-                    <View style={styles.rightSection}>
-                        {/* <TextInput
-                            style={styles.searchInput}
-                            placeholder={effectiveSearchPlaceholder}
-                            placeholderTextColor={theme.textSecondary}
-                            value={searchText}
-                            onChangeText={onSearchChange}
-                        /> */}
-
-
-
-                        <TouchableOpacity
-                            style={styles.addButton}
-                            onPress={onAddPress}
-                            activeOpacity={0.9}
-                        >
-                            <Text style={styles.addButtonText}>{effectiveAddButtonLabel}</Text>
-                        </TouchableOpacity>
-
-                                                <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={onActionsPress}
-                            activeOpacity={0.85}
-                        >
-                            <Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
-                        </TouchableOpacity>
-                        {/* <TouchableOpacity
-                            style={styles.menuTrigger}
-                            onPress={() => setMenuVisible(prev => !prev)}
-                            activeOpacity={0.85}
-                        >
-                            <Text style={styles.menuTriggerText}>⚙</Text>
-                        </TouchableOpacity> */}
-                    </View>
-                </View>
+        <View style={styles.container}>
+            {/* LINHA 1: Título centralizado */}
+            <View style={styles.titleRow}>
+                <Text style={styles.screenName}>{screenName}</Text>
+                 <TextInput
+                    style={styles.searchInput}
+                    placeholder={effectiveSearchPlaceholder}
+                    placeholderTextColor={theme.textSecondary}
+                    value={searchText}
+                    onChangeText={onSearchChange}
+                />
             </View>
-{/* 
-            <View style={styles.actionBar}>
-                <View style={styles.row}>
-                    <View style={styles.leftSection}>
-                        <Text style={styles.screenName}>{screenName}</Text>
-                    </View>
-
-                    <View style={styles.rightSection}>
-                        <TouchableOpacity
-                            style={styles.actionButton}
-                            onPress={onActionsPress}
-                            activeOpacity={0.85}
-                        >
-                            <Text style={styles.actionButtonText}>{effectiveActionsLabel}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View> */}
-        </>
+            
+        </View>
     );
 };

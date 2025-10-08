@@ -300,7 +300,7 @@ export const EntidadeScreen: React.FC = () => {
 				<View style={{ flex: 1, flexDirection: 'row' }}>
 					<WebSidebar
 						isOpen={sidebarOpen}
-						onToggle={() => setSidebarOpen(false)}
+						onToggle={() => setSidebarOpen(!sidebarOpen)}
 						theme={isDark ? 'dark' : 'light'}
 						onThemeChange={toggleTheme}
 						onLogout={handleLogout}
@@ -573,6 +573,17 @@ export const EntidadeScreen: React.FC = () => {
 						</View>
 					}
 				/>
+			)}
+
+			{/* BOTÃO FLUTUANTE WEB */}
+			{Platform.OS === 'web' && (
+				<TouchableOpacity
+					style={[styles.webFab, { backgroundColor: theme.primary }]}
+					onPress={() => handleOpenForm('create')}
+					activeOpacity={0.8}
+				>
+					<Text style={styles.webFabIcon}>+</Text>
+				</TouchableOpacity>
 			)}
 		</View>
 	);
