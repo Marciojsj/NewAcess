@@ -28,7 +28,7 @@ const { width: screenWidth } = Dimensions.get('window');
 export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 	visible = true,
 	onAddPress,
-	addButtonLabel = '+',
+	addButtonLabel = 'Teste de texto muito grande',
 	searchPlaceholder = 'Buscar...',
 	searchText,
 	onSearchChange,
@@ -71,31 +71,30 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 					borderBottomColor: appTheme.borderLight + '20',
 				},
 
-				// Layout da linha principal
-				contentRow: {
-					flexDirection: 'row',
+				// LINHA 1: Título centralizado
+				titleRow: {
+					marginBottom: 27,
 					alignItems: 'center',
-					justifyContent: 'space-between',
-					gap: 12,
-					minHeight: 44,
-				},
-
-				// Seção do título
-				titleSection: {
-					flex: 0,
-					minWidth: 80,
+					justifyContent: 'center',
 				},
 				screenTitle: {
-					fontSize: 16,
-					fontWeight: '600',
+					fontSize: 20,
+					fontWeight: '700',
 					color: appTheme.text,
 					letterSpacing: 0.3,
+					textAlign: 'center',
+				},
+
+				// LINHA 2: Actions (Busca + Botão)
+				actionsRow: {
+					flexDirection: 'row',
+					alignItems: 'center',
+					gap: 12,
 				},
 
 				// Seção de busca
 				searchSection: {
 					flex: 1,
-					marginHorizontal: 8,
 				},
 				searchInput: {
 					height: 40,
@@ -146,42 +145,43 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
 			accessibilityRole="header"
 			accessibilityLabel={`Barra de navegação - ${screenName}`}
 		>
-			<View style={styles.contentRow} pointerEvents="auto">
-				{/* Título da tela */}
-				<View style={styles.titleSection}>
+			<View pointerEvents="auto">
+				{/* LINHA 1: Título do documento */}
+				<View style={styles.titleRow}>
 					<Text style={styles.screenTitle} numberOfLines={1}>
 						{screenName}
 					</Text>
 				</View>
 
-				{/* Campo de busca */}
-				{showSearchBar && (
-					<View style={styles.searchSection}>
-						<TextInput
-							style={styles.searchInput}
-							placeholder={searchPlaceholder}
-							placeholderTextColor={appTheme.textTertiary}
-							value={searchText}
-							onChangeText={onSearchChange}
-							returnKeyType="search"
-							blurOnSubmit={true}
-							accessibilityLabel="Campo de busca"
-							accessibilityHint="Digite para buscar"
-						/>
-					</View>
-				)}
+				{/* LINHA 2: Busca + Botão Adicionar */}
+				<View style={styles.actionsRow}>
+					{showSearchBar && (
+						<View style={styles.searchSection}>
+							<TextInput
+								style={styles.searchInput}
+								placeholder={searchPlaceholder}
+								placeholderTextColor={appTheme.textTertiary}
+								value={searchText}
+								onChangeText={onSearchChange}
+								returnKeyType="search"
+								blurOnSubmit={true}
+								accessibilityLabel="Campo de busca"
+								accessibilityHint="Digite para buscar"
+							/>
+						</View>
+					)}
 
-				{/* Botão de adicionar */}
-				<View style={styles.actionSection}>
-					<TouchableOpacity
-						style={styles.addButton}
-						onPress={onAddPress}
-						activeOpacity={0.8}
-						accessibilityLabel="Adicionar novo item"
-						accessibilityRole="button"
-					>
-						<Text style={styles.addButtonText}>{addButtonLabel}</Text>
-					</TouchableOpacity>
+					<View style={styles.actionSection}>
+						<TouchableOpacity
+							style={styles.addButton}
+							onPress={onAddPress}
+							activeOpacity={0.8}
+							accessibilityLabel="Adicionar novo item"
+							accessibilityRole="button"
+						>
+							<Text style={styles.addButtonText}>{addButtonLabel}</Text>
+						</TouchableOpacity>
+					</View>
 				</View>
 			</View>
 		</Animated.View>

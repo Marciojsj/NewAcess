@@ -284,7 +284,7 @@ export const EntidadeScreen: React.FC = () => {
 						searchText={searchText}
 						onSearchChange={setSearchText}
 						screenName="Entidades"
-						addButtonLabel="+ Nova"
+						addButtonLabel="+"
 						searchPlaceholder="Buscar entidades..."
 						showSearchBar={true}
 					/>
@@ -556,7 +556,7 @@ export const EntidadeScreen: React.FC = () => {
 					keyExtractor={(item) => item.id}
 					style={{ flex: 1 }}
 					contentContainerStyle={{
-						paddingTop: 120,
+						paddingTop: 165,
 						paddingBottom: 100,
 						paddingHorizontal: 16,
 					}}
