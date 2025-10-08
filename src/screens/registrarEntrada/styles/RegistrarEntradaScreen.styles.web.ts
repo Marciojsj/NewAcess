@@ -28,7 +28,7 @@ export default StyleSheet.create({
     textAlign: "center" as any,
   },
   subtitle: {
-    fontSize: responsive.fontSize.lg,
+    fontSize: responsive.fontSize.md,
     color: "rgba(255,255,255,0.7)",
     marginBottom: responsive.spacing.xl,
     textAlign: "center" as any,
@@ -42,7 +42,7 @@ export default StyleSheet.create({
   },
   backButtonText: {
     color: "#ffffff",
-    fontSize: responsive.fontSize.base,
+    fontSize: responsive.fontSize.md,
     fontWeight: "600" as any,
   },
 });

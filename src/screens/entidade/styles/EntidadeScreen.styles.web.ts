@@ -1,5 +1,5 @@
 // src/screens/entidade/styles/EntidadeScreen.styles.web.ts
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform, ViewStyle } from 'react-native';
 import { Theme } from '../../../contexts/ThemeContext';
 
 export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create({
@@ -65,16 +65,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     paddingHorizontal: 12,
     paddingVertical: 12,
     borderRadius: 6,
-    ...Platform.select({
-      web: {
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-        ':hover': {
-          backgroundColor: isDark ? '#7c3aed' : '#5b21b6',
-          transform: 'scale(1.02)',
-        },
-      },
-    }),
   },
   
   addButtonText: {
@@ -107,16 +97,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     paddingRight: 40,
     fontSize: 14,
     color: theme.text,
-    ...Platform.select({
-      web: {
-        outline: 'none',
-        transition: 'all 0.2s ease',
-        ':focus': {
-          borderColor: theme.primary,
-          boxShadow: `0 0 0 3px ${isDark ? 'rgba(99, 102, 241, 0.2)' : 'rgba(99, 102, 241, 0.1)'}`,
-        },
-      },
-    }),
   },
   
   searchIcon: {
@@ -138,7 +118,7 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
   // List
   listContainer: {
     flex: 1,
-    backgroundColor: theme.backgroundCard,
+    backgroundColor: theme.background,
     overflow: 'visible',
   },
   
@@ -155,6 +135,171 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     opacity: 0.7,
   },
   
+  listContent: {
+    padding: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    alignItems: 'flex-start',
+  },
+  
+  // Grid Layout for Cards
+  cardWrapper: {
+    width: 'calc(33.333% - 11px)' as any, // 3 columns with gap (web-only CSS)
+    minWidth: 364,
+    maxWidth: 450,
+  },
+  
+  // Card de Entidade (Web - matching mobile)
+  entityCard: {
+    backgroundColor: theme.backgroundCard,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: theme.borderLight,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 } as { width: number; height: number },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    height: '100%',
+  },
+  
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  
+  cardHeaderInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 4,
+  },
+  
+  cardSubtitle: {
+    fontSize: 13,
+    color: theme.textSecondary,
+  },
+  
+  // Status Badge
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  
+  statusActive: {
+    backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
+    borderWidth: 1,
+    borderColor: isDark ? 'rgba(34, 197, 94, 0.5)' : 'rgba(34, 197, 94, 0.3)',
+  },
+  
+  statusInactive: {
+    backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.15)',
+    borderWidth: 1,
+    borderColor: isDark ? 'rgba(239, 68, 68, 0.5)' : 'rgba(239, 68, 68, 0.3)',
+  },
+  
+  statusText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.text,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  
+  // Detalhes do Card
+  cardDetails: {
+    marginTop: 8,
+  },
+  
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+  },
+  
+  detailRowLast: {
+    borderBottomWidth: 0,
+  },
+  
+  detailLabel: {
+    fontSize: 12,
+    color: theme.textSecondary,
+    fontWeight: '600',
+    flex: 1,
+  },
+  
+  detailValue: {
+    fontSize: 13,
+    color: theme.text,
+    fontWeight: '500',
+    flex: 2,
+    textAlign: 'right',
+  },
+  
+  // Menu de Ações
+  cardActions: {
+    flexDirection: 'row',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: theme.borderLight,
+    gap: 8,
+  },
+  
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+  },
+  
+  editButton: {
+    backgroundColor: isDark ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.1)',
+    borderColor: theme.primary,
+  },
+  
+  deleteButton: {
+    backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : 'rgba(239, 68, 68, 0.1)',
+    borderColor: theme.error,
+  },
+  
+  actionIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  
+  actionText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  
+  editText: {
+    color: theme.primary,
+  },
+  
+  deleteText: {
+    color: theme.error,
+  },
+  
+  // OLD: Table Styles (deprecated - kept for backward compatibility)
   tableContainer: {
     flex: 1,
     minWidth: '100%',
@@ -206,12 +351,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     minHeight: 56,
     width: '100%',
     overflow: 'visible',
-    ...Platform.select({
-      web: {
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      },
-    }),
   },
   
   rowClickable: {
@@ -221,13 +360,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     paddingVertical: 16,
     paddingHorizontal: 16,
     overflow: 'visible',
-    ...Platform.select({
-      web: {
-        ':hover': {
-          backgroundColor: isDark ? 'rgba(99, 102, 241, 0.1)' : 'rgba(99, 102, 241, 0.05)',
-        },
-      },
-    }),
   },
   
   tableCell: {
@@ -248,34 +380,7 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     lineHeight: 20,
   },
   
-  statusBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    minWidth: 70,
-    alignItems: 'center',
-  },
-  
-  statusActive: {
-    backgroundColor: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
-    borderWidth: 1,
-    borderColor: isDark ? 'rgba(34, 197, 94, 0.5)' : 'rgba(34, 197, 94, 0.3)',
-  },
-  
-  statusInactive: {
-    backgroundColor: isDark ? 'rgba(239, 68, 68, 0.2)' : 'rgba(239, 68, 68, 0.15)',
-    borderWidth: 1,
-    borderColor: isDark ? 'rgba(239, 68, 68, 0.5)' : 'rgba(239, 68, 68, 0.3)',
-  },
-  
-  statusText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: isDark ? theme.text : '#000',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+  // OLD statusBadge/statusActive/statusInactive/statusText removed (using new card versions above)
   
   // Actions Menu
   actionsCell: {
@@ -513,12 +618,34 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
   },
   
   closeButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+        transition: 'background-color 0.2s ease',
+        ':hover': {
+          backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+        },
+      },
+    }),
+  },
+  
+  closeButtonText: {
     fontSize: 24,
     color: theme.textSecondary,
     fontWeight: '300',
   },
   
   // Form
+  formScroll: {
+    flex: 1,
+    padding: 24,
+  },
+  
   formContainer: {
     padding: 24,
   },
@@ -580,6 +707,42 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     color: theme.text,
   },
   
+  modalFooter: {
+    flexDirection: 'row',
+    padding: 24,
+    borderTopWidth: 1,
+    borderTopColor: theme.borderLight,
+    gap: 16,
+  },
+  
+  modalButton: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        ':hover': {
+          transform: 'scale(1.02)',
+        },
+      },
+    }),
+  },
+  
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.text,
+  },
+  
+  saveButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.textInverse,
+  },
+  
   formActions: {
     flexDirection: 'row',
     padding: 24,
@@ -611,124 +774,8 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     color: theme.text,
   },
   
-  saveButtonText: {
-    color: theme.textInverse,
-  },
-  
-  // Legacy styles for compatibility
-  listWrapper: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-  },
-  list: {
-    flex: 1,
-    width: '100%',
-  },
-  searchSection: {
-    width: '100%',
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
-  },
-  searchTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  listContent: {
-    width: '100%',
-    alignSelf: 'center',
-    paddingHorizontal: 24,
-    paddingBottom: 40,
-  },
-  listContentMobile: {
-    flexDirection: 'column',
-  },
-  listContentDesktop: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    gap: 16,
-  },
-  card: {
-    width: 320,
-    borderWidth: 1,
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 16,
-    elevation: 3,
-    minHeight: 200,
-  },
-  cardMobile: {
-    width: '100%',
-  },
-  cardDesktop: {
-    flexGrow: 0,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 14,
-  },
-  cardHeaderInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    overflow: 'hidden',
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    marginTop: 4,
-    overflow: 'hidden',
-  },
-  cardMetaRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    marginTop: 12,
-  },
-  metaItem: {
-    flex: 1,
-    minWidth: 140,
-    marginTop: 8,
-  },
-  metaLabel: {
-    fontSize: 12,
-    textTransform: 'uppercase',
-    letterSpacing: 0.4,
-  },
-  metaValue: {
-    fontSize: 14,
-    fontWeight: '500',
-    overflow: 'hidden',
-  },
-  emptyState: {
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
-  },
-  emptyStateTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  emptyStateDescription: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: 360,
-  },
+  // Note: All legacy/duplicate card and list styles removed
+  // Current active styles are defined above with grid layout support
 });
 
 export default createStyles;
