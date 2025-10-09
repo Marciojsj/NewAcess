@@ -1,0 +1,190 @@
+// prisma/schema.prisma
+// Access Control System - Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  SUPERADMIN    // Nível 5 - Acesso total
+  ADMIN         // Nível 4 - Gerencia entidade
+  OPERATOR      // Nível 3 - Opera sistema
+  USER          // Nível 2 - Usuário comum
+  VISITOR       // Nível 1 - Visitante
+  
+  @@map("role")
+}
+
+enum EntityType {
+  SCHOOL
+  CONDOMINIUM
+  COMPANY
+  EVENT
+  OTHER
+  
+  @@map("entitytype")
+}
+
+enum AccessType {
+  ENTRY
+  EXIT
+  
+  @@map("accesstype")
+}
+
+enum AccessStatus {
+  PENDING
+  APPROVED
+  DENIED
+  COMPLETED
+  
+  @@map("accessstatus")
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+model User {
+  id            String      @id @default(uuid())
+  name          String
+  email         String      @unique
+  password      String
+  cpf           String?     @unique
+  phone         String?
+  role          Role        @default(USER)
+  
+  entityId      String?
+  entity        Entity?     @relation(fields: [entityId], references: [id], onDelete: SetNull)
+  
+  refreshTokens RefreshToken[]
+  accessLogsAsOperator AccessLog[] @relation("Operator")
+  accessLogsAsUser AccessLog[] @relation("User")
+  
+  isActive      Boolean     @default(true) @map("isactive")
+  lastLogin     DateTime?   @map("lastlogin")
+  createdAt     DateTime    @default(now()) @map("createdat")
+  updatedAt     DateTime    @updatedAt @map("updatedat")
+  
+  @@index([email])
+  @@index([entityId])
+  @@map("users")
+}
+
+model Entity {
+  id            String      @id @default(uuid())
+  name          String
+  type          EntityType
+  cnpj          String?     @unique
+  
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?     @map("zipcode")
+  
+  phone         String?
+  email         String?
+  
+  users         User[]
+  visitors      Visitor[]
+  accessLogs    AccessLog[]
+  
+  isActive      Boolean     @default(true) @map("isactive")
+  createdAt     DateTime    @default(now()) @map("createdat")
+  updatedAt     DateTime    @updatedAt @map("updatedat")
+  
+  @@index([cnpj])
+  @@map("entities")
+}
+
+model Visitor {
+  id            String      @id @default(uuid())
+  name          String
+  cpf           String?
+  phone         String?
+  email         String?
+  company       String?
+  
+  entityId      String
+  entity        Entity      @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  
+  qrCode        String?     @unique
+  qrCodeExpiry  DateTime?
+  
+  accessLogs    AccessLog[]
+  
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  @@index([entityId])
+  @@index([qrCode])
+  @@map("visitors")
+}
+
+model AccessLog {
+  id            String        @id @default(uuid())
+  type          AccessType
+  status        AccessStatus  @default(PENDING)
+  
+  userId        String?
+  user          User?         @relation("User", fields: [userId], references: [id], onDelete: SetNull)
+  
+  visitorId     String?
+  visitor       Visitor?      @relation(fields: [visitorId], references: [id], onDelete: SetNull)
+  
+  entityId      String
+  entity        Entity        @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  
+  operatorId    String?
+  operator      User?         @relation("Operator", fields: [operatorId], references: [id], onDelete: SetNull)
+  
+  purpose       String?
+  notes         String?
+  temperature   Float?
+  photoUrl      String?
+  
+  timestamp     DateTime      @default(now())
+  exitTimestamp DateTime?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  @@index([entityId])
+  @@index([userId])
+  @@index([visitorId])
+  @@index([operatorId])
+  @@index([timestamp])
+  @@map("access_logs")
+}
+
+model RefreshToken {
+  id            String      @id @default(uuid())
+  token         String      @unique
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+model SystemConfig {
+  id            String      @id @default(uuid())
+  key           String      @unique
+  value         String
+  description   String?
+  updatedAt     DateTime    @updatedAt
+  
+  @@map("system_config")
+}

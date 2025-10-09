@@ -1,17 +1,35 @@
-// 
+/**
+ * Tipos para Entidades
+ * Atualizados para corresponder ao schema do backend
+ */
 
 export interface Entity {
-  id: string; // UUID v7
-  name?: string; // VAR(255) - nome da entidade
-  cpf: string; // VAR(14)
-  rg: string; // VAR(9)
-  type: string; // VAR(255)
-  active: boolean; // BOOLEAN
+  id: string;
+  name: string;
+  cnpj?: string;
+  type: 'SCHOOL' | 'CONDOMINIUM' | 'COMPANY' | 'EVENT' | 'OTHER';
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phone?: string;
+  email?: string;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-export type EntityFormData = Omit<Entity, 'id' | 'createdAt' | 'updatedAt'>;
+export interface EntityFormData {
+  name: string;
+  cnpj?: string;
+  type: 'SCHOOL' | 'CONDOMINIUM' | 'COMPANY' | 'EVENT' | 'OTHER';
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  phone?: string;
+  email?: string;
+}
 
 export interface EntitiesState {
   entities: Entity[];

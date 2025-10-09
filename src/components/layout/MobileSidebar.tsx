@@ -19,11 +19,14 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { responsive, deviceType } from '../../utils/responsive';
 
 type RootStackParamList = {
+	Login: undefined;
 	Home: undefined;
 	RegistrarEntrada: undefined;
 	RegistrarSaida: undefined;
 	Visitantes: undefined;
 	Relatorios: undefined;
+	Users: undefined;
+	AccessLogs: undefined;
 	Alertas: undefined;
 	Entidade: undefined;
 	RegistroEntidade: undefined;
@@ -77,9 +80,10 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 		{ id: '2', title: 'Registrar Entrada', icon: '🚪', onPress: () => { navigation.navigate('RegistrarEntrada'); closeMenu(); } },
 		{ id: '3', title: 'Registrar Saída', icon: '🏃‍♂️', onPress: () => { navigation.navigate('RegistrarSaida'); closeMenu(); } },
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); closeMenu(); } },
-		{ id: '5', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); closeMenu(); } },
-		{ id: '6', title: 'Alertas', icon: '⚠️', onPress: () => { navigation.navigate('Alertas'); closeMenu(); } },
-		{ id: '7', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
+		{ id: '5', title: 'Histórico de Acesso', icon: '📋', onPress: () => { navigation.navigate('AccessLogs'); closeMenu(); } },
+		{ id: '6', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); closeMenu(); } },
+		{ id: '7', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); closeMenu(); } },
+		{ id: '8', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
 	];
 
 	// Sincronizar isOpen externo com interno
@@ -123,6 +127,12 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 					stiffness: 90,
 					useNativeDriver: true,
 				}),
+				Animated.spring(contentAnim, {
+					toValue: screenWidth * 0.7,
+					damping: 20,
+					stiffness: 90,
+					useNativeDriver: true,
+				}),
 				Animated.spring(iconAnim, {
 					toValue: screenWidth * 0.75,
 					damping: 20,
@@ -134,6 +144,12 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 			Animated.parallel([
 				Animated.spring(menuAnim, {
 					toValue: -300,
+					damping: 20,
+					stiffness: 90,
+					useNativeDriver: true,
+				}),
+				Animated.spring(contentAnim, {
+					toValue: 0,
 					damping: 20,
 					stiffness: 90,
 					useNativeDriver: true,
@@ -292,6 +308,16 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 					/>
 				</View>
 			</Animated.View>
+
+			{/* CONTEÚDO COM ANIMAÇÃO */}
+			<Animated.View
+				style={[
+					styles.contentContainer,
+					{
+						transform: [{ translateX: contentAnim }],
+					},
+				]}
+			/>
 
 			{/* LOGOUT MODAL */}
 			<Modal visible={logoutModalVisible} transparent animationType="fade" onRequestClose={() => setLogoutModalVisible(false)}>

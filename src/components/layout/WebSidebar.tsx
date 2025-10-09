@@ -24,6 +24,8 @@ type RootStackParamList = {
 	RegistrarSaida: undefined;
 	Visitantes: undefined;
 	Relatorios: undefined;
+	Users: undefined;
+	AccessLogs: undefined;
 	Alertas: undefined;
 	Entidade: undefined;
 	RegistroEntidade: undefined;
@@ -71,9 +73,10 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
 		{ id: '2', title: 'Registrar Entrada', icon: '🚪', onPress: () => { navigation.navigate('RegistrarEntrada'); onToggle(); } },
 		{ id: '3', title: 'Registrar Saída', icon: '🏃‍♂️', onPress: () => { navigation.navigate('RegistrarSaida'); onToggle(); } },
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); onToggle(); } },
-		{ id: '5', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); onToggle(); } },
-		{ id: '6', title: 'Alertas', icon: '⚠️', onPress: () => { navigation.navigate('Alertas'); onToggle(); } },
-		{ id: '7', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); onToggle(); } },
+		{ id: '5', title: 'Histórico de Acesso', icon: '📋', onPress: () => { navigation.navigate('AccessLogs'); onToggle(); } },
+		{ id: '6', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); onToggle(); } },
+		{ id: '7', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); onToggle(); } },
+		{ id: '8', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); onToggle(); } },
 	];
 
 	useEffect(() => {

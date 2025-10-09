@@ -901,13 +901,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     flexDirection: 'column',
     marginBottom: 16,
   },
-  // Floating Action Button (não usado no mobile, mas necessário para compatibilidade)
-  webFab: {
-    display: 'none',
-  },
-  webFabIcon: {
-    display: 'none',
-  },
 });
 
 export default createStyles;

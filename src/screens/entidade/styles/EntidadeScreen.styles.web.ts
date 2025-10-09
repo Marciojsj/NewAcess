@@ -143,13 +143,11 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     alignItems: 'flex-start',
   },
   
-  // Grid Layout for Cards - Espaçamento proporcional
+  // Grid Layout for Cards
   cardWrapper: {
-    width: 'calc(33.333% - 14px)' as any, // 3 colunas com gap de 20px: (20 * 2) / 3 = ~14px
-    minWidth: 340,
-    maxWidth: 480,
-    flexGrow: 0,
-    flexShrink: 0,
+    width: 'calc(33.333% - 11px)' as any, // 3 columns with gap (web-only CSS)
+    minWidth: 364,
+    maxWidth: 450,
   },
   
   // Card de Entidade (Web - matching mobile)
@@ -164,7 +162,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     shadowOpacity: 0.08,
     shadowRadius: 8,
     height: '100%',
-    width: '100%',
   },
   
   cardHeader: {
@@ -775,48 +772,6 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
     fontSize: 16,
     fontWeight: '600',
     color: theme.text,
-  },
-  
-  // Floating Action Button (Web)
-  webFab: {
-    position: 'fixed' as any,
-    bottom: 32,
-    right: 32,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 } as { width: number; height: number },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    zIndex: 1000,
-    ...Platform.select({
-      web: {
-        cursor: 'pointer',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        boxShadow: isDark 
-          ? '0 8px 24px rgba(99, 102, 241, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)'
-          : '0 8px 24px rgba(99, 102, 241, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2)',
-        ':hover': {
-          transform: 'scale(1.1) rotate(90deg)',
-          boxShadow: isDark
-            ? '0 12px 32px rgba(99, 102, 241, 0.5), 0 6px 16px rgba(0, 0, 0, 0.7)'
-            : '0 12px 32px rgba(99, 102, 241, 0.4), 0 6px 16px rgba(0, 0, 0, 0.3)',
-        },
-        ':active': {
-          transform: 'scale(1.05) rotate(90deg)',
-        },
-      },
-    }),
-  },
-  
-  webFabIcon: {
-    fontSize: 32,
-    color: '#FFFFFF',
-    fontWeight: '300',
-    lineHeight: 32,
   },
   
   // Note: All legacy/duplicate card and list styles removed

@@ -7,12 +7,14 @@ import { ThemeProvider } from './src/contexts/ThemeContext';
 
 import HomeScreen from './src/screens/home/HomeScreen';
 import LoginScreen from './src/screens/login/LoginScreen';
-import RegistrarEntradaScreen from './src/screens/registrarEntrada/RegistrarEntradaScreen';
-import RegistrarSaidaScreen from './src/screens/registrarSaida/RegistrarSaidaScreen';
+import { RegistrarEntradaScreen } from './src/screens/registrarEntrada/RegistrarEntradaScreen';
+import { RegistrarSaidaScreen } from './src/screens/registrarSaida/RegistrarSaidaScreen';
 import VisitantesScreen from './src/screens/visitantes/VisitantesScreen';
-import RelatoriosScreen from './src/screens/relatorios/RelatoriosScreen';
+import { RelatoriosScreen } from './src/screens/relatorios/RelatoriosScreen';
 // import AlertasScreen from './src/screens/alertas/AlertasScreen';
 import { EntidadeScreen } from './src/screens/entidade/EntidadeScreen';
+import { UsersScreen } from './src/screens/users/UsersScreen';
+import { AccessLogsScreen } from './src/screens/access/AccessLogsScreen';
 // import { RegistroEntidadeScreen } from './src/screens/entidade/RegistroEntidadeScreen';
 
 const Stack = createStackNavigator();
@@ -33,6 +35,8 @@ function Routes() {
           <Stack.Screen name="RegistrarSaida" component={RegistrarSaidaScreen} />
           <Stack.Screen name="Visitantes" component={VisitantesScreen} />
           <Stack.Screen name="Relatorios" component={RelatoriosScreen} />
+          <Stack.Screen name="Users" component={UsersScreen} />
+          <Stack.Screen name="AccessLogs" component={AccessLogsScreen} />
           {/* <Stack.Screen name="Alertas" component={AlertasScreen} /> */}
           <Stack.Screen name="Entidade" component={EntidadeScreen} />
           {/* <Stack.Screen name="RegistroEntidade" component={RegistroEntidadeScreen} /> */}

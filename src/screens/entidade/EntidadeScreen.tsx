@@ -263,81 +263,40 @@ export const EntidadeScreen: React.FC = () => {
 	};
 
 	return (
-		<View style={{ flex: 1, backgroundColor: theme.background }}>
+		<SafeAreaView style={[styles.container, { flex: 1 }]}>
 			{/* NAVBAR WEB */}
 			{Platform.OS === 'web' && (
-				<WebNavbar
-					screenName="Entidades"
-					searchText={searchText}
-					onSearchChange={setSearchText}
-					onAddPress={() => handleOpenForm('create')}
-					onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
-					addButtonLabel="+ Nova Entidade"
-				/>
+				<>
+					<WebNavbar
+						screenName="Entidades"
+						searchText={searchText}
+						onSearchChange={setSearchText}
+						onAddPress={() => handleOpenForm('create')}
+						onSidebarToggle={() => setSidebarOpen(!sidebarOpen)}
+						addButtonLabel="+ Nova Entidade"
+					/>
+					<WebSidebar
+						isOpen={sidebarOpen}
+						onToggle={() => setSidebarOpen(false)}
+						theme={isDark ? 'dark' : 'light'}
+						onThemeChange={toggleTheme}
+						onLogout={handleLogout}
+					/>
+				</>
 			)}
 
 			{/* NAVBAR MOBILE */}
 			{Platform.OS !== 'web' && (
 				<>
 					<MobileNavbar
+						onMenuToggle={() => {}}
 						onAddPress={() => handleOpenForm('create')}
 						searchText={searchText}
 						onSearchChange={setSearchText}
 						screenName="Entidades"
-						addButtonLabel="+"
-						searchPlaceholder="Buscar entidades..."
-						showSearchBar={true}
 					/>
-					<MobileSidebar 
-						isOpen={sidebarOpen}
-						onToggle={() => setSidebarOpen(!sidebarOpen)}
-					/>
+					<MobileSidebar></MobileSidebar>
 				</>
-			)}
-
-			{/* LAYOUT WEB COM SIDEBAR */}
-			{Platform.OS === 'web' && (
-				<View style={{ flex: 1, flexDirection: 'row' }}>
-					<WebSidebar
-						isOpen={sidebarOpen}
-						onToggle={() => setSidebarOpen(!sidebarOpen)}
-						theme={isDark ? 'dark' : 'light'}
-						onThemeChange={toggleTheme}
-						onLogout={handleLogout}
-					/>
-					<View style={{ flex: 1, overflow: 'hidden' }}>
-						<ScrollView 
-							style={{ flex: 1 }}
-							showsVerticalScrollIndicator={true}
-						>
-							<View 
-								style={{
-									padding: 24,
-									display: 'grid',
-									gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-									gap: 20,
-									width: '100%',
-								} as any}
-							>
-								{filteredEntidades.length > 0 ? (
-									filteredEntidades.map((item) => (
-										<View key={item.id}>
-											{renderEntityCard({ item })}
-										</View>
-									))
-								) : (
-									<View style={[styles.emptyContainer, { width: '100%', gridColumn: '1 / -1' } as any]}>
-										<Text style={styles.emptyText}>📋</Text>
-										<Text style={styles.emptyTitle}>Nenhuma entidade encontrada</Text>
-										<Text style={styles.emptySubtitle}>
-											{searchText ? 'Tente ajustar sua busca' : 'Crie sua primeira entidade'}
-										</Text>
-									</View>
-								)}
-							</View>
-						</ScrollView>
-					</View>
-				</View>
 			)}
 
 			{/* MODAL DE FORMULÁRIO */}
@@ -548,43 +507,42 @@ export const EntidadeScreen: React.FC = () => {
 				</KeyboardAvoidingView>
 			</Modal>
 
-			{/* LISTA DE ENTIDADES MOBILE - NÃO ADICIONE CONTAINERS EXTRAS AQUI */}
-			{Platform.OS !== 'web' && (
-				<FlatList
-					data={filteredEntidades}
-					renderItem={({ item }) => renderEntityCard({ item })}
-					keyExtractor={(item) => item.id}
-					style={{ flex: 1 }}
-					contentContainerStyle={{
-						paddingTop: 165,
-						paddingBottom: 100,
-						paddingHorizontal: 16,
-					}}
-					showsVerticalScrollIndicator={true}
-					bounces={true}
-					alwaysBounceVertical={true}
-					ListEmptyComponent={
-						<View style={styles.emptyContainer}>
-							<Text style={styles.emptyText}>📋</Text>
-							<Text style={styles.emptyTitle}>Nenhuma entidade encontrada</Text>
-							<Text style={styles.emptySubtitle}>
-								{searchText ? 'Tente ajustar sua busca' : 'Crie sua primeira entidade'}
-							</Text>
-						</View>
-					}
-				/>
-			)}
-
-			{/* BOTÃO FLUTUANTE WEB */}
-			{Platform.OS === 'web' && (
-				<TouchableOpacity
-					style={[styles.webFab, { backgroundColor: theme.primary }]}
-					onPress={() => handleOpenForm('create')}
-					activeOpacity={0.8}
-				>
-					<Text style={styles.webFabIcon}>+</Text>
-				</TouchableOpacity>
-			)}
-		</View>
+			<KeyboardAvoidingView
+				style={{ flex: 1 }}
+				behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+			>
+				<View style={[styles.content, { flex: 1 }]}>
+					<View style={styles.listContainer}>
+						{/* Renderização com Cards - WEB (grid) e MOBILE (lista) */}
+						<FlatList
+							data={filteredEntidades}
+							renderItem={({ item }) =>
+								Platform.OS === 'web' ? (
+									<View style={styles.cardWrapper}>{renderEntityCard({ item })}</View>
+								) : (
+									renderEntityCard({ item })
+								)
+							}
+							keyExtractor={(item) => item.id}
+							contentContainerStyle={[
+								styles.listContent,
+								{ paddingBottom: Platform.OS === 'web' ? 40 : 80 },
+							]}
+							style={{ flex: 1, width: '100%' }}
+							showsVerticalScrollIndicator={true}
+							ListEmptyComponent={
+								<View style={styles.emptyContainer}>
+									<Text style={styles.emptyText}>📋</Text>
+									<Text style={styles.emptyTitle}>Nenhuma entidade encontrada</Text>
+									<Text style={styles.emptySubtitle}>
+										{searchText ? 'Tente ajustar sua busca' : 'Crie sua primeira entidade'}
+									</Text>
+								</View>
+							}
+						/>
+					</View>
+				</View>
+			</KeyboardAvoidingView>
+		</SafeAreaView>
 	);
 };
