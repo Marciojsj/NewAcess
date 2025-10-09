@@ -12,6 +12,7 @@ interface VisitorListProps {
   onEdit: (visitor: Visitor) => void;
   onDelete: (id: string) => void;
   onShowQRCode: (visitor: Visitor) => void;
+  onViewDetails?: (visitor: Visitor) => void;
 }
 
 export const VisitorList: React.FC<VisitorListProps> = ({
@@ -20,6 +21,7 @@ export const VisitorList: React.FC<VisitorListProps> = ({
   onEdit,
   onDelete,
   onShowQRCode,
+  onViewDetails,
 }) => {
   if (loading) {
     return (
@@ -49,6 +51,15 @@ export const VisitorList: React.FC<VisitorListProps> = ({
       </View>
       
       <View style={styles.actionsContainer}>
+        {onViewDetails && (
+          <TouchableOpacity
+            style={[styles.actionButton, styles.detailsButton]}
+            onPress={() => onViewDetails(item)}
+          >
+            <Text style={styles.actionButtonText}>👁️ Detalhes</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={[styles.actionButton, styles.editButton]}
           onPress={() => onEdit(item)}
@@ -143,11 +154,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     gap: 8,
+    flexWrap: 'wrap',
   },
   actionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 6,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  detailsButton: {
+    backgroundColor: '#9C27B0',
   },
   editButton: {
     backgroundColor: '#0066CC',

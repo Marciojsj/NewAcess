@@ -3,7 +3,7 @@
  * Tela de relatórios e dashboard
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,27 +14,41 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useReports } from '../../hooks/useReports';
+import { useAccess } from '../../hooks/useAccess';
 import { DashboardStatsCard } from '../../components/reports/DashboardStatsCard';
 import { TopVisitorsList } from '../../components/reports/TopVisitorsList';
+import { AccessTrendsChart } from '../../components/reports/AccessTrendsChart';
+import { PeakHoursChart } from '../../components/reports/PeakHoursChart';
+import { VisitorDistributionChart } from '../../components/reports/VisitorDistributionChart';
+import { ReportExportButton } from '../../components/reports/ReportExportButton';
 import { deviceType } from '../../utils/responsive';
 
 export const RelatoriosScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const { stats, topVisitors, loading, error, loadDashboardStats, loadTopVisitors } = useReports();
+  const { logs, loadAccessLogs } = useAccess();
+  const [period, setPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [showCharts, setShowCharts] = useState(true);
 
   useEffect(() => {
     if (user?.entityId) {
       loadDashboardStats(user.entityId);
       loadTopVisitors(user.entityId, 10);
+      loadAccessLogs();
     }
-  }, [user?.entityId, loadDashboardStats, loadTopVisitors]);
+  }, [user?.entityId, loadDashboardStats, loadTopVisitors, loadAccessLogs]);
 
   const handleRefresh = () => {
     if (user?.entityId) {
       loadDashboardStats(user.entityId);
       loadTopVisitors(user.entityId, 10);
+      loadAccessLogs();
     }
+  };
+
+  const handleToggleCharts = () => {
+    setShowCharts(!showCharts);
   };
 
   return (
@@ -66,16 +80,104 @@ export const RelatoriosScreen = () => {
       )}
 
       {/* Content */}
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Dashboard Stats */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📊 Estatísticas Gerais</Text>
           <DashboardStatsCard stats={stats} loading={loading} />
         </View>
 
+        {/* Charts Toggle */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>📈 Gráficos Analíticos</Text>
+            <TouchableOpacity
+              style={styles.toggleButton}
+              onPress={handleToggleCharts}
+            >
+              <Text style={styles.toggleButtonText}>
+                {showCharts ? '👁️ Ocultar' : '👁️ Mostrar'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {showCharts && (
+            <>
+              {/* Period Selector */}
+              <View style={styles.periodSelector}>
+                <TouchableOpacity
+                  style={[
+                    styles.periodButton,
+                    period === 'daily' && styles.periodButtonActive,
+                  ]}
+                  onPress={() => setPeriod('daily')}
+                >
+                  <Text
+                    style={[
+                      styles.periodButtonText,
+                      period === 'daily' && styles.periodButtonTextActive,
+                    ]}
+                  >
+                    Diário
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.periodButton,
+                    period === 'weekly' && styles.periodButtonActive,
+                  ]}
+                  onPress={() => setPeriod('weekly')}
+                >
+                  <Text
+                    style={[
+                      styles.periodButtonText,
+                      period === 'weekly' && styles.periodButtonTextActive,
+                    ]}
+                  >
+                    Semanal
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.periodButton,
+                    period === 'monthly' && styles.periodButtonActive,
+                  ]}
+                  onPress={() => setPeriod('monthly')}
+                >
+                  <Text
+                    style={[
+                      styles.periodButtonText,
+                      period === 'monthly' && styles.periodButtonTextActive,
+                    ]}
+                  >
+                    Mensal
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Charts */}
+              <View style={styles.chartsContainer}>
+                <AccessTrendsChart logs={logs} period={period} />
+                <PeakHoursChart logs={logs} />
+                <VisitorDistributionChart logs={logs} />
+              </View>
+            </>
+          )}
+        </View>
+
         {/* Top Visitors */}
         <View style={styles.section}>
           <TopVisitorsList visitors={topVisitors} />
+        </View>
+
+        {/* Export Options */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>💾 Exportar Relatórios</Text>
+          <View style={styles.exportButtons}>
+            <ReportExportButton stats={stats} logs={logs} format="csv" />
+            <ReportExportButton stats={stats} logs={logs} format="json" />
+            <ReportExportButton stats={stats} logs={logs} format="pdf" />
+          </View>
         </View>
 
         {/* Quick Actions */}
@@ -178,13 +280,67 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 16,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    marginBottom: 8,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+  },
+  toggleButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#9C27B0',
+  },
+  toggleButtonText: {
+    color: '#9C27B0',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  periodSelector: {
+    flexDirection: 'row',
     paddingHorizontal: 16,
-    paddingTop: 16,
-    marginBottom: 8,
+    gap: 8,
+    marginBottom: 16,
+  },
+  periodButton: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  periodButtonActive: {
+    backgroundColor: '#9C27B0',
+    borderColor: '#9C27B0',
+  },
+  periodButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
+  periodButtonTextActive: {
+    color: '#fff',
+  },
+  chartsContainer: {
+    paddingHorizontal: 16,
+  },
+  exportButtons: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    gap: 12,
   },
   quickActions: {
     flexDirection: 'row',

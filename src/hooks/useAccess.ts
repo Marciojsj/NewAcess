@@ -78,6 +78,19 @@ export const useAccess = () => {
   }, []);
 
   /**
+   * Buscar horário de entrada ativo
+   */
+  const getActiveEntryTime = useCallback(async (visitorId: string): Promise<Date | null> => {
+    try {
+      const entryTime = await accessService.getActiveEntryTime(visitorId);
+      return entryTime ? new Date(entryTime) : null;
+    } catch (err: any) {
+      console.error('Erro ao buscar horário de entrada:', err);
+      return null;
+    }
+  }, []);
+
+  /**
    * Buscar histórico de um visitante específico
    */
   const getVisitorHistory = useCallback(async (visitorId: string) => {
@@ -150,6 +163,7 @@ export const useAccess = () => {
     getVisitorHistory,
     checkVisitorInside,
     getActiveEntryLogId,
+    getActiveEntryTime,
     filterLogs,
   };
 };

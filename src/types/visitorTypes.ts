@@ -9,6 +9,7 @@ export interface Visitor {
   phone?: string;
   email?: string;
   company?: string;
+  photoUrl?: string;
   qrCode?: string;
   qrCodeExpiry?: string;
   entityId: string;

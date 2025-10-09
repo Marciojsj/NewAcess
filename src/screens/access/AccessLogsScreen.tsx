@@ -106,7 +106,9 @@ export const AccessLogsScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <AccessHistory logs={getFilteredLogs()} loading={loading} />
+      <View style={styles.content}>
+        <AccessHistory logs={getFilteredLogs()} loading={loading} />
+      </View>
     </View>
   );
 };
@@ -165,5 +167,8 @@ const styles = StyleSheet.create({
   },
   filterButtonTextActive: {
     color: '#fff',
+  },
+  content: {
+    flex: 1,
   },
 });

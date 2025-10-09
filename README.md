@@ -39,16 +39,20 @@ Sistema completo de controle de acesso com suporte a múltiplas plataformas (iOS
   - Validações
   - Estados de loading
 
-### 🚧 Em Desenvolvimento
-
-- **Sistema de Permissões** (6 níveis)
-  - Guest, Security, Receptionist, Supervisor, Manager, Admin
-  - Controle granular de acesso
-  - Matriz de permissões configurável
-
 - **Registro de Entrada/Saída**
-  - Registro manual
-  - Scanner QR Code (futuro)
+  - Registro manual com validações
+  - Scanner QR Code integrado
+  - Cálculo automático de tempo de permanência
+  - Histórico completo de acessos
+
+- **Gestão de Visitantes** ⭐ **NOVO**
+  - CRUD completo de visitantes
+  - Detalhes avançados com estatísticas
+  - Upload de fotos do perfil
+  - Gráfico de visitas por período
+  - QR Code individual por visitante
+  - Histórico detalhado de acessos
+  - Estatísticas: tempo total, média de permanência, última visita
   - Cálculo de tempo de permanência
   - Histórico completo
 

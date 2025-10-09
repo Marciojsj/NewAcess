@@ -92,6 +92,20 @@ export const useVisitors = () => {
     await loadVisitors(term);
   };
 
+  const getVisitorById = async (id: string): Promise<Visitor | null> => {
+    try {
+      const visitor = visitors.find(v => v.id === id);
+      if (visitor) return visitor;
+      
+      // Se não encontrar localmente, buscar na API
+      const data = await visitorApi.getVisitorById(id);
+      return data;
+    } catch (err: any) {
+      console.error('Erro ao buscar visitante:', err);
+      return null;
+    }
+  };
+
   return {
     visitors,
     loading,
@@ -102,5 +116,6 @@ export const useVisitors = () => {
     deleteVisitor,
     regenerateQRCode,
     searchVisitors,
+    getVisitorById,
   };
 };

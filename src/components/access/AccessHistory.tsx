@@ -3,7 +3,7 @@
  * Lista o histórico de acessos (entradas e saídas)
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { AccessLog } from '../../types/accessTypes';
+import { calculateStayDuration, getRelativeTime } from '../../utils/timeCalculation';
 
 interface AccessHistoryProps {
   logs: AccessLog[];
@@ -30,7 +31,40 @@ export const AccessHistory: React.FC<AccessHistoryProps> = ({ logs, loading }) =
     });
   };
 
-  const renderItem = ({ item }: { item: AccessLog }) => (
+  // Agrupar logs por visitante e encontrar pares entrada/saída
+  const logsWithDuration = useMemo(() => {
+    const grouped = logs.reduce((acc, log) => {
+      const visitorId = log.visitorId;
+      if (!acc[visitorId]) {
+        acc[visitorId] = [];
+      }
+      acc[visitorId].push(log);
+      return acc;
+    }, {} as Record<string, AccessLog[]>);
+
+    return logs.map(log => {
+      if (log.type === 'EXIT') {
+        // Procurar entrada correspondente
+        const visitorLogs = grouped[log.visitorId] || [];
+        const sortedLogs = visitorLogs
+          .filter(l => l.type === 'ENTRY')
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        
+        // Encontrar entrada mais recente antes da saída
+        const entryLog = sortedLogs.find(entry => 
+          new Date(entry.timestamp).getTime() < new Date(log.timestamp).getTime()
+        );
+
+        if (entryLog) {
+          const duration = calculateStayDuration(entryLog.timestamp, log.timestamp);
+          return { ...log, duration: duration.formattedShort, entryTime: entryLog.timestamp };
+        }
+      }
+      return log;
+    });
+  }, [logs]);
+
+  const renderItem = ({ item }: { item: any }) => (
     <View style={styles.logCard}>
       <View style={styles.logHeader}>
         <View style={[
@@ -53,6 +87,16 @@ export const AccessHistory: React.FC<AccessHistoryProps> = ({ logs, loading }) =
           {item.visitor.company && (
             <Text style={styles.visitorDetail}>Empresa: {item.visitor.company}</Text>
           )}
+        </View>
+      )}
+
+      {item.duration && (
+        <View style={styles.durationBadge}>
+          <Text style={styles.durationIcon}>⏱️</Text>
+          <View style={styles.durationInfo}>
+            <Text style={styles.durationLabel}>Tempo de Permanência:</Text>
+            <Text style={styles.durationValue}>{item.duration}</Text>
+          </View>
         </View>
       )}
 
@@ -90,10 +134,11 @@ export const AccessHistory: React.FC<AccessHistoryProps> = ({ logs, loading }) =
 
   return (
     <FlatList
-      data={logs}
+      data={logsWithDuration}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
+      showsVerticalScrollIndicator={true}
     />
   );
 };
@@ -101,6 +146,8 @@ export const AccessHistory: React.FC<AccessHistoryProps> = ({ logs, loading }) =
 const styles = StyleSheet.create({
   listContainer: {
     padding: 16,
+    paddingBottom: 100,
+    height: 100,
   },
   centerContainer: {
     flex: 1,
@@ -189,5 +236,34 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 8,
     fontStyle: 'italic',
+  },
+  durationBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E3F2FD',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+    marginBottom: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2196F3',
+  },
+  durationIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  durationInfo: {
+    flex: 1,
+  },
+  durationLabel: {
+    fontSize: 12,
+    color: '#1976D2',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  durationValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1565C0',
   },
 });

@@ -154,4 +154,29 @@ export const accessService = {
       return null;
     }
   },
+
+  /**
+   * Buscar horário da última entrada ativa (para calcular duração)
+   */
+  getActiveEntryTime: async (visitorId: string): Promise<string | null> => {
+    try {
+      const logs = await accessApi.getLogs({ visitorId });
+      if (logs.length === 0) return null;
+      
+      // Ordena por timestamp decrescente
+      const sortedLogs = logs.sort((a: APIAccessLog, b: APIAccessLog) => 
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
+      
+      // Verifica se o último registro é entrada
+      if (sortedLogs[0].type === 'ENTRY') {
+        return sortedLogs[0].timestamp;
+      }
+      
+      return null;
+    } catch (error: any) {
+      console.error('Erro ao buscar horário de entrada:', error);
+      return null;
+    }
+  },
 };

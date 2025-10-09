@@ -74,6 +74,10 @@ export default function VisitantesScreen({ navigation }: any) {
     setShowQRCode(true);
   };
 
+  const handleViewDetails = (visitor: Visitor) => {
+    navigation.navigate('VisitorDetails', { visitorId: visitor.id });
+  };
+
   const handleRegenerateQR = async () => {
     if (!qrVisitor) return;
     
@@ -96,11 +100,6 @@ export default function VisitantesScreen({ navigation }: any) {
     } else {
       await createVisitor(data);
     }
-    setShowForm(false);
-    setSelectedVisitor(null);
-  };
-
-  const handleCancelForm = () => {
     setShowForm(false);
     setSelectedVisitor(null);
   };
@@ -153,6 +152,7 @@ export default function VisitantesScreen({ navigation }: any) {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onShowQRCode={handleShowQRCode}
+            onViewDetails={handleViewDetails}
           />
 
           <TouchableOpacity

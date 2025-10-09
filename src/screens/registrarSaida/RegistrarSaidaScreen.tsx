@@ -3,7 +3,7 @@
  * Tela para registrar saída de visitantes
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,15 +18,60 @@ import { useNavigation } from '@react-navigation/native';
 import { Visitor } from '../../types/visitorTypes';
 import { useAccess } from '../../hooks/useAccess';
 import { VisitorSelector } from '../../components/access/VisitorSelector';
+import { QRCodeScanner } from '../../components/access/QRCodeScanner';
 import { deviceType } from '../../utils/responsive';
+import { useVisitors } from '../../hooks/useVisitors';
+import { 
+  calculateStayDuration, 
+  formatDurationShort,
+  getRelativeTime 
+} from '../../utils/timeCalculation';
 
 export const RegistrarSaidaScreen = () => {
   const navigation = useNavigation();
-  const { registerExit, loading, checkVisitorInside, getActiveEntryLogId } = useAccess();
+  const { registerExit, loading, checkVisitorInside, getActiveEntryLogId, getActiveEntryTime } = useAccess();
+  const { visitors } = useVisitors();
   
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
   const [notes, setNotes] = useState('');
   const [showSelector, setShowSelector] = useState(true);
+  const [showScanner, setShowScanner] = useState(false);
+  const [entryTime, setEntryTime] = useState<Date | null>(null);
+  const [stayDuration, setStayDuration] = useState<string>('');
+
+  // Calcular duração quando temos entrada
+  useEffect(() => {
+    if (entryTime) {
+      const duration = calculateStayDuration(entryTime.toISOString(), new Date().toISOString());
+      setStayDuration(duration.formattedShort);
+    }
+  }, [entryTime]);
+
+  const handleQRCodeScan = async (qrData: string) => {
+    try {
+      // Tentar parsear como JSON primeiro
+      let visitorId: string;
+      try {
+        const parsed = JSON.parse(qrData);
+        visitorId = parsed.visitorId || parsed.id;
+      } catch {
+        // Se não for JSON, usar diretamente como ID
+        visitorId = qrData;
+      }
+
+      // Buscar visitante na lista
+      const visitor = visitors.find((v) => v.id === visitorId);
+      
+      if (visitor) {
+        setShowScanner(false);
+        await handleSelectVisitor(visitor);
+      } else {
+        Alert.alert('Erro', 'Visitante não encontrado');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'QR Code inválido');
+    }
+  };
 
   const handleSelectVisitor = async (visitor: Visitor) => {
     // Verificar se o visitante está dentro (tem entrada sem saída)
@@ -43,13 +88,18 @@ export const RegistrarSaidaScreen = () => {
             onPress: () => {
               setSelectedVisitor(visitor);
               setShowSelector(false);
+              setEntryTime(null);
+              setStayDuration('');
             },
           },
         ]
       );
     } else {
+      // Buscar horário de entrada
+      const entry = await getActiveEntryTime(visitor.id);
       setSelectedVisitor(visitor);
       setShowSelector(false);
+      setEntryTime(entry);
     }
   };
 
@@ -94,6 +144,8 @@ export const RegistrarSaidaScreen = () => {
   const handleChangeVisitor = () => {
     setSelectedVisitor(null);
     setShowSelector(true);
+    setEntryTime(null);
+    setStayDuration('');
   };
 
   return (
@@ -111,6 +163,19 @@ export const RegistrarSaidaScreen = () => {
       <ScrollView style={styles.content}>
         {showSelector ? (
           <View style={styles.selectorContainer}>
+            <TouchableOpacity
+              style={styles.scanButton}
+              onPress={() => setShowScanner(true)}
+            >
+              <Text style={styles.scanButtonText}>📷 Escanear QR Code</Text>
+            </TouchableOpacity>
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OU</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
             <Text style={styles.sectionTitle}>Selecione o Visitante:</Text>
             <VisitorSelector
               onSelect={handleSelectVisitor}
@@ -132,6 +197,20 @@ export const RegistrarSaidaScreen = () => {
                   </Text>
                 )}
               </View>
+
+              {entryTime && stayDuration && (
+                <View style={styles.durationCard}>
+                  <View style={styles.durationHeader}>
+                    <Text style={styles.durationIcon}>⏱️</Text>
+                    <Text style={styles.durationTitle}>Tempo de Permanência</Text>
+                  </View>
+                  <Text style={styles.durationValue}>{stayDuration}</Text>
+                  <Text style={styles.durationDetail}>
+                    Entrada: {getRelativeTime(entryTime.toISOString())}
+                  </Text>
+                </View>
+              )}
+
               <TouchableOpacity
                 style={styles.changeButton}
                 onPress={handleChangeVisitor}
@@ -170,6 +249,13 @@ export const RegistrarSaidaScreen = () => {
           </View>
         )}
       </ScrollView>
+
+      <QRCodeScanner
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScan={handleQRCodeScan}
+        title="Escanear QR Code do Visitante"
+      />
     </View>
   );
 };
@@ -281,5 +367,71 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     backgroundColor: '#9E9E9E',
+  },
+  scanButton: {
+    backgroundColor: '#F44336',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  scanButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#ddd',
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    fontSize: 16,
+    color: '#999',
+    fontWeight: 'bold',
+  },
+  durationCard: {
+    backgroundColor: '#FFF3E0',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 12,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#FF9800',
+  },
+  durationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  durationIcon: {
+    fontSize: 24,
+    marginRight: 8,
+  },
+  durationTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#E65100',
+  },
+  durationValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#E65100',
+    marginBottom: 4,
+  },
+  durationDetail: {
+    fontSize: 14,
+    color: '#F57C00',
   },
 });

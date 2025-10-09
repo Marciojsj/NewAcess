@@ -30,6 +30,8 @@ type RootStackParamList = {
 	Alertas: undefined;
 	Entidade: undefined;
 	RegistroEntidade: undefined;
+	Settings: undefined;
+	Permissions: undefined;
 };
 
 type MobileSidebarNavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -82,8 +84,11 @@ export const MobileSidebar: React.FC<MobileSidebarProps> = ({
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); closeMenu(); } },
 		{ id: '5', title: 'Histórico de Acesso', icon: '📋', onPress: () => { navigation.navigate('AccessLogs'); closeMenu(); } },
 		{ id: '6', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); closeMenu(); } },
-		{ id: '7', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); closeMenu(); } },
-		{ id: '8', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
+		{ id: '7', title: 'Alertas', icon: '🔔', onPress: () => { navigation.navigate('Alertas'); closeMenu(); } },
+		{ id: '8', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); closeMenu(); } },
+		{ id: '9', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); closeMenu(); } },
+		{ id: '10', title: 'Configurações', icon: '⚙️', onPress: () => { navigation.navigate('Settings'); closeMenu(); } },
+		{ id: '11', title: 'Permissões', icon: '🔐', onPress: () => { navigation.navigate('Permissions'); closeMenu(); } },
 	];
 
 	// Sincronizar isOpen externo com interno

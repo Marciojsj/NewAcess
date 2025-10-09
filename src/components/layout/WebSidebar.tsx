@@ -29,6 +29,8 @@ type RootStackParamList = {
 	Alertas: undefined;
 	Entidade: undefined;
 	RegistroEntidade: undefined;
+	Settings: undefined;
+	Permissions: undefined;
 };
 
 type WebSidebarNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -75,8 +77,11 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
 		{ id: '4', title: 'Visitantes', icon: '👥', onPress: () => { navigation.navigate('Visitantes'); onToggle(); } },
 		{ id: '5', title: 'Histórico de Acesso', icon: '📋', onPress: () => { navigation.navigate('AccessLogs'); onToggle(); } },
 		{ id: '6', title: 'Relatórios', icon: '📈', onPress: () => { navigation.navigate('Relatorios'); onToggle(); } },
-		{ id: '7', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); onToggle(); } },
-		{ id: '8', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); onToggle(); } },
+		{ id: '7', title: 'Alertas', icon: '🔔', onPress: () => { navigation.navigate('Alertas'); onToggle(); } },
+		{ id: '8', title: 'Gerenciar Usuários', icon: '👤', onPress: () => { navigation.navigate('Users'); onToggle(); } },
+		{ id: '9', title: 'Entidades', icon: '🏢', onPress: () => { navigation.navigate('Entidade'); onToggle(); } },
+		{ id: '10', title: 'Configurações', icon: '⚙️', onPress: () => { navigation.navigate('Settings'); onToggle(); } },
+		{ id: '11', title: 'Permissões', icon: '🔐', onPress: () => { navigation.navigate('Permissions'); onToggle(); } },
 	];
 
 	useEffect(() => {
