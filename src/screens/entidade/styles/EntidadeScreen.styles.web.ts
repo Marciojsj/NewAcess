@@ -788,6 +788,23 @@ export const styles = StyleSheet.create({
     color: theme.text,
   },
   
+  // Action Bar (para AppLayout)
+  actionBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: theme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  
+  addButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textInverse,
+  },
+  
   // Note: All legacy/duplicate card and list styles removed
   // Current active styles are defined above with grid layout support
 });

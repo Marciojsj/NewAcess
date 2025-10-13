@@ -8,15 +8,13 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
-  Platform,
-  StatusBar,
   TextInput,
   Modal,
   Alert,
+  Platform,
 } from 'react-native';
-import { ResponsiveContainer } from '../../components/layout/ResponsiveContainer';
+import { AppLayout } from '../../components/layout/AppLayout';
 import { responsive, deviceType } from '../../utils/responsive';
 import { useVisitors } from '../../hooks/useVisitors';
 import { VisitorList } from '../../components/visitors/VisitorList';
@@ -146,61 +144,39 @@ export default function VisitantesScreen({ navigation }: any) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="#2D3436"
-        {...(Platform.OS === 'web' && { hidden: true })}
-      />
-      <ResponsiveContainer>
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <Text style={[styles.title, deviceType.isDesktop && styles.titleDesktop]}>
-              Visitantes
-            </Text>
-            <TouchableOpacity
-              style={[styles.newButton, deviceType.isDesktop && styles.newButtonDesktop]}
-              onPress={handleNewVisitor}
-            >
-              <Text style={styles.newButtonText}>+ Novo Visitante</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={[styles.searchInput, deviceType.isDesktop && styles.searchInputDesktop]}
-              placeholder="Buscar visitante..."
-              placeholderTextColor="#999"
-              value={searchTerm}
-              onChangeText={handleSearch}
-            />
-          </View>
-
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          )}
-
-          <VisitorList
-            visitors={visitors}
-            loading={loading}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onShowQRCode={handleShowQRCode}
-            onViewDetails={handleViewDetails}
-          />
-
+    <AppLayout 
+      title="Gerenciar Visitantes" 
+      showBackButton={true}
+      showSearch={true}
+      searchValue={searchTerm}
+      onSearchChange={handleSearch}
+    >
+      <View style={styles.container}>
+        {/* Action Bar */}
+        <View style={styles.actionBar}>
           <TouchableOpacity
-            style={[styles.backButton, deviceType.isDesktop && styles.backButtonDesktop]}
-            onPress={() => navigation.navigate('Home')}
+            style={styles.newButton}
+            onPress={handleNewVisitor}
           >
-            <Text style={[styles.backButtonText, deviceType.isDesktop && styles.backButtonTextDesktop]}>
-              Voltar para Home
-            </Text>
+            <Text style={styles.newButtonText}>+ Novo Visitante</Text>
           </TouchableOpacity>
         </View>
-      </ResponsiveContainer>
+
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        )}
+
+        <VisitorList
+          visitors={visitors}
+          loading={loading}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onShowQRCode={handleShowQRCode}
+          onViewDetails={handleViewDetails}
+        />
+      </View>
 
       <Modal visible={showForm} animationType="slide" transparent>
         <View style={styles.modalContainer}>
@@ -233,7 +209,7 @@ export default function VisitantesScreen({ navigation }: any) {
         type={toast.type}
         onHide={hideToast}
       />
-    </SafeAreaView>
+    </AppLayout>
   );
 }
 
@@ -331,5 +307,14 @@ const styles = StyleSheet.create({
     width: '90%',
     maxWidth: 600,
     maxHeight: '80%',
+  },
+  actionBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#2D3436',
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
   },
 });

@@ -915,4 +915,21 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     marginBottom: 16,
   },
+  
+  // Action Bar (para AppLayout)
+  actionBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: theme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.border,
+  },
+  
+  addButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.textInverse,
+  },
 });
