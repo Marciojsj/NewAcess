@@ -21,12 +21,12 @@ import { MobileSidebar } from '../../components/layout/MobileSidebar';
 import { MobileNavbar } from '../../components/layout/MobileNavbar';
 import { deviceType } from '../../utils/responsive';
 import { Entidade, FormMode, ViewMode } from './entidade.types';
-import * as EntidadeService from './entidadeService';
-import { createStyles } from './styles/EntidadeScreen.styles';
+import * as EntidadeService from './entidade.service';
+import { styles } from './styles';
+
 
 export const EntidadeScreen: React.FC = () => {
 	const { theme, isDark, toggleTheme } = useTheme();
-	const styles = createStyles(theme, isDark);
 
 	const [entidades, setEntidades] = useState<Entidade[]>([]);
 	const [filteredEntidades, setFilteredEntidades] = useState<Entidade[]>([]);
@@ -73,21 +73,31 @@ export const EntidadeScreen: React.FC = () => {
 		filterEntidades();
 	}, [searchText, entidades]);
 
-	const loadEntidades = () => {
-		const data = EntidadeService.getAll();
-		console.log('🔵 [ENTIDADE] Carregadas:', data.length, 'entidades');
-		setEntidades(data);
-		setFilteredEntidades(data);
+	const loadEntidades = async () => {
+		try {
+			const data = await EntidadeService.getAll();
+			console.log('🔵 [ENTIDADE] Carregadas:', data.length, 'entidades');
+			setEntidades(data);
+			setFilteredEntidades(data);
+		} catch (error) {
+			console.error('Erro ao carregar entidades:', error);
+			Alert.alert('Erro', 'Não foi possível carregar as entidades');
+		}
 	};
 
-	const filterEntidades = () => {
+	const filterEntidades = async () => {
 		if (!searchText.trim()) {
 			setFilteredEntidades(entidades);
 			return;
 		}
 
-		const results = EntidadeService.search(searchText);
-		setFilteredEntidades(results);
+		try {
+			const results = await EntidadeService.search(searchText);
+			setFilteredEntidades(results);
+		} catch (error) {
+			console.error('Erro ao filtrar entidades:', error);
+			setFilteredEntidades([]);
+		}
 	};
 
 	const handleOpenForm = (mode: FormMode, entidade?: Entidade) => {
@@ -131,7 +141,7 @@ export const EntidadeScreen: React.FC = () => {
 		});
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (!formData.nome?.trim()) {
 			Alert.alert('Erro', 'Nome é obrigatório');
 			return;
@@ -147,7 +157,7 @@ export const EntidadeScreen: React.FC = () => {
 
 		try {
 			if (formMode === 'create') {
-				EntidadeService.create(formData as Omit<Entidade, 'id' | 'createdAt' | 'updatedAt'>);
+				await EntidadeService.create(formData as Omit<Entidade, 'id' | 'createdAt' | 'updatedAt'>);
 				Alert.alert('Sucesso', 'Entidade criada com sucesso!');
 			} else if (formMode === 'edit' && selectedEntidade) {
 				EntidadeService.update(selectedEntidade.id, formData);
@@ -172,10 +182,10 @@ export const EntidadeScreen: React.FC = () => {
 				{
 					text: 'Excluir',
 					style: 'destructive',
-					onPress: () => {
+					onPress: async () => {
 						console.log('🔴 [ENTIDADE] CONFIRMADO - Excluindo:', entidade.nome);
-						EntidadeService.deleteEntidade(entidade.id);
-						loadEntidades();
+						await EntidadeService.deleteEntidade(entidade.id);
+						await loadEntidades();
 						Alert.alert('Sucesso', 'Entidade excluída com sucesso!');
 					},
 				},

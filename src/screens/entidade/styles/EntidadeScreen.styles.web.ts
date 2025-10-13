@@ -1,8 +1,22 @@
 // src/screens/entidade/styles/EntidadeScreen.styles.web.ts
 import { StyleSheet, Platform, ViewStyle } from 'react-native';
-import { Theme } from '../../../contexts/ThemeContext';
 
-export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create({
+// Note: Theme values are hardcoded for now, will be made dynamic later
+const theme = {
+  background: '#ffffff',
+  backgroundCard: '#ffffff',
+  backgroundSecondary: '#f3f4f6',
+  text: '#1f2937',
+  textSecondary: '#6b7280',
+  textInverse: '#ffffff',
+  primary: '#6366f1',
+  error: '#ef4444',
+  border: '#e5e7eb',
+  borderLight: '#f3f4f6',
+};
+const isDark = false;
+
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.background,
@@ -777,5 +791,3 @@ export const createStyles = (theme: Theme, isDark: boolean) => StyleSheet.create
   // Note: All legacy/duplicate card and list styles removed
   // Current active styles are defined above with grid layout support
 });
-
-export default createStyles;

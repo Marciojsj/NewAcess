@@ -1,0 +1,456 @@
+// __tests__/services/entidadeService.test.ts
+
+import * as EntidadeService from '../../src/screens/entidade/entidade.service';
+import type { Entidade } from '../../src/screens/entidade/entidade.types';
+
+describe('EntidadeService', () => {
+  describe('getAll', () => {
+    it('should return all entities', async () => {
+      const entities = await EntidadeService.getAll();
+      expect(entities).toBeDefined();
+      expect(Array.isArray(entities)).toBe(true);
+      expect(entities.length).toBeGreaterThan(0);
+    });
+
+    it('should return entities with correct structure', async () => {
+      const entities = await EntidadeService.getAll();
+      const entity = entities[0];
+
+      expect(entity).toHaveProperty('id');
+      expect(entity).toHaveProperty('nome');
+      expect(entity).toHaveProperty('cnpj');
+      expect(entity).toHaveProperty('tipo');
+      expect(entity).toHaveProperty('email');
+      expect(entity).toHaveProperty('status');
+      expect(entity).toHaveProperty('createdAt');
+      expect(entity).toHaveProperty('updatedAt');
+    });
+
+    it('should return a copy of entities array', async () => {
+      const entities1 = await EntidadeService.getAll();
+      const entities2 = await EntidadeService.getAll();
+      
+      expect(entities1).not.toBe(entities2);
+      expect(entities1).toEqual(entities2);
+    });
+  });
+
+  describe('getById', () => {
+    it('should return entity by id', async () => {
+      const entities = await EntidadeService.getAll();
+      const firstEntity = entities[0];
+      
+      const found = await EntidadeService.getById(firstEntity.id);
+      
+      expect(found).toBeDefined();
+      expect(found?.id).toBe(firstEntity.id);
+      expect(found?.nome).toBe(firstEntity.nome);
+    });
+
+    it('should return null for non-existent id', async () => {
+      const found = await EntidadeService.getById('non-existent-id');
+      expect(found).toBeNull();
+    });
+
+    it('should return correct entity data', async () => {
+      const found = await EntidadeService.getById('1');
+      
+      expect(found).toBeDefined();
+      expect(found?.nome).toBe('Empresa ABC Ltda');
+      expect(found?.cnpj).toBe('12.345.678/0001-90');
+      expect(found?.tipo).toBe('Jurídica');
+    });
+  });
+
+  describe('create', () => {
+    it('should create a new entity', async () => {
+      const newEntity = {
+        nome: 'Nova Empresa Teste',
+        cnpj: '99.999.999/0001-99',
+        tipo: 'Jurídica' as const,
+        email: 'teste@empresa.com',
+        status: 'Ativo' as const,
+      };
+
+      const created = await EntidadeService.create(newEntity);
+
+      expect(created).toBeDefined();
+      expect(created.id).toBeDefined();
+      expect(created.nome).toBe(newEntity.nome);
+      expect(created.cnpj).toBe(newEntity.cnpj);
+      expect(created.createdAt).toBeDefined();
+      expect(created.updatedAt).toBeDefined();
+    });
+
+    it('should generate unique id for each entity', async () => {
+      const entity1 = await EntidadeService.create({
+        nome: 'Empresa 1',
+        cnpj: '11.111.111/0001-11',
+        tipo: 'Jurídica',
+        email: 'empresa1@test.com',
+        status: 'Ativo',
+      });
+
+      const entity2 = await EntidadeService.create({
+        nome: 'Empresa 2',
+        cnpj: '22.222.222/0001-22',
+        tipo: 'Jurídica',
+        email: 'empresa2@test.com',
+        status: 'Ativo',
+      });
+
+      expect(entity1.id).not.toBe(entity2.id);
+    });
+
+    it('should add created entity to the list', async () => {
+      const beforeCount = (await EntidadeService.getAll()).length;
+
+      await EntidadeService.create({
+        nome: 'Test Company',
+        cnpj: '88.888.888/0001-88',
+        tipo: 'Jurídica',
+        email: 'test@company.com',
+        status: 'Ativo',
+      });
+
+      const afterCount = (await EntidadeService.getAll()).length;
+      expect(afterCount).toBe(beforeCount + 1);
+    });
+
+    it('should create entity with optional fields', async () => {
+      const created = await EntidadeService.create({
+        nome: 'Empresa Completa',
+        cnpj: '77.777.777/0001-77',
+        tipo: 'Jurídica',
+        email: 'completa@empresa.com',
+        endereco: 'Rua Teste, 123',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        telefone: '(11) 1234-5678',
+        status: 'Ativo',
+      });
+
+      expect(created.endereco).toBe('Rua Teste, 123');
+      expect(created.cidade).toBe('São Paulo');
+      expect(created.estado).toBe('SP');
+      expect(created.telefone).toBe('(11) 1234-5678');
+    });
+  });
+
+  describe('update', () => {
+    it('should update existing entity', async () => {
+      const entities = await EntidadeService.getAll();
+      const toUpdate = entities[0];
+
+      const updated = await EntidadeService.update(toUpdate.id, {
+        nome: 'Nome Atualizado',
+      });
+
+      expect(updated).toBeDefined();
+      expect(updated?.nome).toBe('Nome Atualizado');
+      expect(updated?.id).toBe(toUpdate.id);
+    });
+
+    it('should return null for non-existent id', async () => {
+      const updated = await EntidadeService.update('non-existent', { nome: 'Test' });
+      expect(updated).toBeNull();
+    });
+
+    it('should update updatedAt timestamp', async () => {
+      const entities = await EntidadeService.getAll();
+      const toUpdate = entities[0];
+      const oldUpdatedAt = toUpdate.updatedAt;
+
+      // Wait a bit to ensure timestamp is different
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      const updated = await EntidadeService.update(toUpdate.id, {
+        nome: 'Updated Name',
+      });
+
+      expect(updated?.updatedAt).not.toBe(oldUpdatedAt);
+    });
+
+    it('should preserve id when updating', async () => {
+      const entities = await EntidadeService.getAll();
+      const toUpdate = entities[0];
+      const originalId = toUpdate.id;
+
+      await EntidadeService.update(toUpdate.id, {
+        nome: 'New Name',
+        id: 'try-to-change-id', // Tentar mudar ID
+      } as any);
+
+      const updated = await EntidadeService.getById(originalId);
+      expect(updated?.id).toBe(originalId);
+    });
+
+    it('should update multiple fields at once', async () => {
+      const entities = await EntidadeService.getAll();
+      const toUpdate = entities[0];
+
+      const updated = await EntidadeService.update(toUpdate.id, {
+        nome: 'New Name',
+        email: 'newemail@test.com',
+        status: 'Inativo',
+      });
+
+      expect(updated?.nome).toBe('New Name');
+      expect(updated?.email).toBe('newemail@test.com');
+      expect(updated?.status).toBe('Inativo');
+    });
+  });
+
+  describe('deleteEntidade', () => {
+    it('should delete entity by id', async () => {
+      const entities = await EntidadeService.getAll();
+      const toDelete = entities[entities.length - 1];
+
+      const result = await EntidadeService.deleteEntidade(toDelete.id);
+
+      expect(result).toBe(true);
+      expect(await EntidadeService.getById(toDelete.id)).toBeNull();
+    });
+
+    it('should return false for non-existent id', async () => {
+      const result = await EntidadeService.deleteEntidade('non-existent-id');
+      expect(result).toBe(false);
+    });
+
+    it('should reduce entities count after deletion', async () => {
+      const beforeCount = (await EntidadeService.getAll()).length;
+      const entities = await EntidadeService.getAll();
+      const toDelete = entities[0];
+
+      await EntidadeService.deleteEntidade(toDelete.id);
+
+      const afterCount = (await EntidadeService.getAll()).length;
+      expect(afterCount).toBe(beforeCount - 1);
+    });
+  });
+
+  describe('search', () => {
+    it('should search entities by name', async () => {
+      const results = EntidadeService.search('Tech');
+      
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].nome).toContain('Tech');
+    });
+
+    it('should search entities by CNPJ', async () => {
+      const results = EntidadeService.search('12.345.678');
+      
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].cnpj).toContain('12.345.678');
+    });
+
+    it('should search entities by email', async () => {
+      const results = EntidadeService.search('techsolutions');
+      
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].email).toContain('techsolutions');
+    });
+
+    it('should search entities by city', async () => {
+      const results = EntidadeService.search('São Paulo');
+      
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].cidade).toBe('São Paulo');
+    });
+
+    it('should search entities by state', async () => {
+      const results = EntidadeService.search('SP');
+      
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].estado).toBe('SP');
+    });
+
+    it('should return all entities for empty search', async () => {
+      const results = EntidadeService.search('');
+      const all = await EntidadeService.getAll();
+      
+      expect(results.length).toBe(all.length);
+    });
+
+    it('should return empty array for no matches', async () => {
+      const results = EntidadeService.search('xyznotfound123');
+      expect(results.length).toBe(0);
+    });
+
+    it('should be case insensitive', async () => {
+      const resultsLower = EntidadeService.search('tech');
+      const resultsUpper = EntidadeService.search('TECH');
+      
+      expect(resultsLower.length).toBeGreaterThan(0);
+      expect(resultsUpper.length).toBe(resultsLower.length);
+    });
+
+    it('should trim whitespace', async () => {
+      const results = EntidadeService.search('  Tech  ');
+      
+      expect(results.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('filterByStatus', () => {
+    it('should filter active entities', async () => {
+      const results = EntidadeService.filterByStatus('Ativo');
+      
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach(entity => {
+        expect(entity.status).toBe('Ativo');
+      });
+    });
+
+    it('should filter inactive entities', async () => {
+      const results = EntidadeService.filterByStatus('Inativo');
+      
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach(entity => {
+        expect(entity.status).toBe('Inativo');
+      });
+    });
+
+    it('should return correct count for each status', async () => {
+      const active = EntidadeService.filterByStatus('Ativo');
+      const inactive = EntidadeService.filterByStatus('Inativo');
+      const all = await EntidadeService.getAll();
+      
+      expect(active.length + inactive.length).toBe(all.length);
+    });
+  });
+
+  describe('filterByType', () => {
+    it('should filter Jurídica entities', async () => {
+      const results = EntidadeService.filterByType('Jurídica');
+      
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach(entity => {
+        expect(entity.tipo).toBe('Jurídica');
+      });
+    });
+
+    it('should filter Física entities', async () => {
+      const results = EntidadeService.filterByType('Física');
+      
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach(entity => {
+        expect(entity.tipo).toBe('Física');
+      });
+    });
+
+    it('should return correct count for each type', async () => {
+      const juridica = EntidadeService.filterByType('Jurídica');
+      const fisica = EntidadeService.filterByType('Física');
+      const all = await EntidadeService.getAll();
+      
+      expect(juridica.length + fisica.length).toBe(all.length);
+    });
+  });
+
+  describe('getStats', () => {
+    it('should return statistics object', async () => {
+      const stats = EntidadeService.getStats();
+      
+      expect(stats).toBeDefined();
+      expect(stats).toHaveProperty('total');
+      expect(stats).toHaveProperty('ativas');
+      expect(stats).toHaveProperty('inativas');
+      expect(stats).toHaveProperty('juridicas');
+      expect(stats).toHaveProperty('fisicas');
+    });
+
+    it('should return correct total count', async () => {
+      const stats = EntidadeService.getStats();
+      const all = await EntidadeService.getAll();
+      
+      expect(stats.total).toBe(all.length);
+    });
+
+    it('should return correct active count', async () => {
+      const stats = EntidadeService.getStats();
+      const active = EntidadeService.filterByStatus('Ativo');
+      
+      expect(stats.ativas).toBe(active.length);
+    });
+
+    it('should return correct inactive count', async () => {
+      const stats = EntidadeService.getStats();
+      const inactive = EntidadeService.filterByStatus('Inativo');
+      
+      expect(stats.inativas).toBe(inactive.length);
+    });
+
+    it('should return correct juridica count', async () => {
+      const stats = EntidadeService.getStats();
+      const juridica = EntidadeService.filterByType('Jurídica');
+      
+      expect(stats.juridicas).toBe(juridica.length);
+    });
+
+    it('should return correct fisica count', async () => {
+      const stats = EntidadeService.getStats();
+      const fisica = EntidadeService.filterByType('Física');
+      
+      expect(stats.fisicas).toBe(fisica.length);
+    });
+
+    it('should have total equal to sum of statuses', async () => {
+      const stats = EntidadeService.getStats();
+      
+      expect(stats.total).toBe(stats.ativas + stats.inativas);
+    });
+
+    it('should have total equal to sum of types', async () => {
+      const stats = EntidadeService.getStats();
+      
+      expect(stats.total).toBe(stats.juridicas + stats.fisicas);
+    });
+  });
+
+  describe('Data Integrity', () => {
+    it('should have valid dates in ISO format', async () => {
+      const entities = await EntidadeService.getAll();
+      
+      entities.forEach(entity => {
+        expect(new Date(entity.createdAt).toISOString()).toBe(entity.createdAt);
+        expect(new Date(entity.updatedAt).toISOString()).toBe(entity.updatedAt);
+      });
+    });
+
+    it('should have valid tipo values', async () => {
+      const entities = await EntidadeService.getAll();
+      const validTypes = ['Física', 'Jurídica'];
+      
+      entities.forEach(entity => {
+        expect(validTypes).toContain(entity.tipo);
+      });
+    });
+
+    it('should have valid status values', async () => {
+      const entities = await EntidadeService.getAll();
+      const validStatuses = ['Ativo', 'Inativo'];
+      
+      entities.forEach(entity => {
+        expect(validStatuses).toContain(entity.status);
+      });
+    });
+
+    it('should have unique ids', async () => {
+      const entities = await EntidadeService.getAll();
+      const ids = entities.map(e => e.id);
+      const uniqueIds = new Set(ids);
+      
+      expect(uniqueIds.size).toBe(entities.length);
+    });
+
+    it('should have valid email format', async () => {
+      const entities = await EntidadeService.getAll();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      entities.forEach(entity => {
+        expect(emailRegex.test(entity.email)).toBe(true);
+      });
+    });
+  });
+});

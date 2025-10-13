@@ -6,8 +6,8 @@
 import { Platform } from 'react-native';
 
 // @ts-ignore
-const webStyles = require('./loginScreen.styles.web').styles;
+const webStyles = require('./LoginScreen.styles.web').styles;
 // @ts-ignore
-const nativeStyles = require('./loginScreen.styles.native').styles;
+const nativeStyles = require('./LoginScreen.styles.native').styles;
 
 export const styles = Platform.OS === 'web' ? webStyles : nativeStyles;

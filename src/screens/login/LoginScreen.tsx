@@ -17,7 +17,7 @@ import { ThemeToggle } from '../../components/ui/ThemeToggle';
 import { ResponsiveContainer } from '../../components/layout/ResponsiveContainer';
 import { responsive, deviceType, useResponsive } from "../../utils/responsive";
 
-import styles from "./styles/LoginScreen.styles";
+import { styles } from "./styles";
 
 export default function LoginScreen() {
 	const [email, setEmail] = useState("");

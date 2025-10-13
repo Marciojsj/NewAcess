@@ -1,13 +1,8 @@
-/**
- * Style Selector
- * Exporta estilos corretos baseado na plataforma
- */
-
 import { Platform } from 'react-native';
 
 // @ts-ignore
-const webStyles = require('./homeScreen.styles.web').styles;
+const webStyles = require('./HomeScreen.styles.web').styles;
 // @ts-ignore
-const nativeStyles = require('./homeScreen.styles.native').styles;
+const nativeStyles = require('./HomeScreen.styles.native').styles;
 
 export const styles = Platform.OS === 'web' ? webStyles : nativeStyles;
