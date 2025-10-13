@@ -49,7 +49,7 @@ apiClient.interceptors.response.use(
             refreshToken,
           });
 
-          const { accessToken } = response.data.message;
+          const { accessToken } = response.data.data;
           await AsyncStorage.setItem('accessToken', accessToken);
 
           // Repetir requisição original com novo token

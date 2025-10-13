@@ -37,7 +37,7 @@ export const authApi = {
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const response = await apiClient.post('/auth/login', credentials);
-    const data = response.data.message;
+    const data = response.data.data;
 
     // Salvar tokens no AsyncStorage
     await AsyncStorage.setItem('accessToken', data.accessToken);
@@ -52,7 +52,7 @@ export const authApi = {
    */
   async register(data: RegisterData): Promise<AuthResponse> {
     const response = await apiClient.post('/auth/register', data);
-    const result = response.data.message;
+    const result = response.data.data;
 
     return result;
   },
@@ -62,7 +62,7 @@ export const authApi = {
    */
   async refreshToken(refreshToken: string): Promise<string> {
     const response = await apiClient.post('/auth/refresh', { refreshToken });
-    const { accessToken } = response.data.message;
+    const { accessToken } = response.data.data;
 
     await AsyncStorage.setItem('accessToken', accessToken);
     return accessToken;
@@ -90,7 +90,7 @@ export const authApi = {
    */
   async getMe() {
     const response = await apiClient.get('/auth/me');
-    return response.data.message;
+    return response.data.data;
   },
 
   /**

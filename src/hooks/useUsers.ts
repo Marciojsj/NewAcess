@@ -34,12 +34,28 @@ export const useUsers = () => {
    */
   const createUser = useCallback(async (userData: UserFormData) => {
     try {
+      console.log('🔷 [useUsers] Iniciando criação de usuário');
+      console.log('📤 [useUsers] Dados enviados:', {
+        ...userData,
+        password: userData.password ? '***' : undefined
+      });
       setLoading(true);
       setError(null);
+      
       const newUser = await userService.createUser(userData);
-      setUsers(prev => [...prev, newUser]);
+      console.log('📥 [useUsers] Usuário retornado do serviço:', newUser);
+      
+      setUsers(prev => {
+        console.log('🔄 [useUsers] Atualizando lista local. Antes:', prev.length);
+        const updated = [...prev, newUser];
+        console.log('🔄 [useUsers] Depois:', updated.length);
+        return updated;
+      });
+      
+      console.log('✅ [useUsers] Criação concluída com sucesso');
       return newUser;
     } catch (err: any) {
+      console.error('❌ [useUsers] Erro na criação:', err);
       setError(err.message || 'Erro ao criar usuário');
       throw err;
     } finally {
@@ -52,12 +68,27 @@ export const useUsers = () => {
    */
   const updateUser = useCallback(async (id: string, userData: Partial<UserFormData>) => {
     try {
+      console.log('🔷 [useUsers] Iniciando atualização de usuário:', id);
+      console.log('📤 [useUsers] Dados de atualização:', {
+        ...userData,
+        password: userData.password ? '***' : undefined
+      });
       setLoading(true);
       setError(null);
+      
       const updatedUser = await userService.updateUser(id, userData);
-      setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
+      console.log('📥 [useUsers] Usuário atualizado retornado:', updatedUser);
+      
+      setUsers(prev => {
+        const updated = prev.map(u => u.id === id ? updatedUser : u);
+        console.log('🔄 [useUsers] Lista atualizada');
+        return updated;
+      });
+      
+      console.log('✅ [useUsers] Atualização concluída com sucesso');
       return updatedUser;
     } catch (err: any) {
+      console.error('❌ [useUsers] Erro na atualização:', err);
       setError(err.message || 'Erro ao atualizar usuário');
       throw err;
     } finally {

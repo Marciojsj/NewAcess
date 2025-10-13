@@ -7,7 +7,7 @@ export const authController = {
   async register(req: AuthRequest, res: Response) {
     try {
       const user = await authService.register(req.body);
-      return successResponse(res, 'Usuário registrado com sucesso', user, 201);
+      return successResponse(res, user, 201, 'Usuário registrado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -17,7 +17,7 @@ export const authController = {
     try {
       const { email, password } = req.body;
       const result = await authService.login(email, password);
-      return successResponse(res, 'Login realizado com sucesso', result);
+      return successResponse(res, result, 'Login realizado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 401);
     }
@@ -27,7 +27,7 @@ export const authController = {
     try {
       const { refreshToken } = req.body;
       const result = await authService.refreshAccessToken(refreshToken);
-      return successResponse(res, 'Token atualizado com sucesso', result);
+      return successResponse(res, result, 'Token atualizado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 401);
     }
@@ -47,7 +47,7 @@ export const authController = {
     try {
       const userId = req.user!.userId;
       const user = await authService.getMe(userId);
-      return successResponse(res, 'Dados do usuário obtidos com sucesso', user);
+      return successResponse(res, user, 'Dados do usuário obtidos com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 404);
     }

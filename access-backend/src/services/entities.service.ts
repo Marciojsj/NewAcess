@@ -68,12 +68,28 @@ export const entitiesService = {
     phone?: string;
     email?: string;
   }) {
-    const entity = await prisma.entity.create({
-      data,
-    });
+    console.log('🔄 [SERVICE] Tentando criar entidade no banco:', data);
+    
+    try {
+      const entity = await prisma.entity.create({
+        data,
+      });
 
-    logger.info(`Nova entidade criada: ${entity.name}`);
-    return entity;
+      console.log('✅ [SERVICE] Entidade salva no banco com ID:', entity.id);
+      console.log('✅ [SERVICE] Dados salvos:', {
+        id: entity.id,
+        name: entity.name,
+        type: entity.type,
+        isActive: entity.isActive
+      });
+      logger.info(`Nova entidade criada: ${entity.name}`);
+      return entity;
+    } catch (err: any) {
+      console.error('❌ [SERVICE] ERRO CRÍTICO ao salvar no banco:', err);
+      console.error('❌ [SERVICE] SQL Error:', err.message);
+      console.error('❌ [SERVICE] Stack:', err.stack);
+      throw err;
+    }
   },
 
   async updateEntity(id: string, data: any) {

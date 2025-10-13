@@ -48,7 +48,7 @@ export const entitiesApi = {
   async getAll(search?: string): Promise<Entity[]> {
     const params = search ? { search } : {};
     const response = await apiClient.get('/entities', { params });
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -56,15 +56,17 @@ export const entitiesApi = {
    */
   async getById(id: string): Promise<Entity> {
     const response = await apiClient.get(`/entities/${id}`);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
    * Criar nova entidade
    */
   async create(data: CreateEntityData): Promise<Entity> {
+    console.log('📤 [FRONTEND] Enviando dados para criar entidade:', data);
     const response = await apiClient.post('/entities', data);
-    return response.data.message;
+    console.log('📥 [FRONTEND] Resposta do backend:', response.data);
+    return response.data.data;
   },
 
   /**
@@ -72,7 +74,7 @@ export const entitiesApi = {
    */
   async update(id: string, data: UpdateEntityData): Promise<Entity> {
     const response = await apiClient.put(`/entities/${id}`, data);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**

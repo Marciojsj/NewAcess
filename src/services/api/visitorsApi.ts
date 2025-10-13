@@ -17,6 +17,7 @@ export interface Visitor {
 export interface CreateVisitorData {
   name: string;
   cpf: string;
+  entityId: string;
   phone?: string;
   email?: string;
   company?: string;
@@ -36,7 +37,7 @@ export const visitorsApi = {
   async getAll(search?: string): Promise<Visitor[]> {
     const params = search ? { search } : {};
     const response = await apiClient.get('/visitors', { params });
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -44,23 +45,38 @@ export const visitorsApi = {
    */
   async getById(id: string): Promise<Visitor> {
     const response = await apiClient.get(`/visitors/${id}`);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
    * Criar novo visitante
    */
   async create(data: CreateVisitorData): Promise<Visitor> {
+    console.log('📤 [visitorsApi] Enviando requisição de criação');
+    console.log('📤 [visitorsApi] Dados:', data);
+    
     const response = await apiClient.post('/visitors', data);
-    return response.data.message;
+    
+    console.log('📥 [visitorsApi] Resposta recebida');
+    console.log('📥 [visitorsApi] Status:', response.status);
+    console.log('📥 [visitorsApi] Response.data:', response.data);
+    
+    return response.data.data;
   },
 
   /**
    * Atualizar visitante
    */
   async update(id: string, data: UpdateVisitorData): Promise<Visitor> {
+    console.log('📤 [visitorsApi] Atualizando visitante:', id);
+    console.log('📤 [visitorsApi] Dados:', data);
+    
     const response = await apiClient.put(`/visitors/${id}`, data);
-    return response.data.message;
+    
+    console.log('📥 [visitorsApi] Resposta recebida');
+    console.log('📥 [visitorsApi] Response.data:', response.data);
+    
+    return response.data.data;
   },
 
   /**
@@ -75,7 +91,7 @@ export const visitorsApi = {
    */
   async regenerateQRCode(id: string): Promise<Visitor> {
     const response = await apiClient.post(`/visitors/${id}/regenerate-qrcode`);
-    return response.data.message;
+    return response.data.data;
   },
 };
 

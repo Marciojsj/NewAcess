@@ -21,6 +21,8 @@ import { responsive, deviceType } from '../../utils/responsive';
 import { useVisitors } from '../../hooks/useVisitors';
 import { VisitorList } from '../../components/visitors/VisitorList';
 import { QRCodeDisplay } from '../../components/access/QRCodeDisplay';
+import { Toast } from '../../components/ui/Toast';
+import { useToast } from '../../hooks/useToast';
 // import { VisitorForm } from '../../components/visitors/VisitorForm';
 import { Visitor } from '../../types/visitorTypes';
 import { useAuth } from '../../contexts/AuthContext';
@@ -37,6 +39,7 @@ export default function VisitantesScreen({ navigation }: any) {
     regenerateQRCode,
     searchVisitors,
   } = useVisitors();
+  const { toast, hideToast, success, error: showError } = useToast();
 
   const [showForm, setShowForm] = useState(false);
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
@@ -63,7 +66,17 @@ export default function VisitantesScreen({ navigation }: any) {
         {
           text: 'Excluir',
           style: 'destructive',
-          onPress: () => deleteVisitor(id),
+          onPress: async () => {
+            try {
+              console.log('🗑️ Tentando excluir visitante:', id);
+              await deleteVisitor(id);
+              console.log('✅ Visitante excluído com sucesso');
+              success('Visitante excluído com sucesso!');
+            } catch (error: any) {
+              console.error('❌ Erro ao excluir visitante:', error);
+              showError(error.message || 'Erro ao excluir visitante');
+            }
+          },
         },
       ]
     );
@@ -82,26 +95,49 @@ export default function VisitantesScreen({ navigation }: any) {
     if (!qrVisitor) return;
     
     try {
+      console.log('🔄 Regenerando QR Code para visitante:', qrVisitor.id);
       await regenerateQRCode(qrVisitor.id);
       // Atualizar o visitante exibido
       const updated = visitors.find(v => v.id === qrVisitor.id);
       if (updated) {
         setQRVisitor(updated);
       }
-      Alert.alert('Sucesso', 'QR Code regenerado com sucesso!');
-    } catch (error) {
-      Alert.alert('Erro', 'Falha ao regenerar QR Code');
+      console.log('✅ QR Code regenerado com sucesso');
+      success('QR Code regenerado com sucesso!');
+    } catch (error: any) {
+      console.error('❌ Erro ao regenerar QR Code:', error);
+      showError(error.message || 'Falha ao regenerar QR Code');
     }
   };
 
   const handleSubmitForm = async (data: any) => {
-    if (selectedVisitor) {
-      await updateVisitor(selectedVisitor.id, data);
-    } else {
-      await createVisitor(data);
+    try {
+      console.log('💾 Iniciando submissão do formulário de visitante');
+      console.log('📝 Dados recebidos:', data);
+      
+      if (selectedVisitor) {
+        console.log('➡️ Atualizando visitante existente:', selectedVisitor.id);
+        const result = await updateVisitor(selectedVisitor.id, data);
+        console.log('✅ Visitante atualizado com sucesso:', result);
+        success('Visitante atualizado com sucesso!');
+      } else {
+        console.log('➡️ Criando novo visitante');
+        const result = await createVisitor(data);
+        console.log('✅ Visitante criado com sucesso:', result);
+        success('Visitante criado com sucesso!');
+      }
+      
+      console.log('🚪 Fechando modal após sucesso');
+      setShowForm(false);
+      setSelectedVisitor(null);
+    } catch (error: any) {
+      console.error('❌ Erro ao salvar visitante:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Response:', error.response?.data);
+      showError(error.message || 'Erro ao salvar visitante');
+      // Não fecha o modal em caso de erro
+      throw error;
     }
-    setShowForm(false);
-    setSelectedVisitor(null);
   };
 
   const handleNewVisitor = () => {
@@ -188,6 +224,14 @@ export default function VisitantesScreen({ navigation }: any) {
           setQRVisitor(null);
         }}
         onRegenerate={handleRegenerateQR}
+      />
+
+      {/* Toast Component */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
       />
     </SafeAreaView>
   );

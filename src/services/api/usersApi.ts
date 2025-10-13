@@ -41,7 +41,7 @@ export const usersApi = {
     if (role) params.role = role;
 
     const response = await apiClient.get('/users', { params });
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -49,15 +49,25 @@ export const usersApi = {
    */
   async getById(id: string): Promise<User> {
     const response = await apiClient.get(`/users/${id}`);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
    * Criar novo usuário
    */
   async create(data: CreateUserData): Promise<User> {
+    console.log('📤 [usersApi] Enviando requisição de criação');
+    console.log('📤 [usersApi] URL: POST /users');
+    console.log('📤 [usersApi] Dados:', { ...data, password: '***' });
+    
     const response = await apiClient.post('/users', data);
-    return response.data.message;
+    
+    console.log('📥 [usersApi] Resposta recebida');
+    console.log('📥 [usersApi] Status:', response.status);
+    console.log('📥 [usersApi] Response completa:', response.data);
+    console.log('📥 [usersApi] response.data.data:', response.data.data);
+    
+    return response.data.data;
   },
 
   /**
@@ -65,7 +75,7 @@ export const usersApi = {
    */
   async update(id: string, data: UpdateUserData): Promise<User> {
     const response = await apiClient.put(`/users/${id}`, data);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**

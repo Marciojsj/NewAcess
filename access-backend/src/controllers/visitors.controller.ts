@@ -8,7 +8,7 @@ export const visitorsController = {
     try {
       const { search } = req.query;
       const visitors = await visitorsService.getAllVisitors(search as string | undefined);
-      return successResponse(res, 'Visitantes obtidos com sucesso', visitors);
+      return successResponse(res, visitors, 'Visitantes obtidos com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -18,7 +18,7 @@ export const visitorsController = {
     try {
       const { id } = req.params;
       const visitor = await visitorsService.getVisitorById(id);
-      return successResponse(res, 'Visitante obtido com sucesso', visitor);
+      return successResponse(res, visitor, 'Visitante obtido com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 404);
     }
@@ -26,19 +26,25 @@ export const visitorsController = {
 
   async createVisitor(req: AuthRequest, res: Response) {
     try {
+      console.log('📝 [CONTROLLER] Criando visitante. Body:', req.body);
       const visitor = await visitorsService.createVisitor(req.body);
-      return successResponse(res, 'Visitante criado com sucesso', visitor, 201);
+      console.log('✅ [CONTROLLER] Visitante criado:', visitor);
+      return successResponse(res, visitor, 'Visitante criado com sucesso', 201);
     } catch (error: any) {
+      console.error('❌ [CONTROLLER] Erro ao criar visitante:', error);
       return errorResponse(res, error.message, 400);
     }
   },
 
   async updateVisitor(req: AuthRequest, res: Response) {
     try {
+      console.log('📝 [CONTROLLER] Atualizando visitante:', req.params.id);
       const { id } = req.params;
       const visitor = await visitorsService.updateVisitor(id, req.body);
-      return successResponse(res, 'Visitante atualizado com sucesso', visitor);
+      console.log('✅ [CONTROLLER] Visitante atualizado:', visitor);
+      return successResponse(res, visitor, 'Visitante atualizado com sucesso');
     } catch (error: any) {
+      console.error('❌ [CONTROLLER] Erro ao atualizar visitante:', error);
       return errorResponse(res, error.message, 400);
     }
   },
@@ -47,7 +53,7 @@ export const visitorsController = {
     try {
       const { id } = req.params;
       await visitorsService.deleteVisitor(id);
-      return successResponse(res, 'Visitante deletado com sucesso');
+      return successResponse(res, null, 'Visitante deletado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -57,7 +63,7 @@ export const visitorsController = {
     try {
       const { id } = req.params;
       const visitor = await visitorsService.regenerateQRCode(id);
-      return successResponse(res, 'QR Code regenerado com sucesso', visitor);
+      return successResponse(res, visitor, 'QR Code regenerado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }

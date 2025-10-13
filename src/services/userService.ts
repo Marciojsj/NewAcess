@@ -73,20 +73,32 @@ export const userService = {
    */
   createUser: async (userData: UserFormData): Promise<User> => {
     try {
+      console.log('🔷 [userService] Iniciando criação de usuário');
+      
       if (!userData.password) {
         throw new Error('Senha é obrigatória para criar usuário');
       }
+
+      // Gerar CPF único baseado em timestamp + random
+      const timestamp = Date.now().toString().slice(-8);
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      const uniqueCpf = timestamp + random;
+      
+      console.log('🔑 [userService] CPF gerado:', uniqueCpf);
 
       const createData: CreateUserData = {
         name: userData.name,
         email: userData.email,
         password: userData.password,
-        cpf: '00000000000', // CPF padrão temporário
+        cpf: uniqueCpf, // CPF único gerado
         role: mapUserRoleToApiRole(userData.role),
         entityId: userData.entityId,
       };
 
+      console.log('📤 [userService] Enviando para API');
       const newUser = await usersApi.create(createData);
+      console.log('✅ [userService] Usuário criado com sucesso:', newUser.id);
+      
       return {
         id: newUser.id,
         name: newUser.name,
@@ -99,8 +111,9 @@ export const userService = {
         entity: newUser.entity,
       };
     } catch (error: any) {
-      console.error('Erro ao criar usuário:', error);
-      throw new Error(error.response?.data?.error || 'Erro ao criar usuário');
+      console.error('❌ [userService] Erro ao criar usuário:', error);
+      console.error('Response data:', error.response?.data);
+      throw new Error(error.response?.data?.message || error.message || 'Erro ao criar usuário');
     }
   },
   /**

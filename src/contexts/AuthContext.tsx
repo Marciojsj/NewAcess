@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Erro ao verificar autenticação:', error);
-      await AsyncStorage.multiRemove(['@accessToken', '@refreshToken', '@userData']);
+      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'userData']);
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       console.error('Erro no logout:', error);
       setUser(null);
-      await AsyncStorage.multiRemove(['@accessToken', '@refreshToken', '@userData']);
+      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'userData']);
     }
   };
 

@@ -11,7 +11,7 @@ export const accessController = {
         ...req.body,
         operatorId,
       });
-      return successResponse(res, 'Entrada registrada com sucesso', accessLog, 201);
+      return successResponse(res, accessLog, 201, 'Entrada registrada com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -22,7 +22,7 @@ export const accessController = {
       const operatorId = req.user!.userId;
       const { accessLogId, notes } = req.body;
       const accessLog = await accessService.registerExit(accessLogId, operatorId, notes);
-      return successResponse(res, 'Saída registrada com sucesso', accessLog, 201);
+      return successResponse(res, accessLog, 201, 'Saída registrada com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -40,7 +40,7 @@ export const accessController = {
       if (endDate) filters.endDate = new Date(endDate as string);
 
       const logs = await accessService.getAccessLogs(filters);
-      return successResponse(res, 'Registros de acesso obtidos com sucesso', logs);
+      return successResponse(res, logs, 'Registros de acesso obtidos com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -59,7 +59,7 @@ export const accessController = {
         new Date(startDate as string),
         new Date(endDate as string)
       );
-      return successResponse(res, 'Relatório obtido com sucesso', report);
+      return successResponse(res, report, 'Relatório obtido com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }

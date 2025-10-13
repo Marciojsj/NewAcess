@@ -8,7 +8,7 @@ export const entitiesController = {
     try {
       const { search } = req.query;
       const entities = await entitiesService.getAllEntities(search as string | undefined);
-      return successResponse(res, 'Entidades obtidas com sucesso', entities);
+      return successResponse(res, entities, 'Entidades obtidas com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -18,7 +18,7 @@ export const entitiesController = {
     try {
       const { id } = req.params;
       const entity = await entitiesService.getEntityById(id);
-      return successResponse(res, 'Entidade obtida com sucesso', entity);
+      return successResponse(res, entity, 'Entidade obtida com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 404);
     }
@@ -26,9 +26,17 @@ export const entitiesController = {
 
   async createEntity(req: AuthRequest, res: Response) {
     try {
+      console.log('📝 [CREATE ENTITY] Dados recebidos:', JSON.stringify(req.body, null, 2));
       const entity = await entitiesService.createEntity(req.body);
-      return successResponse(res, 'Entidade criada com sucesso', entity, 201);
+      console.log('✅ [CREATE ENTITY] Entidade criada com sucesso:', {
+        id: entity.id,
+        name: entity.name,
+        type: entity.type
+      });
+      return successResponse(res, entity, 'Entidade criada com sucesso', 201);
     } catch (error: any) {
+      console.error('❌ [CREATE ENTITY] Erro ao criar entidade:', error.message);
+      console.error('❌ [CREATE ENTITY] Stack:', error.stack);
       return errorResponse(res, error.message, 400);
     }
   },
@@ -37,7 +45,7 @@ export const entitiesController = {
     try {
       const { id } = req.params;
       const entity = await entitiesService.updateEntity(id, req.body);
-      return successResponse(res, 'Entidade atualizada com sucesso', entity);
+      return successResponse(res, entity, 'Entidade atualizada com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -47,7 +55,7 @@ export const entitiesController = {
     try {
       const { id } = req.params;
       await entitiesService.deleteEntity(id);
-      return successResponse(res, 'Entidade deletada com sucesso');
+      return successResponse(res, null, 'Entidade deletada com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }

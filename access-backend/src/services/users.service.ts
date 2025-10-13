@@ -72,35 +72,58 @@ export const usersService = {
     role: Role;
     entityId?: string;
   }) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email: data.email },
-    });
+    try {
+      console.log('🔄 [SERVICE] Tentando criar usuário. Dados:', { ...data, password: '***' });
+      
+      // Verificar email duplicado
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: data.email },
+      });
 
-    if (existingUser) {
-      throw new Error('Email já está em uso');
+      if (existingEmail) {
+        console.log('❌ [SERVICE] Email já existe:', data.email);
+        throw new Error('Email já está em uso');
+      }
+
+      // Verificar CPF duplicado
+      const existingCpf = await prisma.user.findUnique({
+        where: { cpf: data.cpf },
+      });
+
+      if (existingCpf) {
+        console.log('❌ [SERVICE] CPF já existe:', data.cpf);
+        throw new Error('CPF já está em uso');
+      }
+
+      console.log('🔐 [SERVICE] Hasheando senha...');
+      const hashedPassword = await hashPassword(data.password);
+
+      console.log('💾 [SERVICE] Salvando no banco de dados...');
+      const user = await prisma.user.create({
+        data: {
+          ...data,
+          password: hashedPassword,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          cpf: true,
+          phone: true,
+          role: true,
+          entityId: true,
+          isActive: true,
+        },
+      });
+
+      console.log('✅ [SERVICE] Usuário criado com sucesso. ID:', user.id);
+      logger.info(`Novo usuário criado: ${user.email}`);
+      return user;
+    } catch (error: any) {
+      console.error('❌ [SERVICE] Erro ao criar usuário:', error.message);
+      console.error('Stack:', error.stack);
+      throw error;
     }
-
-    const hashedPassword = await hashPassword(data.password);
-
-    const user = await prisma.user.create({
-      data: {
-        ...data,
-        password: hashedPassword,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        cpf: true,
-        phone: true,
-        role: true,
-        entityId: true,
-        isActive: true,
-      },
-    });
-
-    logger.info(`Novo usuário criado: ${user.email}`);
-    return user;
   },
 
   async updateUser(id: string, data: {

@@ -1,76 +1,15 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-
-import { useAuth, AuthProvider } from './src/contexts/AuthContext';
+import { AuthProvider } from './src/contexts/AuthContext';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import { PermissionProvider } from './src/contexts/PermissionContext';
-
-import HomeScreen from './src/screens/home/HomeScreen';
-import LoginScreen from './src/screens/login/LoginScreen';
-import { RegistrarEntradaScreen } from './src/screens/registrarEntrada/RegistrarEntradaScreen';
-import { RegistrarSaidaScreen } from './src/screens/registrarSaida/RegistrarSaidaScreen';
-import VisitantesScreen from './src/screens/visitantes/VisitantesScreen';
-import { RelatoriosScreen } from './src/screens/relatorios/RelatoriosScreen';
-import AlertasScreen from './src/screens/alertas/AlertasScreen';
-import { EntidadeScreen } from './src/screens/entidade/EntidadeScreen';
-import { UsersScreen } from './src/screens/users/UsersScreen';
-import { AccessLogsScreen } from './src/screens/access/AccessLogsScreen';
-import { VisitorDetailsScreen } from './src/screens/visitantes/VisitorDetailsScreen';
-import SettingsScreen from './src/screens/configuracoes/SettingsScreen';
-import ProfileSettingsScreen from './src/screens/configuracoes/ProfileSettingsScreen';
-import SystemSettingsScreen from './src/screens/configuracoes/SystemSettingsScreen';
-import SecuritySettingsScreen from './src/screens/configuracoes/SecuritySettingsScreen';
-import NotificationSettingsScreen from './src/screens/configuracoes/NotificationSettingsScreen';
-import AppSettingsScreen from './src/screens/configuracoes/AppSettingsScreen';
-import PermissionsScreen from './src/screens/permissoes/PermissionsScreen';
-
-const Stack = createStackNavigator();
-
-function Routes() {
-  const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return null;
-  }
-
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {user ? (
-        <>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="RegistrarEntrada" component={RegistrarEntradaScreen} />
-          <Stack.Screen name="RegistrarSaida" component={RegistrarSaidaScreen} />
-          <Stack.Screen name="Visitantes" component={VisitantesScreen} />
-          <Stack.Screen name="VisitorDetails" component={VisitorDetailsScreen} />
-          <Stack.Screen name="Relatorios" component={RelatoriosScreen} />
-          <Stack.Screen name="Alertas" component={AlertasScreen} />
-          <Stack.Screen name="Users" component={UsersScreen} />
-          <Stack.Screen name="AccessLogs" component={AccessLogsScreen} />
-          <Stack.Screen name="Entidade" component={EntidadeScreen} />
-          <Stack.Screen name="Settings" component={SettingsScreen} />
-          <Stack.Screen name="ProfileSettings" component={ProfileSettingsScreen} />
-          <Stack.Screen name="SystemSettings" component={SystemSettingsScreen} />
-          <Stack.Screen name="SecuritySettings" component={SecuritySettingsScreen} />
-          <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
-          <Stack.Screen name="AppSettings" component={AppSettingsScreen} />
-          <Stack.Screen name="Permissions" component={PermissionsScreen} />
-        </>
-      ) : (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      )}
-    </Stack.Navigator>
-  );
-}
+import { AppRouter } from './src/navigation';
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <PermissionProvider>
-          <NavigationContainer>
-            <Routes />
-          </NavigationContainer>
+          <AppRouter />
         </PermissionProvider>
       </AuthProvider>
     </ThemeProvider>

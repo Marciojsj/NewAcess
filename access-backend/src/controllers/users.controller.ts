@@ -11,7 +11,7 @@ export const usersController = {
         entityId as string | undefined,
         role as any
       );
-      return successResponse(res, 'Usuários obtidos com sucesso', users);
+      return successResponse(res, users, 'Usuários obtidos com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -21,7 +21,7 @@ export const usersController = {
     try {
       const { id } = req.params;
       const user = await usersService.getUserById(id);
-      return successResponse(res, 'Usuário obtido com sucesso', user);
+      return successResponse(res, user, 'Usuário obtido com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 404);
     }
@@ -29,9 +29,13 @@ export const usersController = {
 
   async createUser(req: AuthRequest, res: Response) {
     try {
+      console.log('📝 [CONTROLLER] Criando usuário. Body:', req.body);
       const user = await usersService.createUser(req.body);
-      return successResponse(res, 'Usuário criado com sucesso', user, 201);
+      console.log('✅ [CONTROLLER] Usuário criado:', user);
+      console.log('➡️ [CONTROLLER] Enviando resposta com successResponse');
+      return successResponse(res, user, 'Usuário criado com sucesso', 201);
     } catch (error: any) {
+      console.error('❌ [CONTROLLER] Erro ao criar usuário:', error);
       return errorResponse(res, error.message, 400);
     }
   },
@@ -40,7 +44,7 @@ export const usersController = {
     try {
       const { id } = req.params;
       const user = await usersService.updateUser(id, req.body);
-      return successResponse(res, 'Usuário atualizado com sucesso', user);
+      return successResponse(res, user, 'Usuário atualizado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }
@@ -50,7 +54,7 @@ export const usersController = {
     try {
       const { id } = req.params;
       await usersService.deleteUser(id);
-      return successResponse(res, 'Usuário deletado com sucesso');
+      return successResponse(res, null, 'Usuário deletado com sucesso');
     } catch (error: any) {
       return errorResponse(res, error.message, 400);
     }

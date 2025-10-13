@@ -23,10 +23,13 @@ import { deviceType } from '../../utils/responsive';
 import { Entidade, FormMode, ViewMode } from './entidade.types';
 import * as EntidadeService from './entidade.service';
 import { styles } from './styles';
+import { Toast } from '../../components/ui/Toast';
+import { useToast } from '../../hooks/useToast';
 
 
 export const EntidadeScreen: React.FC = () => {
 	const { theme, isDark, toggleTheme } = useTheme();
+	const { toast, hideToast, success, error } = useToast();
 
 	const [entidades, setEntidades] = useState<Entidade[]>([]);
 	const [filteredEntidades, setFilteredEntidades] = useState<Entidade[]>([]);
@@ -142,32 +145,48 @@ export const EntidadeScreen: React.FC = () => {
 	};
 
 	const handleSave = async () => {
+		console.log('💾 [ENTIDADE] Tentando salvar...', { formMode, formData });
+		
+		// Validações
 		if (!formData.nome?.trim()) {
-			Alert.alert('Erro', 'Nome é obrigatório');
-			return;
-		}
-		if (!formData.cnpj?.trim()) {
-			Alert.alert('Erro', 'CNPJ é obrigatório');
+			console.error('❌ [ENTIDADE] Nome obrigatório');
+			error('Nome é obrigatório');
 			return;
 		}
 		if (!formData.email?.trim()) {
-			Alert.alert('Erro', 'Email é obrigatório');
+			console.error('❌ [ENTIDADE] Email obrigatório');
+			error('Email é obrigatório');
 			return;
 		}
 
 		try {
 			if (formMode === 'create') {
-				await EntidadeService.create(formData as Omit<Entidade, 'id' | 'createdAt' | 'updatedAt'>);
-				Alert.alert('Sucesso', 'Entidade criada com sucesso!');
+				console.log('➡️ [ENTIDADE] Criando nova entidade...');
+				const created = await EntidadeService.create(formData as Omit<Entidade, 'id' | 'createdAt' | 'updatedAt'>);
+				console.log('✅ [ENTIDADE] Entidade criada:', created);
+				success('Entidade criada com sucesso!');
 			} else if (formMode === 'edit' && selectedEntidade) {
-				EntidadeService.update(selectedEntidade.id, formData);
-				Alert.alert('Sucesso', 'Entidade atualizada com sucesso!');
+				console.log('➡️ [ENTIDADE] Atualizando entidade:', selectedEntidade.id);
+				const updated = await EntidadeService.update(selectedEntidade.id, formData);
+				console.log('✅ [ENTIDADE] Entidade atualizada:', updated);
+				success('Entidade atualizada com sucesso!');
 			}
 
-			loadEntidades();
+			console.log('🔄 [ENTIDADE] Recarregando lista...');
+			await loadEntidades();
+			
+			console.log('🚪 [ENTIDADE] Fechando modal...');
 			handleCloseForm();
-		} catch (error) {
-			Alert.alert('Erro', 'Erro ao salvar entidade');
+		} catch (err: any) {
+			console.error('❌ [ENTIDADE] Erro ao salvar:', err);
+			console.error('❌ [ENTIDADE] Detalhes:', {
+				message: err.message,
+				response: err.response?.data,
+				status: err.response?.status
+			});
+			
+			const errorMessage = err.response?.data?.message || err.message || 'Erro ao salvar entidade';
+			error(errorMessage);
 		}
 	};
 
@@ -183,10 +202,20 @@ export const EntidadeScreen: React.FC = () => {
 					text: 'Excluir',
 					style: 'destructive',
 					onPress: async () => {
-						console.log('🔴 [ENTIDADE] CONFIRMADO - Excluindo:', entidade.nome);
-						await EntidadeService.deleteEntidade(entidade.id);
-						await loadEntidades();
-						Alert.alert('Sucesso', 'Entidade excluída com sucesso!');
+						try {
+							console.log('🔴 [ENTIDADE] CONFIRMADO - Excluindo:', entidade.nome);
+							const deleted = await EntidadeService.deleteEntidade(entidade.id);
+							if (deleted) {
+								console.log('✅ [ENTIDADE] Entidade excluída com sucesso');
+								success('Entidade excluída com sucesso!');
+								await loadEntidades();
+							} else {
+								throw new Error('Falha ao excluir entidade');
+							}
+						} catch (err: any) {
+							console.error('❌ [ENTIDADE] Erro ao excluir:', err);
+							error(err.response?.data?.message || 'Erro ao excluir entidade');
+						}
 					},
 				},
 			]
@@ -274,6 +303,14 @@ export const EntidadeScreen: React.FC = () => {
 
 	return (
 		<SafeAreaView style={[styles.container, { flex: 1 }]}>
+			{/* Toast de Feedback */}
+			<Toast
+				visible={toast.visible}
+				message={toast.message}
+				type={toast.type}
+				onHide={hideToast}
+			/>
+
 			{/* NAVBAR WEB */}
 			{Platform.OS === 'web' && (
 				<>

@@ -14,15 +14,19 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { AppLayout } from '../../components/layout/AppLayout';
 import { useUsers } from '../../hooks/useUsers';
 import { UserList } from '../../components/users/UserList';
 import { UserForm } from '../../components/users/UserForm';
+import { Toast } from '../../components/ui/Toast';
+import { useToast } from '../../hooks/useToast';
 import { User, UserFormData } from '../../types/userTypes';
 import { deviceType } from '../../utils/responsive';
 
 export const UsersScreen = () => {
   const navigation = useNavigation();
   const { users, loading, error, createUser, updateUser, deleteUser, toggleUserStatus, searchUsers } = useUsers();
+  const { toast, hideToast, success, error: showError } = useToast();
   
   const [search, setSearch] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -60,10 +64,13 @@ export const UsersScreen = () => {
           style: 'destructive',
           onPress: async () => {
             try {
+              console.log('🗑️ Tentando excluir usuário:', user.id);
               await deleteUser(user.id);
-              Alert.alert('Sucesso', 'Usuário excluído com sucesso!');
+              console.log('✅ Usuário excluído com sucesso');
+              success('Usuário excluído com sucesso!');
             } catch (error: any) {
-              Alert.alert('Erro', error.message || 'Erro ao excluir usuário');
+              console.error('❌ Erro ao excluir usuário:', error);
+              showError(error.message || 'Erro ao excluir usuário');
             }
           },
         },
@@ -82,10 +89,13 @@ export const UsersScreen = () => {
           text: 'Confirmar',
           onPress: async () => {
             try {
+              console.log(`🔄 Tentando ${action} usuário:`, user.id);
               await toggleUserStatus(user.id, !user.isActive);
-              Alert.alert('Sucesso', `Usuário ${action === 'ativar' ? 'ativado' : 'desativado'} com sucesso!`);
+              console.log(`✅ Usuário ${action} com sucesso`);
+              success(`Usuário ${action === 'ativar' ? 'ativado' : 'desativado'} com sucesso!`);
             } catch (error: any) {
-              Alert.alert('Erro', error.message || 'Erro ao alterar status do usuário');
+              console.error(`❌ Erro ao ${action} usuário:`, error);
+              showError(error.message || 'Erro ao alterar status do usuário');
             }
           },
         },
@@ -95,14 +105,33 @@ export const UsersScreen = () => {
 
   const handleSubmitForm = async (userData: UserFormData) => {
     try {
+      console.log('💾 Iniciando submissão do formulário de usuário');
+      console.log('📝 Dados recebidos:', {
+        ...userData,
+        password: userData.password ? '***' : undefined
+      });
+      
       if (selectedUser) {
-        await updateUser(selectedUser.id, userData);
+        console.log('➡️ Atualizando usuário existente:', selectedUser.id);
+        const result = await updateUser(selectedUser.id, userData);
+        console.log('✅ Usuário atualizado com sucesso:', result);
+        success('Usuário atualizado com sucesso!');
       } else {
-        await createUser(userData);
+        console.log('➡️ Criando novo usuário');
+        const result = await createUser(userData);
+        console.log('✅ Usuário criado com sucesso:', result);
+        success('Usuário criado com sucesso!');
       }
+      
+      console.log('🚪 Fechando modal após sucesso');
       setModalVisible(false);
       setSelectedUser(null);
     } catch (error: any) {
+      console.error('❌ Erro ao salvar usuário:', error);
+      console.error('Stack trace:', error.stack);
+      console.error('Response:', error.response?.data);
+      showError(error.message || 'Erro ao salvar usuário');
+      // Não fecha o modal em caso de erro
       throw error;
     }
   };
@@ -113,17 +142,10 @@ export const UsersScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>← Voltar</Text>
-        </TouchableOpacity>
-        <View style={styles.headerContent}>
-          <Text style={styles.title}>Gerenciar Usuários</Text>
+    <AppLayout title="Gerenciar Usuários" showBackButton={true}>
+      <View style={styles.container}>
+        {/* Action Bar */}
+        <View style={styles.actionBar}>
           <TouchableOpacity
             style={styles.addButton}
             onPress={handleAddUser}
@@ -131,34 +153,33 @@ export const UsersScreen = () => {
             <Text style={styles.addButtonText}>+ Novo Usuário</Text>
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar por nome, email ou perfil..."
-          value={search}
-          onChangeText={handleSearch}
-          placeholderTextColor="#999"
-        />
-      </View>
-
-      {/* Error Message */}
-      {error && (
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>❌ {error}</Text>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por nome, email ou perfil..."
+            value={search}
+            onChangeText={handleSearch}
+            placeholderTextColor="#999"
+          />
         </View>
-      )}
 
-      {/* User List */}
-      <UserList
-        users={getFilteredUsers()}
-        loading={loading}
-        onEdit={handleEditUser}
-        onDelete={handleDeleteUser}
-        onToggleStatus={handleToggleStatus}
-      />
+        {/* Error Message */}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>❌ {error}</Text>
+          </View>
+        )}
+
+        {/* User List */}
+        <UserList
+          users={getFilteredUsers()}
+          loading={loading}
+          onEdit={handleEditUser}
+          onDelete={handleDeleteUser}
+          onToggleStatus={handleToggleStatus}
+        />
 
       {/* Modal Form */}
       <Modal
@@ -175,7 +196,16 @@ export const UsersScreen = () => {
           />
         </View>
       </Modal>
-    </View>
+
+      {/* Toast Component */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
+      </View>
+    </AppLayout>
   );
 };
 
@@ -184,36 +214,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
-  header: {
-    backgroundColor: '#2196F3',
-    padding: 16,
-    paddingTop: deviceType.isMobile ? 40 : 16,
-  },
-  backButton: {
-    marginBottom: 8,
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  headerContent: {
+  actionBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    justifyContent: 'flex-end',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   addButton: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   addButtonText: {
-    color: '#2196F3',
+    color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
   },

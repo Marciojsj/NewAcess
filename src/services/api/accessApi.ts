@@ -52,7 +52,7 @@ export const accessApi = {
    */
   async registerEntry(data: RegisterEntryData): Promise<AccessLog> {
     const response = await apiClient.post('/access/entry', data);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -60,7 +60,7 @@ export const accessApi = {
    */
   async registerExit(data: RegisterExitData): Promise<AccessLog> {
     const response = await apiClient.post('/access/exit', data);
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -68,7 +68,7 @@ export const accessApi = {
    */
   async getLogs(filters?: AccessFilters): Promise<AccessLog[]> {
     const response = await apiClient.get('/access/logs', { params: filters });
-    return response.data.message;
+    return response.data.data;
   },
 
   /**
@@ -82,7 +82,7 @@ export const accessApi = {
     const response = await apiClient.get('/access/report', {
       params: { entityId, startDate, endDate },
     });
-    return response.data.message;
+    return response.data.data;
   },
 };
 
