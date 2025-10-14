@@ -110,7 +110,7 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
-      <AppLayout title="Dashboard" showBackButton={false}>
+      <AppLayout>
         <View style={[styles.container, styles.centerContent]}>
           <ActivityIndicator size="large" color="#2196F3" />
           <Text style={styles.loadingText}>Carregando dashboard...</Text>
@@ -120,7 +120,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <AppLayout title="Dashboard" showBackButton={false}>
+    <AppLayout>
       <ScrollView
         style={styles.scrollView}
         refreshControl={
@@ -128,7 +128,7 @@ export default function HomeScreen() {
         }
       >
         {/* Header de Boas-Vindas */}
-        <View style={styles.welcomeSection}>
+        {/* <View style={styles.welcomeSection}>
           <View>
             <Text style={styles.greeting}>Olá, {user?.name || 'Usuário'} 👋</Text>
             <Text style={styles.subtitle}>Bem-vindo ao AccessControl</Text>
@@ -139,7 +139,7 @@ export default function HomeScreen() {
           >
             <Text style={styles.logoutButtonText}>Sair</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {/* KPIs Grid */}
         <View style={styles.kpiGrid}>
