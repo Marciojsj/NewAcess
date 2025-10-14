@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { responsive } from "../../../utils/responsive";	
+import { responsive } from "../../../utils/responsive";
 
 const { width, height } = Dimensions.get("window");
 
@@ -48,6 +48,17 @@ export default StyleSheet.create({
 		borderColor: "rgba(124, 44, 199, 0.62)", // Será theme.loginCircle3
 		top: height * 0.4,
 		right: -width * 0.1,
+	},
+	circle4: {
+		position: "absolute",
+		width: 120,
+		height: 120,
+		borderRadius: 60,
+		borderWidth: 4,
+		borderColor: "#ccc",
+		top: 80,
+		right: 40,
+		opacity: 0.5,
 	},
 	formContainer: {
 		top: height * 0.25,

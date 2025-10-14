@@ -1,70 +1,75 @@
 /**
- * Configuração centralizada da API
- * 
- * Este arquivo contém todas as configurações relacionadas à comunicação
- * com o backend, incluindo URLs, timeouts e outras configurações.
+ * API Config centralizado
+ * Compatível com: Web, iOS (emulador/físico), Android (emulador/físico)
  */
 
 import { Platform } from 'react-native';
 
-/**
- * Configurações da API
- */
 export const API_CONFIG = {
-  // URLs do backend
-  BACKEND_URL_LOCAL: 'http://localhost:3000/api',
-  BACKEND_URL_IP: 'http://192.168.101.245:3000/api', // IP da sua máquina
-  BACKEND_URL_ANDROID_EMULATOR: 'http://10.0.2.2:3000/api',
+  BACKEND_URL_LOCAL: 'http://localhost:3000/api',           // Web/dev
+  BACKEND_URL_IP: 'http://192.168.101.245:3000/api',       // Mobile físico (mesma rede)
+  BACKEND_URL_ANDROID_EMULATOR: 'http://10.0.2.2:3000/api',// Android emulator
   BACKEND_URL_PRODUCTION: 'https://seu-backend-producao.com/api',
-  
-  // Timeouts
+
   REQUEST_TIMEOUT: 10000, // 10 segundos
-  
-  // Headers padrão
   HEADERS: {
     'Content-Type': 'application/json',
   },
-  
-  // Configurações de retry
+
   MAX_RETRIES: 3,
-  RETRY_DELAY: 1000, // 1 segundo
+  RETRY_DELAY: 1000,
 };
 
 /**
- * Retorna a URL da API baseada no ambiente e plataforma
+ * Retorna a URL correta do backend
  */
 export const getApiUrl = (): string => {
-  // Ambiente de produção
+  let selectedUrl = API_CONFIG.BACKEND_URL_LOCAL;
+
   if (!__DEV__) {
-    return API_CONFIG.BACKEND_URL_PRODUCTION;
+    selectedUrl = API_CONFIG.BACKEND_URL_PRODUCTION;
+  } else {
+    switch (Platform.OS) {
+      case 'web':
+        selectedUrl = API_CONFIG.BACKEND_URL_LOCAL;
+        break;
+      case 'android':
+        // Emulador usa 10.0.2.2, device físico precisa do IP
+        selectedUrl = API_CONFIG.BACKEND_URL_ANDROID_EMULATOR;
+        break;
+      case 'ios':
+        // Emulador pode usar localhost, dispositivo físico precisa do IP
+        // Aqui assumimos que __DEV__ + iOS físico → usar IP
+        selectedUrl = API_CONFIG.BACKEND_URL_IP;
+        break;
+      default:
+        selectedUrl = API_CONFIG.BACKEND_URL_LOCAL;
+    }
   }
-  
-  // Ambiente de desenvolvimento
-  switch (Platform.OS) {
-    case 'web':
-      // Browser usa localhost
-      return API_CONFIG.BACKEND_URL_LOCAL;
-      
-    case 'android':
-      // Android emulador usa 10.0.2.2
-      // Para device físico, mude para BACKEND_URL_IP
-      return API_CONFIG.BACKEND_URL_ANDROID_EMULATOR;
-      
-    case 'ios':
-      // iOS pode usar localhost
-      return API_CONFIG.BACKEND_URL_LOCAL;
-      
-    default:
-      return API_CONFIG.BACKEND_URL_LOCAL;
-  }
+
+  // Log detalhado para debug
+  console.log('🔧 [API CONFIG]');
+  console.log('  - Plataforma:', Platform.OS);
+  console.log('  - __DEV__:', __DEV__);
+  console.log('  - URL selecionada:', selectedUrl);
+  console.log('  - Timeout:', API_CONFIG.REQUEST_TIMEOUT, 'ms');
+
+  return selectedUrl;
 };
 
 /**
- * Log da configuração atual (apenas em desenvolvimento)
+ * Teste rápido da URL
+ * Retorna true se a URL é acessível via fetch (apenas dev)
  */
-if (__DEV__) {
-  console.log('🔧 Configuração da API:');
-  console.log('  - Plataforma:', Platform.OS);
-  console.log('  - URL da API:', getApiUrl());
-  console.log('  - Timeout:', API_CONFIG.REQUEST_TIMEOUT, 'ms');
-}
+export const testApiConnection = async () => {
+  const url = getApiUrl();
+  try {
+    const response = await fetch(url + '/ping'); // ajuste endpoint de teste no seu backend
+    const data = await response.json();
+    console.log('✅ Teste de conexão API OK:', data);
+    return true;
+  } catch (error) {
+    console.error('❌ Teste de conexão API falhou:', error);
+    return false;
+  }
+};
