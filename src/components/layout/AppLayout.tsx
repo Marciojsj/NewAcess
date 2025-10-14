@@ -101,7 +101,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({
             onToggle={() => setSidebarOpen(!sidebarOpen)}
             theme={isDark ? 'dark' : 'light'}
             onThemeChange={toggleTheme}
-            onLogout={handleLogout}
           />
         )}
 

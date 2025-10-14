@@ -1,4 +1,4 @@
-/* WebSidebar.tsx - Sidebar com logout funcional, pesquisa, scroll invisível e destaque */
+/* WebSidebar.tsx - Sidebar com hover, logout funcional, pesquisa, scroll invisível e destaque */
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, Pressable, Animated, StyleSheet, Platform, ScrollView, TextInput, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -67,6 +67,9 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
 
+  const [hoveredAction, setHoveredAction] = useState<string | null>(null); // hover item
+  const [hoveredFooter, setHoveredFooter] = useState<string | null>(null); // hover footer
+
   const sidebarActions: SidebarAction[] = [
     { id: '1', title: 'Dashboard', icon: Home, onPress: () => { navigation.navigate('Home'); onToggle(); } },
     { id: '2', title: 'Registrar Entrada', icon: LogIn, onPress: () => { navigation.navigate('RegistrarEntrada'); onToggle(); } },
@@ -101,6 +104,26 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
       index: 0,
       routes: [{ name: 'Login' }],
     });
+  };
+
+  const getActionStyle = (id: string, isMatched: boolean): import('react-native').ViewStyle => {
+      let style: import('react-native').ViewStyle = {
+        justifyContent: isOpen ? 'flex-start' : 'center',
+      };
+      if (isMatched) {
+        style = { ...style, borderWidth: 2, borderColor: '#7f00ff', borderRadius: 10 };
+      }
+      if (hoveredAction === id) {
+        style = { ...style, backgroundColor: currentTheme === 'dark' ? '#333' : '#e0e0e0' };
+      }
+      return style;
+    };
+
+  const getFooterStyle = (id: string): import('react-native').ViewStyle => {
+    return {
+      justifyContent: isOpen ? 'flex-start' : 'center',
+      backgroundColor: hoveredFooter === id ? (currentTheme === 'dark' ? '#333' : '#e0e0e0') : 'transparent',
+    };
   };
 
   return (
@@ -145,16 +168,14 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
           showsVerticalScrollIndicator={false}
         >
           {filteredActions.map(item => {
-            const isMatched = searchQuery && item.title.toLowerCase().includes(searchQuery.toLowerCase());
+            const isMatched = !!(searchQuery && item.title.toLowerCase().includes(searchQuery.toLowerCase()));
             return (
               <Pressable
                 key={item.id}
                 onPress={item.onPress}
-                style={[
-                  styles.actionButton,
-                  { justifyContent: isOpen ? 'flex-start' : 'center' },
-                  isMatched ? { borderWidth: 2, borderColor: '#7f00ff', borderRadius: 10 } : {}
-                ]}
+                onHoverIn={() => setHoveredAction(item.id)}
+                onHoverOut={() => setHoveredAction(null)}
+                style={[styles.actionButton, getActionStyle(item.id, isMatched)]}
               >
                 <item.icon size={24} color={appTheme.text} />
                 {isOpen && <Text style={[styles.actionTitle, { color: appTheme.text }]}>{item.title}</Text>}
@@ -167,7 +188,9 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
         <View style={styles.footer}>
           <Pressable
             onPress={onThemeChange}
-            style={[styles.footerButton, { justifyContent: isOpen ? 'flex-start' : 'center' }]}
+            onHoverIn={() => setHoveredFooter('theme')}
+            onHoverOut={() => setHoveredFooter(null)}
+            style={[styles.footerButton, getFooterStyle('theme')]}
           >
             {isDark ? <Sun color={appTheme.text} size={20} /> : <Moon color={appTheme.text} size={20} />}
             {isOpen && (
@@ -178,7 +201,9 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({
           </Pressable>
           <Pressable
             onPress={() => setLogoutModalVisible(true)}
-            style={[styles.footerButton, { justifyContent: isOpen ? 'flex-start' : 'center' }]}
+            onHoverIn={() => setHoveredFooter('logout')}
+            onHoverOut={() => setHoveredFooter(null)}
+            style={[styles.footerButton, getFooterStyle('logout')]}
           >
             <LogOut color={appTheme.error} size={20} />
             {isOpen && <Text style={{ marginLeft: 10, color: appTheme.error }}>Logout</Text>}
