@@ -30,8 +30,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         {/* Sidebar Web */}
         {deviceType.isDesktop && (
           <WebSidebar
-            isOpen={sidebarOpen}
-            onToggle={() => setSidebarOpen(!sidebarOpen)}
             theme={isDark ? 'dark' : 'light'}
             onThemeChange={toggleTheme}
           />
