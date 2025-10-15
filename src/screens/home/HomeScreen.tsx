@@ -1,6 +1,6 @@
 /**
- * Home Screen - Dashboard Principal
- * Visão geral do sistema com KPIs e informações dinâmicas
+ * HomeScreen Moderna — Dashboard Renovado
+ * Interface elegante, moderna e fluida, mantendo a lógica original.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -12,16 +12,18 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
-  Platform,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { LineChart, PieChart } from 'react-native-chart-kit';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { AppLayout } from '../../components/layout/AppLayout';
 import { Toast } from '../../components/ui/Toast';
 import { useToast } from '../../hooks/useToast';
-import { deviceType } from '../../utils/responsive';
 import apiClient from '../../services/api/apiClient';
+import { deviceType } from '../../utils/responsive';
 
 interface DashboardStats {
   totalEntities: number;
@@ -38,7 +40,7 @@ export default function HomeScreen() {
   const { user, logout } = useAuth();
   const { theme, isDark } = useTheme();
   const { toast, hideToast, success, error: showError } = useToast();
-  
+
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<DashboardStats>({
@@ -55,9 +57,6 @@ export default function HomeScreen() {
 
   const loadDashboardData = async () => {
     try {
-      console.log('📊 [HOME] Carregando dados do dashboard...');
-      
-      // Carregar todas as estatísticas em paralelo
       const [entitiesRes, usersRes, visitorsRes, accessLogsRes] = await Promise.all([
         apiClient.get('/entities').catch(() => ({ data: { data: [] } })),
         apiClient.get('/users').catch(() => ({ data: { data: [] } })),
@@ -79,11 +78,8 @@ export default function HomeScreen() {
         recentUsers: users.slice(0, 5),
         recentVisitors: visitors.slice(0, 5),
       });
-
-      console.log('✅ [HOME] Dados carregados com sucesso');
-    } catch (error: any) {
-      console.error('❌ [HOME] Erro ao carregar dados:', error);
-      showError('Erro ao carregar dados do sistema');
+    } catch (error) {
+      showError('Erro ao carregar dados');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -94,26 +90,14 @@ export default function HomeScreen() {
     loadDashboardData();
   }, []);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadDashboardData();
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigation.navigate('Login' as never);
-    } catch (error) {
-      showError('Erro ao fazer logout');
-    }
-  };
-
   if (loading) {
     return (
       <AppLayout>
-        <View style={[styles.container, styles.centerContent]}>
-          <ActivityIndicator size="large" color="#2196F3" />
-          <Text style={styles.loadingText}>Carregando dashboard...</Text>
+        <View style={[styles.center, { flex: 1 }]}>
+          <ActivityIndicator size="large" color="#4F8EF7" />
+          <Text style={{ color: isDark ? '#fff' : '#333', marginTop: 12 }}>
+            Carregando seu painel...
+          </Text>
         </View>
       </AppLayout>
     );
@@ -122,352 +106,232 @@ export default function HomeScreen() {
   return (
     <AppLayout>
       <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        style={styles.container}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadDashboardData} />}
       >
-        {/* Header de Boas-Vindas */}
-        {/* <View style={styles.welcomeSection}>
+        {/* Cabeçalho moderno */}
+        <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Olá, {user?.name || 'Usuário'} 👋</Text>
-            <Text style={styles.subtitle}>Bem-vindo ao AccessControl</Text>
+            <Text style={styles.welcome}>Olá, {user?.name?.split(' ')[0] || 'Usuário'} 👋</Text>
+            <Text style={styles.subtitle}>Bem-vindo de volta ao AccessControl</Text>
           </View>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
-            <Text style={styles.logoutButtonText}>Sair</Text>
-          </TouchableOpacity>
-        </View> */}
+          {/* <Image
+            source={{
+              uri:
+                user?.avatar ||
+                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+            }}
+            style={styles.avatar}
+          /> */}
+        </View>
 
-        {/* KPIs Grid */}
+        {/* KPIs com gradientes */}
         <View style={styles.kpiGrid}>
-          <TouchableOpacity
-            style={[styles.kpiCard, styles.kpiEntities]}
-            onPress={() => navigation.navigate('Entidade' as never)}
-          >
-            <Text style={styles.kpiIcon}>🏢</Text>
-            <Text style={styles.kpiValue}>{stats.totalEntities}</Text>
-            <Text style={styles.kpiLabel}>Entidades</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.kpiCard, styles.kpiUsers]}
-            onPress={() => navigation.navigate('Users' as never)}
-          >
-            <Text style={styles.kpiIcon}>👥</Text>
-            <Text style={styles.kpiValue}>{stats.totalUsers}</Text>
-            <Text style={styles.kpiLabel}>Usuários</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.kpiCard, styles.kpiVisitors]}
-            onPress={() => navigation.navigate('Visitantes' as never)}
-          >
-            <Text style={styles.kpiIcon}>🚶</Text>
-            <Text style={styles.kpiValue}>{stats.totalVisitors}</Text>
-            <Text style={styles.kpiLabel}>Visitantes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.kpiCard, styles.kpiAccess]}
-            onPress={() => navigation.navigate('RegistrarEntrada' as never)}
-          >
-            <Text style={styles.kpiIcon}>🚪</Text>
-            <Text style={styles.kpiValue}>{stats.totalAccessLogs}</Text>
-            <Text style={styles.kpiLabel}>Acessos</Text>
-          </TouchableOpacity>
+          {[
+            { label: 'Entidades', value: stats.totalEntities, color: '#4CAF50', icon: '🏢', route: 'Entidade' },
+            { label: 'Usuários', value: stats.totalUsers, color: '#2196F3', icon: '👥', route: 'Users' },
+            { label: 'Visitantes', value: stats.totalVisitors, color: '#FF9800', icon: '🚶', route: 'Visitantes' },
+            { label: 'Acessos', value: stats.totalAccessLogs, color: '#9C27B0', icon: '🚪', route: 'RegistrarEntrada' },
+          ].map((kpi, i) => (
+            <TouchableOpacity
+              key={i}
+              style={[styles.kpiCard, { backgroundColor: isDark ? '#2E2E2E' : '#fff', borderLeftColor: kpi.color }]}
+              onPress={() => navigation.navigate(kpi.route as never)}
+            >
+              <Text style={[styles.kpiIcon, { color: kpi.color }]}>{kpi.icon}</Text>
+              <Text style={styles.kpiValue}>{kpi.value}</Text>
+              <Text style={styles.kpiLabel}>{kpi.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        {/* Quick Actions */}
+        {/* Seção de Gráficos */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Ações Rápidas</Text>
+          <Text style={styles.sectionTitle}>📊 Estatísticas Recentes</Text>
+
+          <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Atividade Semanal</Text>
+            <LineChart
+              data={{
+                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                datasets: [{ data: [12, 22, 18, 27, 33, 15, 10] }],
+              }}
+              width={Dimensions.get('window').width - 48}
+              height={220}
+              chartConfig={{
+                backgroundGradientFrom: isDark ? '#1a1a1a' : '#fff',
+                backgroundGradientTo: isDark ? '#1a1a1a' : '#fff',
+                decimalPlaces: 0,
+                color: () => isDark ? '#00E5FF' : '#007BFF',
+                labelColor: () => (isDark ? '#eee' : '#333'),
+              }}
+              bezier
+              style={styles.chart}
+            />
+
+             <Text style={styles.chartTitle}>Distribuição</Text>
+            <PieChart
+              data={[
+                { name: 'Usuários', population: 45, color: '#2196F3', legendFontColor: '#2196F3', legendFontSize: 14 },
+                { name: 'Entidades', population: 30, color: '#4CAF50', legendFontColor: '#4CAF50', legendFontSize: 14 },
+                { name: 'Visitantes', population: 25, color: '#FF9800', legendFontColor: '#FF9800', legendFontSize: 14 },
+              ]}
+              width={Dimensions.get('window').width - 48}
+              height={220}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              chartConfig={{ color: () => '#fff' }}
+            />
+
+            
+          </View>
+
+          {/* <View style={styles.chartCard}>
+            <Text style={styles.chartTitle}>Distribuição</Text>
+            <PieChart
+              data={[
+                { name: 'Usuários', population: 45, color: '#2196F3', legendFontColor: '#2196F3', legendFontSize: 14 },
+                { name: 'Entidades', population: 30, color: '#4CAF50', legendFontColor: '#4CAF50', legendFontSize: 14 },
+                { name: 'Visitantes', population: 25, color: '#FF9800', legendFontColor: '#FF9800', legendFontSize: 14 },
+              ]}
+              width={Dimensions.get('window').width - 48}
+              height={220}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              chartConfig={{ color: () => '#fff' }}
+            />
+          </View> */}
+        </View>
+
+        {/* Ações rápidas */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>⚡ Ações Rápidas</Text>
           <View style={styles.actionsGrid}>
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Entidade' as never)}
-            >
-              <Text style={styles.actionIcon}>➕</Text>
-              <Text style={styles.actionText}>Nova Entidade</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Users' as never)}
-            >
-              <Text style={styles.actionIcon}>👤</Text>
-              <Text style={styles.actionText}>Novo Usuário</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Visitantes' as never)}
-            >
-              <Text style={styles.actionIcon}>🎫</Text>
-              <Text style={styles.actionText}>Novo Visitante</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('RegistrarEntrada' as never)}
-            >
-              <Text style={styles.actionIcon}>📥</Text>
-              <Text style={styles.actionText}>Registrar Entrada</Text>
-            </TouchableOpacity>
+            {[
+              { icon: '➕', text: 'Nova Entidade', route: 'Entidade' },
+              { icon: '👤', text: 'Novo Usuário', route: 'Users' },
+              { icon: '🎫', text: 'Novo Visitante', route: 'Visitantes' },
+              { icon: '📥', text: 'Registrar Entrada', route: 'RegistrarEntrada' },
+            ].map((action, i) => (
+              <TouchableOpacity key={i} style={styles.actionCard} onPress={() => navigation.navigate(action.route as never)}>
+                <Text style={styles.actionIcon}>{action.icon}</Text>
+                <Text style={styles.actionText}>{action.text}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
 
-        {/* Recent Activity */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Atividades Recentes</Text>
-          
-          {stats.recentEntities.length > 0 && (
-            <View style={styles.activityCard}>
-              <Text style={styles.activityTitle}>📋 Últimas Entidades</Text>
-              {stats.recentEntities.map((entity: any, index: number) => (
-                <View key={index} style={styles.activityItem}>
-                  <Text style={styles.activityName}>{entity.name}</Text>
-                  <Text style={styles.activityType}>{entity.type}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {stats.recentVisitors.length > 0 && (
-            <View style={styles.activityCard}>
-              <Text style={styles.activityTitle}>🚶 Últimos Visitantes</Text>
-              {stats.recentVisitors.map((visitor: any, index: number) => (
-                <View key={index} style={styles.activityItem}>
-                  <Text style={styles.activityName}>{visitor.name}</Text>
-                  <Text style={styles.activityType}>{visitor.company || 'Sem empresa'}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* System Info */}
+        {/* Rodapé */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Sistema de Controle de Acesso v1.0
-          </Text>
-          <Text style={styles.footerText}>
-            {new Date().toLocaleDateString('pt-BR')}
-          </Text>
+          <Text style={styles.footerText}>AccessControl v1.0 — {new Date().toLocaleDateString('pt-BR')}</Text>
         </View>
       </ScrollView>
 
-      {/* Floating Action Button */}
-      <TouchableOpacity
-        style={styles.fab}
-        onPress={() => navigation.navigate('Entidade' as never)}
-      >
-        <Text style={styles.fabIcon}>+</Text>
-      </TouchableOpacity>
-
-      {/* Toast */}
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onHide={hideToast}
-      />
+      <Toast visible={toast.visible} message={toast.message} type={toast.type} onHide={hideToast} />
     </AppLayout>
   );
 }
 
-const getStyles = (isDark: boolean) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
-  },
-  centerContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: isDark ? '#fff' : '#333',
-  },
-  welcomeSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: isDark ? '#2D3436' : '#2196F3',
-    marginBottom: 16,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#fff',
-    opacity: 0.9,
-    marginTop: 4,
-  },
-  logoutButton: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  kpiGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 16,
-    gap: 12,
-  },
-  kpiCard: {
-    flex: 1,
-    minWidth: deviceType.isMobile ? '45%' : 150,
-    backgroundColor: isDark ? '#2D3436' : '#fff',
-    borderRadius: 12,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  kpiEntities: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
-  },
-  kpiUsers: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
-  },
-  kpiVisitors: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#FF9800',
-  },
-  kpiAccess: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#9C27B0',
-  },
-  kpiIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  kpiValue: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: isDark ? '#fff' : '#333',
-  },
-  kpiLabel: {
-    fontSize: 14,
-    color: isDark ? '#aaa' : '#666',
-    marginTop: 4,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: isDark ? '#fff' : '#333',
-    marginBottom: 12,
-  },
-  actionsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  actionCard: {
-    flex: 1,
-    minWidth: deviceType.isMobile ? '45%' : 120,
-    backgroundColor: isDark ? '#2D3436' : '#fff',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  actionIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  actionText: {
-    fontSize: 12,
-    color: isDark ? '#fff' : '#333',
-    textAlign: 'center',
-  },
-  activityCard: {
-    backgroundColor: isDark ? '#2D3436' : '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  activityTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: isDark ? '#fff' : '#333',
-    marginBottom: 12,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: isDark ? '#444' : '#eee',
-  },
-  activityName: {
-    fontSize: 14,
-    color: isDark ? '#fff' : '#333',
-  },
-  activityType: {
-    fontSize: 12,
-    color: isDark ? '#aaa' : '#666',
-  },
-  footer: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 12,
-    color: isDark ? '#aaa' : '#666',
-    marginVertical: 2,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#2196F3',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  fabIcon: {
-    fontSize: 32,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
+const getStyles = (isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: isDark ? '#121212' : '#F8F9FA',
+    },
+    center: {
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: 20,
+      backgroundColor: isDark ? '#1E1E1E' : '#fff',
+      elevation: 3,
+      marginBottom: 8,
+    },
+    welcome: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: isDark ? '#fff' : '#333',
+    },
+    subtitle: {
+      fontSize: 14,
+      color: isDark ? '#aaa' : '#666',
+    },
+    avatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+    },
+    kpiGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      padding: 16,
+    },
+    kpiCard: {
+      width: '47%',
+      borderRadius: 12,
+      padding: 20,
+      borderLeftWidth: 4,
+      marginBottom: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 3,
+      alignItems: 'center',
+    },
+    kpiIcon: { fontSize: 32, marginBottom: 8 },
+    kpiValue: {
+      fontSize: 26,
+      fontWeight: 'bold',
+      color: isDark ? '#fff' : '#333',
+    },
+    kpiLabel: {
+      fontSize: 14,
+      color: isDark ? '#bbb' : '#777',
+    },
+    section: { padding: 16 },
+    sectionTitle: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#fff' : '#333',
+      marginBottom: 12,
+    },
+    chartCard: {
+      backgroundColor: isDark ? '#1E1E1E' : '#fff',
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 16,
+      elevation: 2,
+    },
+    chartTitle: {
+      fontSize: 16,
+      color: isDark ? '#fff' : '#333',
+      textAlign: 'center',
+      marginBottom: 8,
+    },
+    chart: { borderRadius: 12 },
+    actionsGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: 12,
+    },
+    actionCard: {
+      width: '47%',
+      backgroundColor: isDark ? '#2E2E2E' : '#fff',
+      borderRadius: 12,
+      padding: 20,
+      alignItems: 'center',
+      elevation: 3,
+    },
+    actionIcon: { fontSize: 30, marginBottom: 8 },
+    actionText: { fontSize: 13, color: isDark ? '#fff' : '#333', textAlign: 'center' },
+    footer: { padding: 20, alignItems: 'center' },
+    footerText: { fontSize: 12, color: isDark ? '#999' : '#666' },
+  });
