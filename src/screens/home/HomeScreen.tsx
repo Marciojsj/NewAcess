@@ -1,6 +1,6 @@
 /**
- * HomeScreen Moderna — Dashboard Renovado
- * Interface elegante, moderna e fluida, mantendo a lógica original.
+ * HomeScreen - Video Buddy Style Dashboard
+ * Interface moderna e limpa inspirada no Video Buddy Pro
  */
 
 import React, { useState, useEffect } from 'react';
@@ -16,14 +16,19 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { LineChart, PieChart } from 'react-native-chart-kit';
 import { useAuth } from '../../contexts/AuthContext';
+
+// Adicione a propriedade 'avatar' ao tipo User se não existir
+interface User {
+  name?: string;
+  avatar?: string;
+  // outras propriedades existentes...
+}
 import { useTheme } from '../../contexts/ThemeContext';
 import { AppLayout } from '../../components/layout/AppLayout';
 import { Toast } from '../../components/ui/Toast';
 import { useToast } from '../../hooks/useToast';
 import apiClient from '../../services/api/apiClient';
-import { deviceType } from '../../utils/responsive';
 
 interface DashboardStats {
   totalEntities: number;
@@ -35,14 +40,29 @@ interface DashboardStats {
   recentVisitors: any[];
 }
 
+interface AgendaItem {
+  id: string;
+  title: string;
+  time: string;
+  status: 'scheduled' | 'pending';
+}
+
+interface Invitation {
+  id: string;
+  sender: string;
+  title: string;
+  type: string;
+}
+
 export default function HomeScreen() {
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
-  const { theme, isDark } = useTheme();
-  const { toast, hideToast, success, error: showError } = useToast();
+  const { user } = useAuth();
+  const { isDark } = useTheme();
+  const { toast, hideToast, error } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [stats, setStats] = useState<DashboardStats>({
     totalEntities: 0,
     totalUsers: 0,
@@ -52,6 +72,21 @@ export default function HomeScreen() {
     recentUsers: [],
     recentVisitors: [],
   });
+
+  // Dados mockados da agenda (em produção, viriam da API)
+  const [agenda] = useState<AgendaItem[]>([
+    { id: '1', title: 'Morning stand-up', time: '9:00 - 9:15', status: 'scheduled' },
+    { id: '2', title: 'Planning catchup', time: '10:00 - 10:30', status: 'scheduled' },
+    { id: '3', title: 'Dev 1:1', time: '13:00 - 14:00', status: 'pending' },
+    { id: '4', title: 'PM consultation', time: '15:00 - 15:30', status: 'scheduled' },
+  ]);
+
+  // Convites mockados
+  const [invitations] = useState<Invitation[]>([
+    { id: '1', sender: 'Samson', title: 'invited you to Ul planning', type: 'planning' },
+    { id: '2', sender: 'Lana', title: 'invited you to Brainstorm!', type: 'brainstorm' },
+    { id: '3', sender: 'Seminar', title: 'invited you to Brainstorming', type: 'brainstorming' },
+  ]);
 
   const styles = getStyles(isDark);
 
@@ -78,8 +113,8 @@ export default function HomeScreen() {
         recentUsers: users.slice(0, 5),
         recentVisitors: visitors.slice(0, 5),
       });
-    } catch (error) {
-      showError('Erro ao carregar dados');
+    } catch (err) {
+      error('Erro ao carregar dados');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -90,12 +125,69 @@ export default function HomeScreen() {
     loadDashboardData();
   }, []);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Bom dia';
+    if (hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
+  const renderCalendar = () => {
+    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+    const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay();
+    const days = [];
+    const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+    return (
+      <View style={styles.calendar}>
+        <View style={styles.calendarHeader}>
+          <Text style={styles.calendarMonth}>
+            {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </Text>
+        </View>
+        <View style={styles.weekDays}>
+          {weekDays.map((day, i) => (
+            <Text key={i} style={styles.weekDay}>{day}</Text>
+          ))}
+        </View>
+        <View style={styles.daysGrid}>
+          {Array.from({ length: firstDay }).map((_, i) => (
+            <View key={`empty-${i}`} style={styles.dayCell} />
+          ))}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const isToday = day === new Date().getDate();
+            const isSelected = day === selectedDate;
+            return (
+              <TouchableOpacity
+                key={day}
+                style={[
+                  styles.dayCell,
+                  isToday && styles.today,
+                  isSelected && styles.selectedDay,
+                ]}
+                onPress={() => setSelectedDate(day)}
+              >
+                <Text style={[
+                  styles.dayText,
+                  (isToday || isSelected) && styles.dayTextActive,
+                ]}>
+                  {day}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
   if (loading) {
     return (
       <AppLayout>
         <View style={[styles.center, { flex: 1 }]}>
           <ActivityIndicator size="large" color="#4F8EF7" />
-          <Text style={{ color: isDark ? '#fff' : '#333', marginTop: 12 }}>
+          <Text style={[styles.loadingText, { color: isDark ? '#fff' : '#333' }]}>
             Carregando seu painel...
           </Text>
         </View>
@@ -103,129 +195,191 @@ export default function HomeScreen() {
     );
   }
 
+  const screenWidth = Dimensions.get('window').width;
+  const isDesktop = screenWidth > 768;
+
   return (
     <AppLayout>
       <ScrollView
         style={styles.container}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadDashboardData} />}
       >
-        {/* Cabeçalho moderno */}
+        {/* Cabeçalho */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.welcome}>Olá, {user?.name?.split(' ')[0] || 'Usuário'} 👋</Text>
-            <Text style={styles.subtitle}>Bem-vindo de volta ao AccessControl</Text>
+          <View style={styles.headerContent}>
+            <Text style={styles.greeting}>
+              {getGreeting()}, {user?.name?.split(' ')[0] || 'Usuário'}!
+            </Text>
+            <Image
+              source={{
+                uri: user?.avatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+              }}
+              style={styles.avatar}
+            />
           </View>
-          {/* <Image
-            source={{
-              uri:
-                user?.avatar ||
-                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-            }}
-            style={styles.avatar}
-          /> */}
         </View>
 
-        {/* KPIs com gradientes */}
-        <View style={styles.kpiGrid}>
-          {[
-            { label: 'Entidades', value: stats.totalEntities, color: '#4CAF50', icon: '🏢', route: 'Entidade' },
-            { label: 'Usuários', value: stats.totalUsers, color: '#2196F3', icon: '👥', route: 'Users' },
-            { label: 'Visitantes', value: stats.totalVisitors, color: '#FF9800', icon: '🚶', route: 'Visitantes' },
-            { label: 'Acessos', value: stats.totalAccessLogs, color: '#9C27B0', icon: '🚪', route: 'RegistrarEntrada' },
-          ].map((kpi, i) => (
+        {/* Container Principal - Grid Layout */}
+        <View style={[styles.mainContent, isDesktop && styles.mainContentDesktop]}>
+          {/* Coluna Esquerda */}
+          <View style={[styles.leftColumn, isDesktop && styles.leftColumnDesktop]}>
+            {/* Agenda do Dia */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Your agenda today</Text>
+              {agenda.map((item) => (
+                <View key={item.id} style={styles.agendaItem}>
+                  <View style={styles.agendaInfo}>
+                    <Text style={styles.agendaTitle}>{item.title}</Text>
+                    <Text style={styles.agendaTime}>{item.time}</Text>
+                  </View>
+                  <View style={styles.agendaActions}>
+                    <TouchableOpacity style={styles.btnSchedule}>
+                      <Text style={styles.btnScheduleText}>Schedule</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.btnChange}>
+                      <Text style={styles.btnChangeText}>Change attendance</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            {/* Grid de Ações e Conteúdo */}
+            <View style={styles.bottomGrid}>
+              {/* Calendário */}
+              <View style={[styles.card, styles.calendarCard]}>
+                <Text style={styles.cardTitle}>Calendar</Text>
+                {renderCalendar()}
+              </View>
+
+              {/* Convites */}
+              <View style={[styles.card, styles.invitationsCard]}>
+                <Text style={styles.cardTitle}>Invitations</Text>
+                {invitations.map((inv) => (
+                  <View key={inv.id} style={styles.invitationItem}>
+                    <Image
+                      source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
+                      style={styles.invitationAvatar}
+                    />
+                    <View style={styles.invitationInfo}>
+                      <Text style={styles.invitationSender}>{inv.sender}</Text>
+                      <Text style={styles.invitationTitle}>{inv.title}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.btnRsvp}>
+                      <Text style={styles.btnRsvpText}>RSVP</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+
+                        {/* Coluna Direita - Ações Rápidas */}
+          <View style={[styles.rightColumn, isDesktop && styles.rightColumnDesktop]}>
             <TouchableOpacity
-              key={i}
-              style={[styles.kpiCard, { backgroundColor: isDark ? '#2E2E2E' : '#fff', borderLeftColor: kpi.color }]}
-              onPress={() => navigation.navigate(kpi.route as never)}
+              style={[styles.actionCard, styles.actionCardPrimary]}
+              onPress={() => navigation.navigate('RegistrarEntrada' as never)}
             >
-              <Text style={[styles.kpiIcon, { color: kpi.color }]}>{kpi.icon}</Text>
-              <Text style={styles.kpiValue}>{kpi.value}</Text>
-              <Text style={styles.kpiLabel}>{kpi.label}</Text>
+              <View style={styles.actionIcon}>
+                <Text style={styles.actionIconText}>📹</Text>
+              </View>
+              <Text style={styles.actionText}>Start a meeting</Text>
             </TouchableOpacity>
-          ))}
-        </View>
 
-        {/* Seção de Gráficos */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Estatísticas Recentes</Text>
+            <TouchableOpacity
+              style={styles.actionCard}
+              onPress={() => navigation.navigate('Visitantes' as never)}
+            >
+              <View style={styles.actionIcon}>
+                <Text style={styles.actionIconText}>➕</Text>
+              </View>
+              <Text style={styles.actionText}>Join a meeting</Text>
+            </TouchableOpacity>
 
-          <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Atividade Semanal</Text>
-            <LineChart
-              data={{
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
-                datasets: [{ data: [12, 22, 18, 27, 33, 15, 10] }],
-              }}
-              width={Dimensions.get('window').width - 48}
-              height={220}
-              chartConfig={{
-                backgroundGradientFrom: isDark ? '#1a1a1a' : '#fff',
-                backgroundGradientTo: isDark ? '#1a1a1a' : '#fff',
-                decimalPlaces: 0,
-                color: () => isDark ? '#00E5FF' : '#007BFF',
-                labelColor: () => (isDark ? '#eee' : '#333'),
-              }}
-              bezier
-              style={styles.chart}
-            />
+             <TouchableOpacity
+              style={styles.actionCard}
+              onPress={() => navigation.navigate('Visitantes' as never)}
+            >
+              <View style={styles.actionIcon}>
+                <Text style={styles.actionIconText}>➕</Text>
+              </View>
+              <Text style={styles.actionText}>Join a meeting</Text>
+            </TouchableOpacity>
 
-             <Text style={styles.chartTitle}>Distribuição</Text>
-            <PieChart
-              data={[
-                { name: 'Usuários', population: 45, color: '#2196F3', legendFontColor: '#2196F3', legendFontSize: 14 },
-                { name: 'Entidades', population: 30, color: '#4CAF50', legendFontColor: '#4CAF50', legendFontSize: 14 },
-                { name: 'Visitantes', population: 25, color: '#FF9800', legendFontColor: '#FF9800', legendFontSize: 14 },
-              ]}
-              width={Dimensions.get('window').width - 48}
-              height={220}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              chartConfig={{ color: () => '#fff' }}
-            />
+             <TouchableOpacity
+              style={styles.actionCard}
+              onPress={() => navigation.navigate('Visitantes' as never)}
+            >
+              <View style={styles.actionIcon}>
+                <Text style={styles.actionIconText}>➕</Text>
+              </View>
+              <Text style={styles.actionText}>Join a meeting</Text>
+            </TouchableOpacity>
 
-            
+            <TouchableOpacity
+              style={styles.actionCard}
+              onPress={() => navigation.navigate('Entidade' as never)}
+            >
+              <View style={styles.actionIcon}>
+                <Text style={styles.actionIconText}>📅</Text>
+              </View>
+              <Text style={styles.actionText}>Schedule a meeting</Text>
+            </TouchableOpacity>
+
+            {/* KPIs Compactos */}
+            <View style={styles.kpiContainer}>
+              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
+                <Text style={styles.kpiMiniLabel}>Entidades</Text>
+              </View>
+              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
+                <Text style={styles.kpiMiniLabel}>Usuários</Text>
+              </View>
+            </View>
+             <View style={styles.kpiContainer}>
+              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
+                <Text style={styles.kpiMiniLabel}>Entidades</Text>
+              </View>
+              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
+                <Text style={styles.kpiMiniLabel}>Usuários</Text>
+              </View>
+            </View>
+             <View style={styles.kpiContainer}>
+              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
+                <Text style={styles.kpiMiniLabel}>Entidades</Text>
+              </View>
+              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
+                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
+                <Text style={styles.kpiMiniLabel}>Usuários</Text>
+              </View>
+            </View>
           </View>
 
-          {/* <View style={styles.chartCard}>
-            <Text style={styles.chartTitle}>Distribuição</Text>
-            <PieChart
-              data={[
-                { name: 'Usuários', population: 45, color: '#2196F3', legendFontColor: '#2196F3', legendFontSize: 14 },
-                { name: 'Entidades', population: 30, color: '#4CAF50', legendFontColor: '#4CAF50', legendFontSize: 14 },
-                { name: 'Visitantes', population: 25, color: '#FF9800', legendFontColor: '#FF9800', legendFontSize: 14 },
-              ]}
-              width={Dimensions.get('window').width - 48}
-              height={220}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="15"
-              chartConfig={{ color: () => '#fff' }}
-            />
-          </View> */}
-        </View>
-
-        {/* Ações rápidas */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>⚡ Ações Rápidas</Text>
-          <View style={styles.actionsGrid}>
-            {[
-              { icon: '➕', text: 'Nova Entidade', route: 'Entidade' },
-              { icon: '👤', text: 'Novo Usuário', route: 'Users' },
-              { icon: '🎫', text: 'Novo Visitante', route: 'Visitantes' },
-              { icon: '📥', text: 'Registrar Entrada', route: 'RegistrarEntrada' },
-            ].map((action, i) => (
-              <TouchableOpacity key={i} style={styles.actionCard} onPress={() => navigation.navigate(action.route as never)}>
-                <Text style={styles.actionIcon}>{action.icon}</Text>
-                <Text style={styles.actionText}>{action.text}</Text>
-              </TouchableOpacity>
-            ))}
+              {/* Insights */}
+              <View style={[styles.card, styles.insightsCard]}>
+                <Text style={styles.cardTitle}>Insights</Text>
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightLabel}>Number of meetings you hosted this week</Text>
+                  <Text style={styles.insightValue}>{stats.totalAccessLogs}</Text>
+                </View>
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightLabel}>Number of meetings you joined this week</Text>
+                  <Text style={styles.insightValue}>{stats.totalVisitors}</Text>
+                </View>
+              </View>
+            </View>
           </View>
+
+
         </View>
 
         {/* Rodapé */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>AccessControl v1.0 — {new Date().toLocaleDateString('pt-BR')}</Text>
+          <Text style={styles.footerText}>
+            AccessControl v1.0 — {new Date().toLocaleDateString('pt-BR')}
+          </Text>
         </View>
       </ScrollView>
 
@@ -238,100 +392,309 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#121212' : '#F8F9FA',
+      backgroundColor: isDark ? '#1A1A1A' : '#F5F7FA',
     },
     center: {
       justifyContent: 'center',
       alignItems: 'center',
     },
+    loadingText: {
+      marginTop: 12,
+      fontSize: 14,
+    },
     header: {
+      backgroundColor: isDark ? '#2563EB' : '#4F8EF7',
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      // paddingTop: 48,
+    },
+    headerContent: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: 20,
-      backgroundColor: isDark ? '#1E1E1E' : '#fff',
-      elevation: 3,
-      marginBottom: 8,
     },
-    welcome: {
-      fontSize: 22,
+    greeting: {
+      fontSize: 24,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#333',
-    },
-    subtitle: {
-      fontSize: 14,
-      color: isDark ? '#aaa' : '#666',
+      color: '#FFFFFF',
     },
     avatar: {
       width: 48,
       height: 48,
       borderRadius: 24,
+      borderWidth: 2,
+      borderColor: '#FFFFFF',
     },
-    kpiGrid: {
+    mainContent: {
+      padding: 16,
+    },
+    mainContentDesktop: {
+      flexDirection: 'row',
+      gap: 16,
+    },
+    leftColumn: {
+      flex: 1,
+    },
+    leftColumnDesktop: {
+      flex: 2,
+    },
+    rightColumn: {
+      gap: 12,
+      marginTop: 16,
+    },
+    rightColumnDesktop: {
+      flex: 1,
+      marginTop: 0,
+    },
+    card: {
+      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    cardTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+      marginBottom: 16,
+    },
+    agendaItem: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
+    },
+    agendaInfo: {
+      flex: 1,
+    },
+    agendaTitle: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+      marginBottom: 4,
+    },
+    agendaTime: {
+      fontSize: 12,
+      color: isDark ? '#9CA3AF' : '#6B7280',
+    },
+    agendaActions: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    btnSchedule: {
+      backgroundColor: '#4F8EF7',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 6,
+    },
+    btnScheduleText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '500',
+    },
+    btnChange: {
+      backgroundColor: isDark ? '#3E3E3E' : '#F3F4F6',
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+      borderRadius: 6,
+    },
+    btnChangeText: {
+      color: isDark ? '#9CA3AF' : '#6B7280',
+      fontSize: 11,
+      fontWeight: '500',
+    },
+    bottomGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'space-between',
-      padding: 16,
+      gap: 16,
     },
-    kpiCard: {
-      width: '47%',
-      borderRadius: 12,
-      padding: 20,
-      borderLeftWidth: 4,
+    calendarCard: {
+      flex: 1,
+      minWidth: 280,
+    },
+    invitationsCard: {
+      flex: 1,
+      minWidth: 280,
+    },
+    insightsCard: {
+      flex: 1,
+      minWidth: 280,
+    },
+    calendar: {
+      marginTop: 8,
+    },
+    calendarHeader: {
       marginBottom: 12,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowRadius: 5,
-      elevation: 3,
-      alignItems: 'center',
     },
-    kpiIcon: { fontSize: 32, marginBottom: 8 },
-    kpiValue: {
-      fontSize: 26,
-      fontWeight: 'bold',
-      color: isDark ? '#fff' : '#333',
-    },
-    kpiLabel: {
+    calendarMonth: {
       fontSize: 14,
-      color: isDark ? '#bbb' : '#777',
-    },
-    section: { padding: 16 },
-    sectionTitle: {
-      fontSize: 18,
       fontWeight: '600',
-      color: isDark ? '#fff' : '#333',
-      marginBottom: 12,
+      color: isDark ? '#FFFFFF' : '#1F2937',
     },
-    chartCard: {
-      backgroundColor: isDark ? '#1E1E1E' : '#fff',
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 16,
-      elevation: 2,
-    },
-    chartTitle: {
-      fontSize: 16,
-      color: isDark ? '#fff' : '#333',
-      textAlign: 'center',
+    weekDays: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
       marginBottom: 8,
     },
-    chart: { borderRadius: 12 },
-    actionsGrid: {
+    weekDay: {
+      width: 32,
+      textAlign: 'center',
+      fontSize: 12,
+      fontWeight: '600',
+      color: isDark ? '#9CA3AF' : '#6B7280',
+    },
+    daysGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'space-between',
+    },
+    dayCell: {
+      width: '14.28%',
+      aspectRatio: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginVertical: 2,
+    },
+    today: {
+      backgroundColor: '#4F8EF7',
+      borderRadius: 8,
+    },
+    selectedDay: {
+      backgroundColor: isDark ? '#3E3E3E' : '#E5E7EB',
+      borderRadius: 8,
+    },
+    dayText: {
+      fontSize: 13,
+      color: isDark ? '#FFFFFF' : '#1F2937',
+    },
+    dayTextActive: {
+      color: '#FFFFFF',
+      fontWeight: '600',
+    },
+    invitationItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 12,
       gap: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
+    },
+    invitationAvatar: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+    },
+    invitationInfo: {
+      flex: 1,
+    },
+    invitationSender: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+    },
+    invitationTitle: {
+      fontSize: 12,
+      color: isDark ? '#9CA3AF' : '#6B7280',
+      marginTop: 2,
+    },
+    btnRsvp: {
+      backgroundColor: '#4F8EF7',
+      paddingHorizontal: 16,
+      paddingVertical: 6,
+      borderRadius: 6,
+    },
+    btnRsvpText: {
+      color: '#FFFFFF',
+      fontSize: 12,
+      fontWeight: '600',
+    },
+    insightItem: {
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
+    },
+    insightLabel: {
+      fontSize: 12,
+      color: isDark ? '#9CA3AF' : '#6B7280',
+      marginBottom: 8,
+    },
+    insightValue: {
+      fontSize: 32,
+      fontWeight: 'bold',
+      color: '#4F8EF7',
     },
     actionCard: {
-      width: '47%',
-      backgroundColor: isDark ? '#2E2E2E' : '#fff',
+      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
       borderRadius: 12,
       padding: 20,
+      flexDirection: 'row',
       alignItems: 'center',
+      gap: 16,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
       elevation: 3,
     },
-    actionIcon: { fontSize: 30, marginBottom: 8 },
-    actionText: { fontSize: 13, color: isDark ? '#fff' : '#333', textAlign: 'center' },
-    footer: { padding: 20, alignItems: 'center' },
-    footerText: { fontSize: 12, color: isDark ? '#999' : '#666' },
+    actionCardPrimary: {
+      backgroundColor: '#4F8EF7',
+    },
+    actionIcon: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: isDark ? '#3E3E3E' : '#F3F4F6',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    actionIconText: {
+      fontSize: 24,
+    },
+    actionText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+      flex: 1,
+    },
+    kpiContainer: {
+      flexDirection: 'row',
+      gap: 12,
+      marginTop: 8,
+    },
+    kpiMini: {
+      flex: 1,
+      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
+      borderRadius: 12,
+      padding: 16,
+      borderLeftWidth: 4,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    },
+    kpiMiniValue: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+      marginBottom: 4,
+    },
+    kpiMiniLabel: {
+      fontSize: 11,
+      color: isDark ? '#9CA3AF' : '#6B7280',
+    },
+    footer: {
+      padding: 24,
+      alignItems: 'center',
+    },
+    footerText: {
+      fontSize: 12,
+      color: isDark ? '#6B7280' : '#9CA3AF',
+    },
   });

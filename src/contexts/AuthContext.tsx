@@ -12,6 +12,7 @@ interface User {
   phone?: string;
   entityId?: string;
   isActive: boolean;
+  avatar?: string;
 }
 
 interface AuthContextData {
@@ -19,6 +20,7 @@ interface AuthContextData {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   isLoading: boolean;
+  
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
