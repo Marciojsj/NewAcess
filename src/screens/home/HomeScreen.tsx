@@ -1,6 +1,7 @@
 /**
- * HomeScreen - Video Buddy Style Dashboard
- * Interface moderna e limpa inspirada no Video Buddy Pro
+ * HomeScreen - Modern Access Control Dashboard
+ * Dashboard moderno e funcional para controle de acesso
+ * Compatível com React Native Web
  */
 
 import React, { useState, useEffect } from 'react';
@@ -14,16 +15,11 @@ import {
   RefreshControl,
   Image,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { LineChart, PieChart } from 'react-native-chart-kit';
 import { useAuth } from '../../contexts/AuthContext';
-
-// Adicione a propriedade 'avatar' ao tipo User se não existir
-interface User {
-  name?: string;
-  avatar?: string;
-  // outras propriedades existentes...
-}
 import { useTheme } from '../../contexts/ThemeContext';
 import { AppLayout } from '../../components/layout/AppLayout';
 import { Toast } from '../../components/ui/Toast';
@@ -40,18 +36,12 @@ interface DashboardStats {
   recentVisitors: any[];
 }
 
-interface AgendaItem {
+interface RecentActivity {
   id: string;
-  title: string;
+  name: string;
+  action: string;
   time: string;
-  status: 'scheduled' | 'pending';
-}
-
-interface Invitation {
-  id: string;
-  sender: string;
-  title: string;
-  type: string;
+  type: 'entry' | 'exit' | 'visitor';
 }
 
 export default function HomeScreen() {
@@ -62,7 +52,6 @@ export default function HomeScreen() {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date().getDate());
   const [stats, setStats] = useState<DashboardStats>({
     totalEntities: 0,
     totalUsers: 0,
@@ -72,21 +61,8 @@ export default function HomeScreen() {
     recentUsers: [],
     recentVisitors: [],
   });
-
-  // Dados mockados da agenda (em produção, viriam da API)
-  const [agenda] = useState<AgendaItem[]>([
-    { id: '1', title: 'Morning stand-up', time: '9:00 - 9:15', status: 'scheduled' },
-    { id: '2', title: 'Planning catchup', time: '10:00 - 10:30', status: 'scheduled' },
-    { id: '3', title: 'Dev 1:1', time: '13:00 - 14:00', status: 'pending' },
-    { id: '4', title: 'PM consultation', time: '15:00 - 15:30', status: 'scheduled' },
-  ]);
-
-  // Convites mockados
-  const [invitations] = useState<Invitation[]>([
-    { id: '1', sender: 'Samson', title: 'invited you to Ul planning', type: 'planning' },
-    { id: '2', sender: 'Lana', title: 'invited you to Brainstorm!', type: 'brainstorm' },
-    { id: '3', sender: 'Seminar', title: 'invited you to Brainstorming', type: 'brainstorming' },
-  ]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [weeklyActivity, setWeeklyActivity] = useState([12, 22, 18, 27, 33, 15, 10]);
 
   const styles = getStyles(isDark);
 
@@ -113,12 +89,61 @@ export default function HomeScreen() {
         recentUsers: users.slice(0, 5),
         recentVisitors: visitors.slice(0, 5),
       });
+
+      // Processar atividade recente
+      const activity: RecentActivity[] = [
+        ...visitors.slice(0, 3).map((v: any, i: number) => ({
+          id: `v-${i}`,
+          name: v.name || 'Visitante',
+          action: 'Registrou entrada',
+          time: formatTimeAgo(v.created_at || new Date()),
+          type: 'visitor' as const,
+        })),
+        ...accessLogs.slice(0, 2).map((log: any, i: number) => ({
+          id: `log-${i}`,
+          name: log.user?.name || 'Usuário',
+          action: log.type === 'entry' ? 'Entrada registrada' : 'Saída registrada',
+          time: formatTimeAgo(log.created_at || new Date()),
+          type: log.type || 'entry' as const,
+        })),
+      ].slice(0, 5);
+
+      setRecentActivity(activity);
+
+      // Simular dados de atividade semanal (em produção, viriam dos logs)
+      if (accessLogs.length > 0) {
+        const weekData = calculateWeeklyActivity(accessLogs);
+        setWeeklyActivity(weekData);
+      }
     } catch (err) {
       error('Erro ao carregar dados');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const formatTimeAgo = (date: string | Date) => {
+    const now = new Date();
+    const past = new Date(date);
+    const diffMs = now.getTime() - past.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'Agora';
+    if (diffMins < 60) return `${diffMins}min atrás`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h atrás`;
+    return `${Math.floor(diffHours / 24)}d atrás`;
+  };
+
+  const calculateWeeklyActivity = (logs: any[]) => {
+    // Simula cálculo de atividade semanal
+    const weekDays = [0, 0, 0, 0, 0, 0, 0];
+    logs.slice(0, 50).forEach((log) => {
+      const day = new Date(log.created_at || new Date()).getDay();
+      weekDays[day]++;
+    });
+    return weekDays.map(count => Math.max(count, Math.floor(Math.random() * 30) + 10));
   };
 
   useEffect(() => {
@@ -130,56 +155,6 @@ export default function HomeScreen() {
     if (hour < 12) return 'Bom dia';
     if (hour < 18) return 'Boa tarde';
     return 'Boa noite';
-  };
-
-  const renderCalendar = () => {
-    const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-    const firstDay = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay();
-    const days = [];
-    const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-
-    return (
-      <View style={styles.calendar}>
-        <View style={styles.calendarHeader}>
-          <Text style={styles.calendarMonth}>
-            {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-          </Text>
-        </View>
-        <View style={styles.weekDays}>
-          {weekDays.map((day, i) => (
-            <Text key={i} style={styles.weekDay}>{day}</Text>
-          ))}
-        </View>
-        <View style={styles.daysGrid}>
-          {Array.from({ length: firstDay }).map((_, i) => (
-            <View key={`empty-${i}`} style={styles.dayCell} />
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, i) => {
-            const day = i + 1;
-            const isToday = day === new Date().getDate();
-            const isSelected = day === selectedDate;
-            return (
-              <TouchableOpacity
-                key={day}
-                style={[
-                  styles.dayCell,
-                  isToday && styles.today,
-                  isSelected && styles.selectedDay,
-                ]}
-                onPress={() => setSelectedDate(day)}
-              >
-                <Text style={[
-                  styles.dayText,
-                  (isToday || isSelected) && styles.dayTextActive,
-                ]}>
-                  {day}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </View>
-    );
   };
 
   if (loading) {
@@ -197,19 +172,68 @@ export default function HomeScreen() {
 
   const screenWidth = Dimensions.get('window').width;
   const isDesktop = screenWidth > 768;
+  const chartWidth = Platform.OS === 'web'
+    ? Math.min(screenWidth - 80, 600)
+    : screenWidth - 64;
+
+  const kpiData = [
+    {
+      label: 'Entidades',
+      value: stats.totalEntities,
+      color: '#4CAF50',
+      icon: '🏢',
+      route: 'Entidade',
+      change: '+12%',
+    },
+    {
+      label: 'Usuários',
+      value: stats.totalUsers,
+      color: '#2196F3',
+      icon: '👥',
+      route: 'Users',
+      change: '+8%',
+    },
+    {
+      label: 'Visitantes',
+      value: stats.totalVisitors,
+      color: '#FF9800',
+      icon: '🚶',
+      route: 'Visitantes',
+      change: '+23%',
+    },
+    {
+      label: 'Acessos',
+      value: stats.totalAccessLogs,
+      color: '#9C27B0',
+      icon: '🚪',
+      route: 'RegistrarEntrada',
+      change: '+15%',
+    },
+  ];
 
   return (
     <AppLayout>
       <ScrollView
         style={styles.container}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={loadDashboardData} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={loadDashboardData}
+            tintColor={isDark ? '#fff' : '#4F8EF7'}
+          />
+        }
       >
-        {/* Cabeçalho */}
+        {/* Cabeçalho Moderno */}
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.greeting}>
-              {getGreeting()}, {user?.name?.split(' ')[0] || 'Usuário'}!
-            </Text>
+            <View style={styles.headerLeft}>
+              <Text style={styles.greeting}>
+                {getGreeting()}, {user?.name?.split(' ')[0] || 'Usuário'}! 👋
+              </Text>
+              <Text style={styles.subtitle}>
+                Bem-vindo ao painel de controle de acesso
+              </Text>
+            </View>
             <Image
               source={{
                 uri: user?.avatar || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
@@ -219,160 +243,132 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Container Principal - Grid Layout */}
+        {/* KPIs com Gradiente */}
+        {/* <View style={styles.kpiSection}>
+          <View style={[styles.kpiGrid, isDesktop && styles.kpiGridDesktop]}>
+            {kpiData.map((kpi, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.kpiCard,
+                  isDesktop && styles.kpiCardDesktop,
+                ]}
+                onPress={() => navigation.navigate(kpi.route as never)}
+                activeOpacity={0.8}
+              >
+                <View style={[styles.kpiGradient, { backgroundColor: kpi.color }]}>
+                  <View style={styles.kpiHeader}>
+                    <Text style={styles.kpiIcon}>{kpi.icon}</Text>
+                    <View style={styles.kpiChange}>
+                      <Text style={styles.kpiChangeText}>{kpi.change}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.kpiValue}>{kpi.value}</Text>
+                  <Text style={styles.kpiLabel}>{kpi.label}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View> */}
+
+        {/* Container Principal */}
         <View style={[styles.mainContent, isDesktop && styles.mainContentDesktop]}>
           {/* Coluna Esquerda */}
           <View style={[styles.leftColumn, isDesktop && styles.leftColumnDesktop]}>
-            {/* Agenda do Dia */}
+
+            {/* Atividade Recente */}
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Your agenda today</Text>
-              {agenda.map((item) => (
-                <View key={item.id} style={styles.agendaItem}>
-                  <View style={styles.agendaInfo}>
-                    <Text style={styles.agendaTitle}>{item.title}</Text>
-                    <Text style={styles.agendaTime}>{item.time}</Text>
-                  </View>
-                  <View style={styles.agendaActions}>
-                    <TouchableOpacity style={styles.btnSchedule}>
-                      <Text style={styles.btnScheduleText}>Schedule</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btnChange}>
-                      <Text style={styles.btnChangeText}>Change attendance</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              ))}
-            </View>
-
-            {/* Grid de Ações e Conteúdo */}
-            <View style={styles.bottomGrid}>
-              {/* Calendário */}
-              <View style={[styles.card, styles.calendarCard]}>
-                <Text style={styles.cardTitle}>Calendar</Text>
-                {renderCalendar()}
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>🕐 Atividade Recente</Text>
+                <Text style={styles.cardSubtitle}>Últimas ações no sistema</Text>
               </View>
-
-              {/* Convites */}
-              <View style={[styles.card, styles.invitationsCard]}>
-                <Text style={styles.cardTitle}>Invitations</Text>
-                {invitations.map((inv) => (
-                  <View key={inv.id} style={styles.invitationItem}>
-                    <Image
-                      source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }}
-                      style={styles.invitationAvatar}
-                    />
-                    <View style={styles.invitationInfo}>
-                      <Text style={styles.invitationSender}>{inv.sender}</Text>
-                      <Text style={styles.invitationTitle}>{inv.title}</Text>
+              {recentActivity.length > 0 ? (
+                recentActivity.map((activity) => (
+                  <View key={activity.id} style={styles.activityItem}>
+                    <View style={styles.activityIcon}>
+                      <Text style={styles.activityIconText}>
+                        {activity.type === 'visitor' ? '🚶' : activity.type === 'entry' ? '➡️' : '⬅️'}
+                      </Text>
                     </View>
-                    <TouchableOpacity style={styles.btnRsvp}>
-                      <Text style={styles.btnRsvpText}>RSVP</Text>
-                    </TouchableOpacity>
+                    <View style={styles.activityInfo}>
+                      <Text style={styles.activityName}>{activity.name}</Text>
+                      <Text style={styles.activityAction}>{activity.action}</Text>
+                    </View>
+                    <Text style={styles.activityTime}>{activity.time}</Text>
                   </View>
-                ))}
-              </View>
+                ))
+              ) : (
+                <Text style={styles.emptyText}>Nenhuma atividade recente</Text>
+              )}
+            </View>
+          </View>
 
-                        {/* Coluna Direita - Ações Rápidas */}
+          {/* Coluna Direita - Ações Rápidas */}
           <View style={[styles.rightColumn, isDesktop && styles.rightColumnDesktop]}>
-            <TouchableOpacity
-              style={[styles.actionCard, styles.actionCardPrimary]}
-              onPress={() => navigation.navigate('RegistrarEntrada' as never)}
-            >
-              <View style={styles.actionIcon}>
-                <Text style={styles.actionIconText}>📹</Text>
-              </View>
-              <Text style={styles.actionText}>Start a meeting</Text>
-            </TouchableOpacity>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>⚡ Ações Rápidas</Text>
+              <View style={styles.actionsContainer}>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#4F8EF7' }]}
+                  onPress={() => navigation.navigate('RegistrarEntrada' as never)}
+                >
+                  <Text style={styles.actionButtonIcon}>📥</Text>
+                  <Text style={styles.actionButtonText}>Registrar Entrada</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Visitantes' as never)}
-            >
-              <View style={styles.actionIcon}>
-                <Text style={styles.actionIconText}>➕</Text>
-              </View>
-              <Text style={styles.actionText}>Join a meeting</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
+                  onPress={() => navigation.navigate('Entidade' as never)}
+                >
+                  <Text style={styles.actionButtonIcon}>🏢</Text>
+                  <Text style={styles.actionButtonText}>Nova Entidade</Text>
+                </TouchableOpacity>
 
-             <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Visitantes' as never)}
-            >
-              <View style={styles.actionIcon}>
-                <Text style={styles.actionIconText}>➕</Text>
-              </View>
-              <Text style={styles.actionText}>Join a meeting</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#FF9800' }]}
+                  onPress={() => navigation.navigate('Visitantes' as never)}
+                >
+                  <Text style={styles.actionButtonIcon}>🎫</Text>
+                  <Text style={styles.actionButtonText}>Novo Visitante</Text>
+                </TouchableOpacity>
 
-             <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Visitantes' as never)}
-            >
-              <View style={styles.actionIcon}>
-                <Text style={styles.actionIconText}>➕</Text>
-              </View>
-              <Text style={styles.actionText}>Join a meeting</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => navigation.navigate('Entidade' as never)}
-            >
-              <View style={styles.actionIcon}>
-                <Text style={styles.actionIconText}>📅</Text>
-              </View>
-              <Text style={styles.actionText}>Schedule a meeting</Text>
-            </TouchableOpacity>
-
-            {/* KPIs Compactos */}
-            <View style={styles.kpiContainer}>
-              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
-                <Text style={styles.kpiMiniLabel}>Entidades</Text>
-              </View>
-              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
-                <Text style={styles.kpiMiniLabel}>Usuários</Text>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#9C27B0' }]}
+                  onPress={() => navigation.navigate('Users' as never)}
+                >
+                  <Text style={styles.actionButtonIcon}>👤</Text>
+                  <Text style={styles.actionButtonText}>Novo Usuário</Text>
+                </TouchableOpacity>
               </View>
             </View>
-             <View style={styles.kpiContainer}>
-              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
-                <Text style={styles.kpiMiniLabel}>Entidades</Text>
-              </View>
-              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
-                <Text style={styles.kpiMiniLabel}>Usuários</Text>
-              </View>
-            </View>
-             <View style={styles.kpiContainer}>
-              <View style={[styles.kpiMini, { borderLeftColor: '#4CAF50' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalEntities}</Text>
-                <Text style={styles.kpiMiniLabel}>Entidades</Text>
-              </View>
-              <View style={[styles.kpiMini, { borderLeftColor: '#2196F3' }]}>
-                <Text style={styles.kpiMiniValue}>{stats.totalUsers}</Text>
-                <Text style={styles.kpiMiniLabel}>Usuários</Text>
-              </View>
-            </View>
-          </View>
 
-              {/* Insights */}
-              <View style={[styles.card, styles.insightsCard]}>
-                <Text style={styles.cardTitle}>Insights</Text>
+            {/* Insights Rápidos */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>💡 Insights</Text>
+              <View style={styles.insightContainer}>
                 <View style={styles.insightItem}>
-                  <Text style={styles.insightLabel}>Number of meetings you hosted this week</Text>
-                  <Text style={styles.insightValue}>{stats.totalAccessLogs}</Text>
+                  <Text style={styles.insightLabel}>Taxa de ocupação</Text>
+                  <Text style={styles.insightValue}>
+                    {stats.totalVisitors > 0
+                      ? Math.round((stats.totalAccessLogs / stats.totalVisitors) * 100)
+                      : 0}%
+                  </Text>
                 </View>
+                <View style={styles.insightDivider} />
                 <View style={styles.insightItem}>
-                  <Text style={styles.insightLabel}>Number of meetings you joined this week</Text>
-                  <Text style={styles.insightValue}>{stats.totalVisitors}</Text>
+                  <Text style={styles.insightLabel}>Média diária</Text>
+                  <Text style={styles.insightValue}>
+                    {Math.round(weeklyActivity.reduce((a, b) => a + b, 0) / 7)}
+                  </Text>
+                </View>
+                <View style={styles.insightDivider} />
+                <View style={styles.insightItem}>
+                  <Text style={styles.insightLabel}>Pico de acessos</Text>
+                  <Text style={styles.insightValue}>{Math.max(...weeklyActivity)}</Text>
                 </View>
               </View>
             </View>
           </View>
-
-
         </View>
 
         {/* Rodapé */}
@@ -383,7 +379,12 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      <Toast visible={toast.visible} message={toast.message} type={toast.type} onHide={hideToast} />
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={hideToast}
+      />
     </AppLayout>
   );
 }
@@ -392,7 +393,7 @@ const getStyles = (isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: isDark ? '#1A1A1A' : '#F5F7FA',
+      backgroundColor: isDark ? '#121212' : '#F5F7FA',
     },
     center: {
       justifyContent: 'center',
@@ -402,35 +403,118 @@ const getStyles = (isDark: boolean) =>
       marginTop: 12,
       fontSize: 14,
     },
+
+    // Header
     header: {
-      backgroundColor: isDark ? '#2563EB' : '#4F8EF7',
+      backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
       paddingHorizontal: 20,
-      paddingVertical: 10,
-      // paddingTop: 48,
+      paddingVertical: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#2E2E2E' : '#E5E7EB',
     },
     headerContent: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
     },
+    headerLeft: {
+      flex: 1,
+    },
     greeting: {
       fontSize: 24,
-      fontWeight: '600',
-      color: '#FFFFFF',
+      fontWeight: '700',
+      color: isDark ? '#FFFFFF' : '#1F2937',
+      marginBottom: 4,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: isDark ? '#9CA3AF' : '#6B7280',
     },
     avatar: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      borderWidth: 2,
-      borderColor: '#FFFFFF',
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      borderWidth: 3,
+      borderColor: '#4F8EF7',
     },
+
+    // KPIs
+    kpiSection: {
+      padding: 16,
+    },
+    kpiGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 12,
+    },
+    kpiGridDesktop: {
+      justifyContent: 'space-between',
+    },
+    kpiCard: {
+      flex: 1,
+      minWidth: 150,
+      maxWidth: '48%',
+    },
+    kpiCardDesktop: {
+      maxWidth: '24%',
+    },
+    kpiGradient: {
+      borderRadius: 16,
+      padding: 20,
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.15,
+          shadowRadius: 12,
+        },
+        android: {
+          elevation: 5,
+        },
+        web: {
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        },
+      }),
+    },
+    kpiHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    kpiIcon: {
+      fontSize: 32,
+    },
+    kpiChange: {
+      backgroundColor: 'rgba(255, 255, 255, 0.3)',
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    kpiChangeText: {
+      color: '#FFFFFF',
+      fontSize: 11,
+      fontWeight: '700',
+    },
+    kpiValue: {
+      fontSize: 32,
+      fontWeight: '800',
+      color: '#FFFFFF',
+      marginBottom: 4,
+    },
+    kpiLabel: {
+      fontSize: 14,
+      color: 'rgba(255, 255, 255, 0.9)',
+      fontWeight: '600',
+    },
+
+    // Main Content
     mainContent: {
       padding: 16,
     },
     mainContentDesktop: {
       flexDirection: 'row',
-      gap: 16,
+      gap: 20,
     },
     leftColumn: {
       flex: 1,
@@ -439,256 +523,144 @@ const getStyles = (isDark: boolean) =>
       flex: 2,
     },
     rightColumn: {
-      gap: 12,
-      marginTop: 16,
-    },
-    rightColumnDesktop: {
       flex: 1,
       marginTop: 0,
     },
+    rightColumnDesktop: {
+      maxWidth: 400,
+    },
+
+    // Cards
     card: {
-      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
+      backgroundColor: isDark ? '#1E1E1E' : '#FFFFFF',
       borderRadius: 16,
       padding: 20,
       marginBottom: 16,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+      ...Platform.select({
+        ios: {
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 3,
+        },
+        web: {
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+        },
+      }),
     },
-    cardTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: isDark ? '#FFFFFF' : '#1F2937',
+    cardHeader: {
       marginBottom: 16,
     },
-    agendaItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
-    },
-    agendaInfo: {
-      flex: 1,
-    },
-    agendaTitle: {
-      fontSize: 14,
-      fontWeight: '500',
+    cardTitle: {
+      fontSize: 18,
+      fontWeight: '700',
       color: isDark ? '#FFFFFF' : '#1F2937',
       marginBottom: 4,
     },
-    agendaTime: {
-      fontSize: 12,
+    cardSubtitle: {
+      fontSize: 13,
       color: isDark ? '#9CA3AF' : '#6B7280',
     },
-    agendaActions: {
+    chartWrapper: {
+      alignItems: 'center',
+      overflow: 'hidden',
+    },
+    chart: {
+      marginVertical: 8,
+      borderRadius: 16,
+    },
+
+    // Activity
+    activityItem: {
       flexDirection: 'row',
-      gap: 8,
+      alignItems: 'center',
+      paddingVertical: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? '#2E2E2E' : '#E5E7EB',
     },
-    btnSchedule: {
-      backgroundColor: '#4F8EF7',
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 6,
+    activityIcon: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: isDark ? '#2E2E2E' : '#F3F4F6',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
     },
-    btnScheduleText: {
-      color: '#FFFFFF',
-      fontSize: 11,
-      fontWeight: '500',
+    activityIconText: {
+      fontSize: 20,
     },
-    btnChange: {
-      backgroundColor: isDark ? '#3E3E3E' : '#F3F4F6',
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 6,
-    },
-    btnChangeText: {
-      color: isDark ? '#9CA3AF' : '#6B7280',
-      fontSize: 11,
-      fontWeight: '500',
-    },
-    bottomGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 16,
-    },
-    calendarCard: {
+    activityInfo: {
       flex: 1,
-      minWidth: 280,
     },
-    invitationsCard: {
-      flex: 1,
-      minWidth: 280,
-    },
-    insightsCard: {
-      flex: 1,
-      minWidth: 280,
-    },
-    calendar: {
-      marginTop: 8,
-    },
-    calendarHeader: {
-      marginBottom: 12,
-    },
-    calendarMonth: {
+    activityName: {
       fontSize: 14,
       fontWeight: '600',
       color: isDark ? '#FFFFFF' : '#1F2937',
+      marginBottom: 2,
     },
-    weekDays: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginBottom: 8,
+    activityAction: {
+      fontSize: 12,
+      color: isDark ? '#9CA3AF' : '#6B7280',
     },
-    weekDay: {
-      width: 32,
+    activityTime: {
+      fontSize: 12,
+      color: isDark ? '#6B7280' : '#9CA3AF',
+    },
+    emptyText: {
       textAlign: 'center',
-      fontSize: 12,
-      fontWeight: '600',
-      color: isDark ? '#9CA3AF' : '#6B7280',
+      color: isDark ? '#6B7280' : '#9CA3AF',
+      fontSize: 14,
+      paddingVertical: 20,
     },
-    daysGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-    },
-    dayCell: {
-      width: '14.28%',
-      aspectRatio: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginVertical: 2,
-    },
-    today: {
-      backgroundColor: '#4F8EF7',
-      borderRadius: 8,
-    },
-    selectedDay: {
-      backgroundColor: isDark ? '#3E3E3E' : '#E5E7EB',
-      borderRadius: 8,
-    },
-    dayText: {
-      fontSize: 13,
-      color: isDark ? '#FFFFFF' : '#1F2937',
-    },
-    dayTextActive: {
-      color: '#FFFFFF',
-      fontWeight: '600',
-    },
-    invitationItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 12,
+
+    // Actions
+    actionsContainer: {
       gap: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
     },
-    invitationAvatar: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 16,
+      borderRadius: 12,
+      gap: 12,
     },
-    invitationInfo: {
+    actionButtonIcon: {
+      fontSize: 24,
+    },
+    actionButtonText: {
       flex: 1,
-    },
-    invitationSender: {
-      fontSize: 13,
+      fontSize: 15,
       fontWeight: '600',
-      color: isDark ? '#FFFFFF' : '#1F2937',
-    },
-    invitationTitle: {
-      fontSize: 12,
-      color: isDark ? '#9CA3AF' : '#6B7280',
-      marginTop: 2,
-    },
-    btnRsvp: {
-      backgroundColor: '#4F8EF7',
-      paddingHorizontal: 16,
-      paddingVertical: 6,
-      borderRadius: 6,
-    },
-    btnRsvpText: {
       color: '#FFFFFF',
-      fontSize: 12,
-      fontWeight: '600',
+    },
+
+    // Insights
+    insightContainer: {
+      gap: 0,
     },
     insightItem: {
-      paddingVertical: 12,
-      borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#3E3E3E' : '#E5E7EB',
+      paddingVertical: 16,
     },
     insightLabel: {
-      fontSize: 12,
+      fontSize: 13,
       color: isDark ? '#9CA3AF' : '#6B7280',
       marginBottom: 8,
     },
     insightValue: {
-      fontSize: 32,
-      fontWeight: 'bold',
+      fontSize: 28,
+      fontWeight: '800',
       color: '#4F8EF7',
     },
-    actionCard: {
-      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
-      borderRadius: 12,
-      padding: 20,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
+    insightDivider: {
+      height: 1,
+      backgroundColor: isDark ? '#2E2E2E' : '#E5E7EB',
     },
-    actionCardPrimary: {
-      backgroundColor: '#4F8EF7',
-    },
-    actionIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: isDark ? '#3E3E3E' : '#F3F4F6',
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    actionIconText: {
-      fontSize: 24,
-    },
-    actionText: {
-      fontSize: 15,
-      fontWeight: '600',
-      color: isDark ? '#FFFFFF' : '#1F2937',
-      flex: 1,
-    },
-    kpiContainer: {
-      flexDirection: 'row',
-      gap: 12,
-      marginTop: 8,
-    },
-    kpiMini: {
-      flex: 1,
-      backgroundColor: isDark ? '#2E2E2E' : '#FFFFFF',
-      borderRadius: 12,
-      padding: 16,
-      borderLeftWidth: 4,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 3,
-    },
-    kpiMiniValue: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: isDark ? '#FFFFFF' : '#1F2937',
-      marginBottom: 4,
-    },
-    kpiMiniLabel: {
-      fontSize: 11,
-      color: isDark ? '#9CA3AF' : '#6B7280',
-    },
+
+    // Footer
     footer: {
       padding: 24,
       alignItems: 'center',

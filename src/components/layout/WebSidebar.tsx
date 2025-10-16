@@ -79,7 +79,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({ theme, onThemeChange }) 
     action.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const sidebarWidth = isHovered ? 280 : 60;
+  const sidebarWidth = isHovered ? 280 : 35;
 
   const handleLogout = () => {
     logout();
@@ -116,7 +116,7 @@ export const WebSidebar: React.FC<WebSidebarProps> = ({ theme, onThemeChange }) 
           left: 0,
           bottom: 0,
           paddingTop: 20,
-          paddingLeft: 10,
+          paddingLeft: 5,
           paddingRight: 10,
           backgroundColor: currentTheme === 'dark' ? appTheme.backgroundSecondary : appTheme.backgroundCard,
           boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',

@@ -40,7 +40,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
           style={[
             styles.content,
             {
-              paddingLeft: deviceType.isDesktop ? (sidebarOpen ? 60 : 60) : 0,
+              paddingLeft: deviceType.isDesktop ? (sidebarOpen ? 60 : 50) : 0,
             },
           ]}
         >
@@ -76,7 +76,7 @@ const getStyles = (isDark: boolean) =>
       backgroundColor: isDark ? '#1a1a1a' : '#f5f5f5',
       flexDirection: 'row',
       overflow: 'hidden',
-      paddingLeft: deviceType.isDesktop ? 10 : 0,
+      paddingLeft: deviceType.isDesktop ? 0 : 0,
     },
     content: {
       flex: 1,
